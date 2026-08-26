@@ -36,9 +36,17 @@ sudo zypper in systemd-zram-service
 sudo systemctl enable --now zramswap.service
 ```
 
+### `sudo` without password
+
+Edit `sudoers` file using `sudo EDITOR=nano visudo` and add line for your user:
+
+```
+your_username ALL=(ALL) NOPASSWD: ALL
+```
+
 ## Config
 
-### Linking hte config
+### Linking the config
 
 ```bash
 rm ~/.config/hypr
