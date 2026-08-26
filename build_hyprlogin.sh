@@ -102,4 +102,4 @@ fi
 log "Done. Binary: ${PREFIX}/bin/hyprlogin"
 log "Example greeter Hyprland config: ${PREFIX}/share/hyprlogin/hyprland-greeter.conf"
 log "Example greetd config: ${PREFIX}/share/hyprlogin/greetd-config.toml"
-log "To boot into hyprlogin after LUKS unlock, run: ${SCRIPT_DIR}/setup_greetd.sh"
+log "Configure greetd by hand; see ${SCRIPT_DIR}/README.md"

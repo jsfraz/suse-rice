@@ -3,8 +3,7 @@
 ## Dependencies
 
 - git
-- [uwsm](https://wiki.hypr.land/Useful-Utilities/Systemd-start/#uwsm)
-- [hyprland](https://github.com/hyprwm/Hyprland)
+- [hyprland](https://github.com/hyprwm/Hyprland) (+`hyprland-guiutils`)
 - [greetd](https://sr.ht/~kennylevinsen/greetd/)
 - [hyprlogin](https://github.com/AuthenticSm1les/hyprlogin)
 
@@ -16,11 +15,11 @@
 
 ### [Move Docker data](https://evodify.com/change-docker-storage-location/) to `/home`
 
-Edit `/etc/docker/daemon.json` (don't forget to change user):
+Edit `/etc/docker/daemon.json` (**change username to your user!**):
 
 ```json
 {
-  "data-root": "/home/user/.docker_data"
+  "data-root": "/home/razj/.docker_data"
 }
 ```
 
@@ -39,29 +38,43 @@ sudo systemctl enable --now zramswap.service
 
 ## Config
 
-### Hyprland
+### Linking hte config
 
-After LUKS unlock the machine must boot `graphical.target` so greetd can
-replace `getty@tty1` and show `hyprlogin`.
-`systemctl enable greetd.service` alone is not enough: openSUSE defaults to
-`multi-user.target`, which leaves a login prompt on VT1.
+```bash
+rm ~/.config/hypr
+rm ~/.config/hyprlogin
+ln -sf $PWD/.config/hypr ~/.config/hypr
+ln -sf $PWD/.config/hyprlogin ~/.config/hyprlogin
+```
+
+### Hyprland / greetd / hyprlogin
+
+The greeter session runs as user `greeter`, which cannot read `$HOME`. Put
+greeter configs in `/etc/hyprlogin/`, not under `/home`.
 
 ```bash
 ./build_hyprlogin.sh
-./setup_greetd.sh
+sudo usermod -aG video,render greeter
+sudo install -Dm644 ~/.config/hyprlogin/hyprland-greeter.lua /etc/hyprlogin/hyprland-greeter.lua
+sudo install -Dm644 ~/.config/hyprlogin/hyprlogin.lua /etc/hyprlogin/hyprlogin.lua
 ```
 
-Then reboot. Do not `systemctl start greetd` from an already logged-in TTY:
-greetd conflicts with `getty@tty1`.
+> Set `sessions:default_user` in [hyprlogin.lua](.config/hyprlogin/hyprlogin.lua) before installing.
 
-`setup_greetd.sh` installs `config/greetd/config.toml` and
-`config/hyprlogin/hyprland-greeter.conf`, enables greetd as the display
-manager, sets `graphical.target`, and prefills hyprlogin with your user and
-the Hyprland session. It does **not** add greetd `[initial_session]`, so the
-desktop is not skipped — only the TTY login is.
+Edit `/etc/greetd/config.toml`:
 
-Check without changing anything:
+```toml
+[terminal]
+vt = 1
+
+[default_session]
+command = "start-hyprland -- --config /etc/hyprlogin/hyprland-greeter.lua"
+user = "greeter"
+```
 
 ```bash
-./setup_greetd.sh --verify-only
+sudo systemctl enable greetd.service
+sudo systemctl set-default graphical.target
 ```
+
+Then reboot.
