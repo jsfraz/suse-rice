@@ -2,6 +2,5 @@
 /hyprlogin/
 
 # Generated config
-.config/starship.toml
-.config/fastfetch/config.jsonc
-.config/btop/themes/matugen.theme
+.config/hypr/colors.lua
+.config/kitty/colors.conf

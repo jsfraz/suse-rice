@@ -2,12 +2,14 @@
 
 ## Dependencies
 
-- git
+- [git](https://git-scm.com/)
 - [hyprland](https://github.com/hyprwm/Hyprland) (+`hyprland-guiutils`)
 - [greetd](https://sr.ht/~kennylevinsen/greetd/)
 - [hyprlogin](https://github.com/AuthenticSm1les/hyprlogin)
-- [FiraCode Nerd Font](https://www.nerdfonts.com)
+- [wayvnc](https://github.com/any1/wayvnc)
 - [matugen](https://github.com/InioX/matugen)
+- [FiraCode Nerd Font](https://www.nerdfonts.com)
+- [kitty](https://github.com/kovidgoyal/kitty)
 - [starship](https://github.com/starship/starship)
 - [fastfetch](https://github.com/fastfetch-cli/fastfetch)
 - [btop](https://github.com/aristocratos/btop)
@@ -54,12 +56,14 @@ your_username ALL=(ALL) NOPASSWD: ALL
 ### Linking the config
 
 ```bash
-rm ~/.config/hypr
-rm ~/.config/hyprlogin
-rm ~/.config/matugen
+rm -r ~/.config/hypr
+rm -r ~/.config/hyprlogin
+rm -r ~/.config/matugen
+rm -r ~/.config/kitty
 ln -sf $PWD/.config/hypr ~/.config/hypr
 ln -sf $PWD/.config/hyprlogin ~/.config/hyprlogin
 ln -sf $PWD/.config/matugen ~/.config/matugen
+ln -sf $PWD/.config/kitty ~/.config/kitty
 ```
 
 ### Hyprland / greetd / hyprlogin
@@ -94,7 +98,18 @@ sudo systemctl set-default graphical.target
 
 Then reboot.
 
-# starship
+### wayvnc
+
+Hyprland starts wayvnc on `0.0.0.0:5900` without TLS (`-r` draws the cursor into the stream). This is unencrypted on the LAN. Do not expose port 5900 to the internet.
+
+Allow the port in firewalld (`--reload` is required after `--permanent`):
+
+```bash
+sudo firewall-cmd --permanent --add-port=5900/tcp
+sudo firewall-cmd --reload
+```
+
+### starship
 
 Add the following to the end of ~/.bashrc:
 
@@ -114,6 +129,6 @@ if [ ! "$(tty)" = "/dev/tty1" ]; then
 fi
 ```
 
-## btop
+### btop
 
 After generating theme using `matugen`, choose it from `btop` settings.
