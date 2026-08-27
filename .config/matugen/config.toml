@@ -15,6 +15,16 @@ block_postfix = "*>"
 input_path = "~/.config/matugen/templates/hyprland.lua"
 output_path = "~/.config/hypr/colors.lua"
 
+[templates.hyprlogin]
+input_path = "~/.config/matugen/templates/hyprland.lua"
+output_path = "~/.config/hyprlogin/colors.lua"
+post_hook = "sudo install -Dm644 ~/.config/hyprlogin/colors.lua /etc/hyprlogin/colors.lua"
+
+[templates.hyprlogin_conf]
+input_path = "~/.config/matugen/templates/hyprlogin.conf"
+output_path = "~/.config/hyprlogin/colors.conf"
+post_hook = "sudo install -Dm644 ~/.config/hyprlogin/colors.conf /etc/hyprlogin/colors.conf"
+
 [templates.kitty]
 input_path = "~/.config/matugen/templates/kitty.conf"
 output_path = "~/.config/kitty/colors.conf"

@@ -75,10 +75,13 @@ greeter configs in `/etc/hyprlogin/`, not under `/home`.
 ./build_hyprlogin.sh
 sudo usermod -aG video,render greeter
 sudo install -Dm644 ~/.config/hyprlogin/hyprland-greeter.lua /etc/hyprlogin/hyprland-greeter.lua
-sudo install -Dm644 ~/.config/hyprlogin/hyprlogin.lua /etc/hyprlogin/hyprlogin.lua
+sudo install -Dm644 ~/.config/hyprlogin/hyprlogin.conf /etc/hyprlogin/hyprlogin.conf
+sudo install -Dm644 ~/.config/hyprlogin/colors.lua /etc/hyprlogin/colors.lua
+sudo install -Dm644 ~/.config/hyprlogin/colors.conf /etc/hyprlogin/colors.conf
 ```
 
-> Set `sessions:default_user` in [hyprlogin.lua](.config/hyprlogin/hyprlogin.lua) before installing.
+> Set `sessions:default_user` in [hyprlogin.conf](.config/hyprlogin/hyprlogin.conf) and [hyprlogin.lua](.config/hyprlogin/hyprlogin.lua) before installing.
+> `matugen` copies `colors.lua` / `colors.conf` into `/etc/hyprlogin/` via `sudo` (needed because the greeter cannot read `$HOME`).
 
 Edit `/etc/greetd/config.toml`:
 
