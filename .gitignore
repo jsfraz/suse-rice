@@ -3,6 +3,5 @@
 
 # Generated config
 .config/hypr/colors.lua
-.config/hyprlogin/colors.lua
 .config/hyprlogin/colors.conf
 .config/kitty/colors.conf
