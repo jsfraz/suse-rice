@@ -11,10 +11,8 @@
 -- Please note not all available settings / options are set here.
 -- For a full list, see the wiki
 
--- You can (and should!!) split this configuration into multiple files
--- Create your files separately and then require them like this:
--- require("myColors")
-
+-- Split config: generated palette from matugen
+local colors = require("colors")
 
 ------------------
 ---- MONITORS ----
@@ -25,7 +23,7 @@ hl.monitor({
     output   = "",
     mode     = "preferred",
     position = "auto",
-    scale    = "auto",
+    scale    = 1,
 })
 
 
@@ -88,13 +86,13 @@ hl.env("HYPRCURSOR_SIZE", "24")
 hl.config({
     general = {
         gaps_in  = 5,
-        gaps_out = 20,
+        gaps_out = 15,
 
-        border_size = 2,
+        border_size = 1,
 
         col = {
-            active_border   = { colors = {"rgba(33ccffee)", "rgba(00ff99ee)"}, angle = 45 },
-            inactive_border = "rgba(595959aa)",
+            active_border   = { colors = { colors.active_border, colors.active_border_alt }, angle = 45 },
+            inactive_border = colors.inactive_border,
         },
 
         -- Set to true to enable resizing windows by clicking and dragging on borders and gaps
@@ -118,13 +116,13 @@ hl.config({
             enabled      = true,
             range        = 4,
             render_power = 3,
-            color        = 0xee1a1a1a,
+            color        = colors.window_shadow,
         },
 
         blur = {
             enabled   = true,
             size      = 3,
-            passes    = 1,
+            passes    = 2,
             vibrancy  = 0.1696,
         },
     },
