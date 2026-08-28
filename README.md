@@ -1,5 +1,7 @@
 # suse-rice
 
+[![wakatime](https://wakatime.com/badge/user/992c0ad1-7dae-4115-9198-1ba533452d32/project/419b7c20-068d-40d9-b9d9-2fecfa2b4968.svg)](https://wakatime.com/badge/user/992c0ad1-7dae-4115-9198-1ba533452d32/project/419b7c20-068d-40d9-b9d9-2fecfa2b4968)
+
 ## Dependencies
 
 - [git](https://git-scm.com/)
