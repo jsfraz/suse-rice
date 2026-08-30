@@ -35,7 +35,7 @@ hl.monitor({
 local terminal    = "kitty"
 local fileManager = "dolphin"
 -- TODO icons
-local menu        = "rofi -show combi -combi-modes \"drun,ssh\" -modes combi -theme ~/.config/rofi/launcher.rasi -show-icons -icon-theme $(echo none)"
+local menu        = "rofi -show combi -combi-modes \"drun,ssh\" -modes combi -theme ~/.config/rofi/launcher.rasi -show-icons -icon-theme crystal-remix-blue"
 
 
 -------------------
@@ -90,7 +90,7 @@ hl.config({
         gaps_in  = 5,
         gaps_out = 15,
 
-        border_size = 1,
+        border_size = 2,
 
         col = {
             active_border   = { colors = { colors.active_border } },
@@ -107,25 +107,26 @@ hl.config({
     },
 
     decoration = {
-        rounding       = 10,
+        rounding       = 18,
         rounding_power = 2,
 
-        -- Change transparency of focused and unfocused windows
+        -- Focused apps stay solid; inactive ones recede slightly
         active_opacity   = 1.0,
-        inactive_opacity = 1.0,
+        inactive_opacity = 0.92,
 
         shadow = {
             enabled      = true,
-            range        = 4,
-            render_power = 3,
+            range        = 28,
+            render_power = 2,
+            offset       = { 0, 8 },
             color        = colors.window_shadow,
         },
 
         blur = {
             enabled   = true,
-            size      = 8,
-            passes    = 3,
-            vibrancy  = 0.35,
+            size      = 12,
+            passes    = 4,
+            vibrancy  = 0.45,
             popups    = true,
         },
     },
@@ -208,8 +209,9 @@ hl.config({
 
 hl.config({
     misc = {
-        force_default_wallpaper = -1,    -- Set to 0 or 1 to disable the anime mascot wallpapers
-        disable_hyprland_logo   = false, -- If true disables the random hyprland logo / anime girl background. :(
+        force_default_wallpaper = 0,
+        disable_hyprland_logo   = true,
+        background_color        = colors.bg_color,
     },
 })
 
@@ -339,6 +341,13 @@ hl.window_rule({
     },
 
     no_focus = true,
+})
+
+-- Qt draws a client-side shadow in the surface; Hyprland would add a second one
+hl.window_rule({
+    name  = "dolphin-no-double-shadow",
+    match = { class = "^org\\.kde\\.dolphin$", float = true },
+    no_shadow = true,
 })
 
 -- Frosted glass behind Rofi (layer-shell, not a regular window)

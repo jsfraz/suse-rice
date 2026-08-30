@@ -10,7 +10,21 @@ $character"""
 palette = 'colors'
 
 [palettes.colors]
-primary = '{{colors.source_color.default.hex}}'
+<* if {{ is_dark_mode }} *>
+primary = '{{ colors.primary.default.hex | set_saturation: 80.0 | set_lightness: 55.0 }}'
+secondary = '{{ colors.primary.default.hex | set_hue: 185.0 | set_saturation: 82.0 | set_lightness: 50.0 }}'
+tertiary = '{{ colors.primary.default.hex | set_hue: 140.0 | set_saturation: 78.0 | set_lightness: 48.0 }}'
+accent = '{{ colors.primary.default.hex | set_hue: 48.0 | set_saturation: 90.0 | set_lightness: 54.0 }}'
+on_surface = '{{ colors.on_surface.default.hex }}'
+fail = '{{ colors.primary.default.hex | set_hue: 8.0 | set_saturation: 88.0 | set_lightness: 52.0 }}'
+<* else *>
+primary = '{{ colors.primary.default.hex | set_saturation: 86.0 | set_lightness: 40.0 }}'
+secondary = '{{ colors.primary.default.hex | set_hue: 185.0 | set_saturation: 82.0 | set_lightness: 30.0 }}'
+tertiary = '{{ colors.primary.default.hex | set_hue: 148.0 | set_saturation: 88.0 | set_lightness: 28.0 }}'
+accent = '{{ colors.primary.default.hex | set_hue: 36.0 | set_saturation: 90.0 | set_lightness: 36.0 }}'
+on_surface = '{{ colors.on_surface.default.hex | set_lightness: 12.0 }}'
+fail = '{{ colors.primary.default.hex | set_hue: 8.0 | set_saturation: 86.0 | set_lightness: 42.0 }}'
+<* endif *>
 
 [aws]
 symbol = "  "
@@ -65,7 +79,7 @@ format = '\[[$symbol($version)]($style)\]'
 
 [directory]
 read_only = " 󰌾"
-style = 'bold fg'
+style = 'bold secondary'
 
 [docker_context]
 symbol = " "
@@ -99,9 +113,11 @@ format = '\[[$symbol$account(@$domain)(\($region\))]($style)\]'
 
 [git_branch]
 symbol = " "
+style = 'bold tertiary'
 format = '\[[$symbol$branch]($style)\]'
 
 [git_status]
+style = 'bold accent'
 format = '([\[$all_status$ahead_behind\]]($style))'
 
 [git_commit]
@@ -304,6 +320,10 @@ format = '\[[$time]($style)\]'
 disabled = false
 show_always = true
 format = '[$user](bold primary)'
+
+[character]
+success_symbol = '[❯](bold primary)'
+error_symbol = '[❯](bold fail)'
 
 [vagrant]
 format = '\[[$symbol($version)]($style)\]'

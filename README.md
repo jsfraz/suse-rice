@@ -17,6 +17,9 @@
 - [starship](https://github.com/starship/starship)
 - [fastfetch](https://github.com/fastfetch-cli/fastfetch)
 - [btop](https://github.com/aristocratos/btop)
+- [rofi](https://github.com/davatorium/rofi)
+- [dolphin](https://apps.kde.org/dolphin/) (`qt6-wayland`, `libxcb-cursor0`)
+- [Crystal Remix icon theme — color variants](https://github.com/jsfraz/crystal-remix-icon-theme-color-variants)
 
 ## Recommanded installation setup
 - disk encryption + verification using **Only password** method
@@ -78,6 +81,7 @@ The greeter session runs as user `greeter`, which cannot read `$HOME`. Put
 greeter configs in `/etc/hyprlogin/`, not under `/home`.
 
 ```bash
+chmod +x build_hyprlogin.sh
 ./build_hyprlogin.sh
 sudo usermod -aG video,render greeter
 sudo install -Dm644 ~/.config/hyprlogin/hyprland-greeter.lua /etc/hyprlogin/hyprland-greeter.lua
@@ -140,3 +144,15 @@ fi
 ### btop
 
 After generating theme using `matugen`, choose it from `btop` settings.
+
+### Crystal Remix icon theme — color variants
+
+Clones [crystal-remix-icon-theme-color-variants](https://github.com/jsfraz/crystal-remix-icon-theme-color-variants) and builds every accent (`./build.sh all`). Themes install to `~/.local/share/icons/crystal-remix-<color>/`.
+
+```bash
+chmod +x ./build_crystal_remix.sh
+./build_crystal_remix.sh
+
+gsettings set org.gnome.desktop.interface icon-theme 'crystal-remix-blue'
+kwriteconfig6 --file kdeglobals --group Icons --key Theme crystal-remix-blue
+```

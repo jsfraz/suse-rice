@@ -5,7 +5,8 @@
 
 local ok, colors = pcall(require, "colors")
 if not ok then
-    colors = { bg_color = "rgba(111111ff)" }
+    -- Tinted teal, not flat grey — used only when matugen palette is missing
+    colors = { bg_color = "rgba(0d3340ff)" }
 end
 
 hl.monitor({
