@@ -1,6 +1,5 @@
 /**
- * Frutiger Aero launcher — frosted glass, gel capsules, inner highlights.
- * Palette: matugen → colors.rasi (same derivation as kitty colors.conf).
+ * Frosted Aero launcher — kitty-matched glass, gel tiles, matugen light/dark.
  **/
 
 /*****----- Configuration -----*****/
@@ -8,9 +7,9 @@ configuration {
     modi:                       "combi";
     combi-modi:                 "drun,ssh";
     show-icons:                 true;
-    display-combi:              "⌕";
-    display-drun:               "⌕";
-    display-ssh:                "›";
+    display-combi:              "";
+    display-drun:               "";
+    display-ssh:                "";
     drun-display-format:        "{name}";
     /* Wheel follows the row (L→R), not the column. */
     ml-row-up:                  "";
@@ -28,7 +27,7 @@ configuration {
     font:                        "Source Sans 3 13";
 }
 
-/*****----- Main Window -----*****/
+/*****----- Main Window (glass frame) -----*****/
 window {
     transparency:                "real";
     location:                    center;
@@ -42,43 +41,54 @@ window {
     margin:                      0px;
     padding:                     0px;
     border:                      2px 1px 1px 1px;
-    border-radius:               28px;
+    border-radius:               16px;
     border-color:                @rim;
     background-color:            @glass;
     background-image:            @gloss-window;
     cursor:                      "default";
 }
 
-/*****----- Main Box -----*****/
+/*****----- Main Box (inner white highlight) -----*****/
 mainbox {
     enabled:                     true;
-    spacing:                     18px;
-    margin:                      0px;
-    padding:                     22px;
-    border:                      0px;
-    border-radius:               0px;
+    spacing:                     8px;
+    margin:                      2px;
+    padding:                     8px 8px 10px 8px;
+    border:                      1px;
+    border-radius:               14px;
+    border-color:                @rim;
     background-color:            transparent;
-    children:                    [ "inputbar", "listview" ];
+    children:                    [ "inputbar", "message", "body" ];
 }
 
-/*****----- Inputbar -----*****/
+/*****----- Inputbar (Aero search field) -----*****/
 inputbar {
     enabled:                     true;
-    spacing:                     12px;
+    expand:                      false;
+    spacing:                     8px;
     margin:                      0px;
-    padding:                     14px 22px;
-    border:                      2px 1px 1px 1px;
-    border-radius:               28px;
+    padding:                     8px 12px;
+    border:                      1px;
+    border-radius:               12px;
     border-color:                @rim-input;
     background-color:            @glass-input;
     background-image:            @gloss-input;
     text-color:                  @foreground;
-    children:                    [ "prompt", "entry" ];
+    children:                    [ "textbox-icon", "entry" ];
 }
 
+textbox-icon {
+    enabled:                     true;
+    expand:                      false;
+    str:                         "⌕";
+    font:                        "Source Sans 3 14";
+    background-color:            transparent;
+    text-color:                  @accent;
+    vertical-align:              0.5;
+}
 prompt {
     enabled:                     true;
-    font:                        "Source Sans 3 16";
+    font:                        "Source Sans 3 14";
     background-color:            transparent;
     text-color:                  @accent;
     vertical-align:              0.5;
@@ -100,6 +110,22 @@ entry {
     cursor-color:                @accent;
 }
 
+/*****----- Body (window-body surface) -----*****/
+body {
+    enabled:                     true;
+    expand:                      true;
+    orientation:                 vertical;
+    spacing:                     0px;
+    margin:                      0px;
+    padding:                     8px;
+    border:                      1px;
+    border-radius:               10px;
+    border-color:                @rim;
+    background-color:            @body;
+    background-image:            @gloss-body;
+    children:                    [ "listview" ];
+}
+
 /*****----- Listview -----*****/
 listview {
     enabled:                     true;
@@ -114,9 +140,9 @@ listview {
     fixed-height:                true;
     fixed-columns:               true;
 
-    spacing:                     12px;
+    spacing:                     8px;
     margin:                      0px;
-    padding:                     4px;
+    padding:                     2px;
     border:                      0px;
     border-radius:               0px;
     background-color:            transparent;
@@ -126,18 +152,18 @@ listview {
 scrollbar {
     handle-width:                6px;
     handle-color:                @scrollbar;
-    border-radius:               6px;
+    border-radius:               3px;
     background-color:            @tile;
 }
 
-/*****----- Elements -----*****/
+/*****----- Elements (Aero gel buttons) -----*****/
 element {
     enabled:                     true;
-    spacing:                     10px;
+    spacing:                     8px;
     margin:                      0px;
-    padding:                     16px 8px 12px 8px;
+    padding:                     14px 8px 10px 8px;
     border:                      1px;
-    border-radius:               22px;
+    border-radius:               8px;
     border-color:                @rim-tile;
     background-color:            @tile;
     background-image:            @gloss-tile;
@@ -155,24 +181,24 @@ element alternate.normal {
 element selected.normal {
     background-color:            @gel;
     background-image:            @gloss-gel;
-    border:                      3px 1px 1px 1px;
-    border-radius:               22px;
+    border:                      2px 1px 1px 1px;
+    border-radius:               8px;
     border-color:                @rim-gel;
     text-color:                  @gel-text;
 }
 element selected.urgent {
     background-color:            @gel-urgent;
     background-image:            @gloss-gel;
-    border:                      3px 1px 1px 1px;
-    border-radius:               22px;
+    border:                      2px 1px 1px 1px;
+    border-radius:               8px;
     border-color:                @rim-gel;
     text-color:                  @gel-urgent-text;
 }
 element selected.active {
     background-color:            @gel-active;
     background-image:            @gloss-gel;
-    border:                      3px 1px 1px 1px;
-    border-radius:               22px;
+    border:                      2px 1px 1px 1px;
+    border-radius:               8px;
     border-color:                @rim-gel;
     text-color:                  @gel-active-text;
 }
@@ -194,10 +220,19 @@ element-text {
 }
 
 /*****----- Message -----*****/
+message {
+    enabled:                     true;
+    margin:                      0px;
+    padding:                     8px 12px;
+    border:                      1px;
+    border-radius:               10px;
+    background-image:            @gloss-body;
+    text-color:                  @foreground;
+}
 error-message {
-    padding:                     16px 20px;
-    border:                      2px 1px 1px 1px;
-    border-radius:               16px;
+    padding:                     12px 16px;
+    border:                      1px;
+    border-radius:               8px;
     border-color:                @rim;
     background-color:            @error-glass;
     background-image:            @gloss-window;

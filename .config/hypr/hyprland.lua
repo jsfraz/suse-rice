@@ -355,7 +355,7 @@ hl.layer_rule({
     name         = "rofi-glass",
     match        = { namespace = "rofi" },
     blur         = true,
-    ignore_alpha = 0.2,
+    ignore_alpha = 0.1,
     animation    = "popin",
 })
 
