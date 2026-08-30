@@ -5,7 +5,7 @@
 ## Dependencies
 
 - [git](https://git-scm.com/)
-- [hyprland](https://github.com/hyprwm/Hyprland) (+`hyprland-guiutils`)
+- [hyprland](https://github.com/hyprwm/Hyprland) (`hyprland-guiutils`)
 - [hyprpaper](https://github.com/hyprwm/hyprpaper)
 - [golang 1.27.0](https://go.dev/dl/)
 - [rcm](rcm/README.md)
@@ -15,6 +15,7 @@
 - [hyprlogin](https://github.com/AuthenticSm1les/hyprlogin)
 - [wayvnc](https://github.com/any1/wayvnc)
 - [matugen](https://github.com/InioX/matugen)
+- [python-pillow](https://pypi.org/project/pillow/) package
 - [FiraCode Nerd Font](https://www.nerdfonts.com)
 - [kitty](https://github.com/kovidgoyal/kitty)
 - [starship](https://github.com/starship/starship)
@@ -23,6 +24,7 @@
 - [rofi](https://github.com/davatorium/rofi)
 - [dolphin](https://apps.kde.org/dolphin/) (`qt6-wayland`, `libxcb-cursor0`)
 - [Crystal Remix icon theme — color variants](https://github.com/jsfraz/crystal-remix-icon-theme-color-variants)
+- [darkman](https://gitlab.com/WhyNotHugo/darkman)
 
 ## Recommanded installation setup
 - disk encryption + verification using **Only password** method
@@ -71,11 +73,15 @@ rm -r ~/.config/hyprlogin
 rm -r ~/.config/matugen
 rm -r ~/.config/kitty
 rm -r ~/.config/rofi
+rm -r ~/.config/darkman
+rm -r ~/.local/share/darkman
 ln -sf $PWD/.config/hypr ~/.config/hypr
 ln -sf $PWD/.config/hyprlogin ~/.config/hyprlogin
 ln -sf $PWD/.config/matugen ~/.config/matugen
 ln -sf $PWD/.config/kitty ~/.config/kitty
 ln -sf $PWD/.config/rofi ~/.config/rofi
+ln -sf $PWD/.config/darkman ~/.config/darkman
+ln -sf $PWD/.local/share/darkman ~/.local/share/darkman
 ```
 
 ### Hyprland / greetd / hyprlogin
@@ -89,7 +95,8 @@ chmod +x build_hyprlogin.sh
 sudo usermod -aG video,render greeter
 sudo install -Dm644 ~/.config/hyprlogin/hyprland-greeter.lua /etc/hyprlogin/hyprland-greeter.lua
 sudo install -Dm644 ~/.config/hyprlogin/hyprlogin.conf /etc/hyprlogin/hyprlogin.conf
-matugen
+chmod +x ~/.config/matugen/matugen.sh
+chmod +x ~/.config/matugen/color_utils.py
 ```
 
 > Set `sessions:default_user` in [hyprlogin.conf](.config/hyprlogin/hyprlogin.conf) before installing.
@@ -118,8 +125,8 @@ Then reboot.
 A tool for managing SwayWM rice environment configuration. To install `rcm`, run the following command:
 
 ```bash
-chmod +x ./install_rcm.sh
-./install_rcm.sh
+chmod +x ./build_rcm.sh
+./build_rcm.sh
 ```
 
 The script compiles as your user (so it finds `go` on your PATH) and asks for sudo only to install into `/usr/local/bin`.
@@ -164,6 +171,19 @@ After generating theme using `matugen`, choose it from `btop` settings.
 Clones [crystal-remix-icon-theme-color-variants](https://github.com/jsfraz/crystal-remix-icon-theme-color-variants) and builds every accent (`./build.sh all`). Themes install to `~/.local/share/icons/crystal-remix-<color>/`.
 
 ```bash
-chmod +x ./build_crystal_remix.sh
-./build_crystal_remix.sh
+chmod +x ./install_crystal_remix.sh
+./install_crystal_remix.sh
 ```
+
+### darkman
+
+To manage dark/light themes automatically based on the time of day. Install using:
+
+```bash
+chmod +x ./build_darkman.sh
+./build_darkman.sh
+chmod +x ~/.local/share/darkman/darkman.sh
+systemctl --user enable --now darkman.service
+```
+
+You can edit `lat` and `lng` in `~/.config/darkman/config.yml`.

@@ -1,6 +1,7 @@
 # Sources
-/hyprlogin/
+./hyprlogin/
 crystal-remix-icon-theme-color-variants/
+darkman/
 
 # Generated config
 .config/hypr/colors.lua

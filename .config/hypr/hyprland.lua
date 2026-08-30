@@ -61,16 +61,7 @@ hl.on("hyprland.start", function()
         exit 1
     ']])
     -- Themes
-    hl.exec_cmd([[sh -c '
-        color=$(rcm get color -b blue)
-        icons=crystal-remix-$color
-        # GTK: gsettings list-recursively org.gnome.desktop.interface
-        # gsettings set org.gnome.desktop.interface gtk-theme 'TODO'
-        # gsettings set org.gnome.desktop.interface color-scheme 'prefer-TODO'
-        gsettings set org.gnome.desktop.interface icon-theme $icons
-        # QT
-        kwriteconfig6 --file kdeglobals --group Icons --key Theme $icons
-    ']])
+    hl.exec_cmd([[sh -c '~/.config/matugen/matugen.sh']])
     -- TODO secure wayvnc
     hl.exec_cmd("wayvnc 0.0.0.0 -f 60 -k $(rcm get keyboard -b cz) -r")
 end)
