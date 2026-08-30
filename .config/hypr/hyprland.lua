@@ -34,7 +34,8 @@ hl.monitor({
 -- Set programs that you use
 local terminal    = "kitty"
 local fileManager = "dolphin"
-local menu        = "hyprlauncher"
+-- TODO icons
+local menu        = "rofi -show combi -combi-modes \"drun,ssh\" -modes combi -theme ~/.config/rofi/launcher.rasi -show-icons -icon-theme $(echo none)"
 
 
 -------------------
@@ -44,6 +45,7 @@ local menu        = "hyprlauncher"
 -- See https://wiki.hypr.land/Configuring/Basics/Autostart/
 --
 -- wayvnc listens on 0.0.0.0:5900
+-- TODO layout
 hl.on("hyprland.start", function()
     hl.exec_cmd("wayvnc 0.0.0.0 -f 60 -k cz -r")
 end)

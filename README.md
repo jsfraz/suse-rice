@@ -6,6 +6,7 @@
 
 - [git](https://git-scm.com/)
 - [hyprland](https://github.com/hyprwm/Hyprland) (+`hyprland-guiutils`)
+- [brightnessctl](https://github.com/Hummer12007/brightnessctl)
 - [greetd](https://sr.ht/~kennylevinsen/greetd/)
 - [hyprlogin](https://github.com/AuthenticSm1les/hyprlogin)
 - [wayvnc](https://github.com/any1/wayvnc)
@@ -62,10 +63,12 @@ rm -r ~/.config/hypr
 rm -r ~/.config/hyprlogin
 rm -r ~/.config/matugen
 rm -r ~/.config/kitty
+rm -r ~/.config/rofi
 ln -sf $PWD/.config/hypr ~/.config/hypr
 ln -sf $PWD/.config/hyprlogin ~/.config/hyprlogin
 ln -sf $PWD/.config/matugen ~/.config/matugen
 ln -sf $PWD/.config/kitty ~/.config/kitty
+ln -sf $PWD/.config/rofi ~/.config/rofi
 ```
 
 ### Hyprland / greetd / hyprlogin
