@@ -123,9 +123,10 @@ hl.config({
 
         blur = {
             enabled   = true,
-            size      = 3,
-            passes    = 2,
-            vibrancy  = 0.1696,
+            size      = 8,
+            passes    = 3,
+            vibrancy  = 0.35,
+            popups    = true,
         },
     },
 
@@ -340,13 +341,14 @@ hl.window_rule({
     no_focus = true,
 })
 
--- Layer rules also return a handle.
--- local overlayLayerRule = hl.layer_rule({
---     name  = "no-anim-overlay",
---     match = { namespace = "^my-overlay$" },
---     no_anim = true,
--- })
--- overlayLayerRule:set_enabled(false)
+-- Frosted glass behind Rofi (layer-shell, not a regular window)
+hl.layer_rule({
+    name         = "rofi-glass",
+    match        = { namespace = "rofi" },
+    blur         = true,
+    ignore_alpha = 0.2,
+    animation    = "popin",
+})
 
 -- Hyprland-run windowrule
 hl.window_rule({

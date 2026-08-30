@@ -44,4 +44,62 @@
     surface-container: {{colors.surface_container.default.hex}};
     surface-container-high: {{colors.surface_container_high.default.hex}};
     surface-container-highest: {{colors.surface_container_highest.default.hex}};
+
+    /* --- Launcher chrome (mirrors kitty colors.conf) --- */
+    /* Hex8: Rofi cannot apply /alpha to @variables. */
+<* if {{ is_dark_mode }} *>
+    foreground: {{ colors.on_surface.default.hex }};
+    muted: {{ colors.on_surface_variant.default.hex }};
+    accent: {{ colors.primary.default.hex | set_saturation: 78.0 | set_lightness: 62.0 }};
+    scrollbar: {{ colors.primary.default.hex | set_saturation: 70.0 | set_lightness: 64.0 }};
+    gel-text: {{ colors.primary.default.hex | set_saturation: 45.0 | set_lightness: 18.0 }};
+    gel-urgent-text: {{ colors.primary.default.hex | set_hue: 8.0 | set_saturation: 45.0 | set_lightness: 18.0 }};
+    gel-active-text: {{ colors.primary.default.hex | set_hue: 300.0 | set_saturation: 40.0 | set_lightness: 18.0 }};
+    text-hl: bold {{ colors.primary.default.hex | set_saturation: 40.0 | set_lightness: 92.0 }};
+
+    glass: {{ colors.source_color.default.hex | set_lightness: 16.0 | set_saturation: 42.0 }}70;
+    glass-input: {{ colors.primary.default.hex | set_saturation: 32.0 | set_lightness: 30.0 }}73;
+    tile: {{ colors.primary.default.hex | set_saturation: 50.0 | set_lightness: 55.0 }}14;
+    gel: {{ colors.primary.default.hex | set_saturation: 82.0 | set_lightness: 68.0 }}d4;
+    gel-urgent: {{ colors.primary.default.hex | set_hue: 8.0 | set_saturation: 90.0 | set_lightness: 64.0 }}d4;
+    gel-active: {{ colors.primary.default.hex | set_hue: 300.0 | set_saturation: 72.0 | set_lightness: 68.0 }}d4;
+    error-glass: {{ colors.error_container.default.hex }}99;
+
+    rim: {{ colors.primary.default.hex | set_saturation: 40.0 | set_lightness: 88.0 }}99;
+    rim-input: {{ colors.primary.default.hex | set_saturation: 45.0 | set_lightness: 90.0 }}b3;
+    rim-tile: {{ colors.primary.default.hex | set_saturation: 50.0 | set_lightness: 70.0 }}3d;
+    rim-gel: {{ colors.primary.default.hex | set_saturation: 25.0 | set_lightness: 98.0 }}e6;
+
+    gloss-window: linear-gradient(to bottom, {{ colors.primary.default.hex | set_saturation: 20.0 | set_lightness: 98.0 }}5c, {{ colors.primary.default.hex | set_saturation: 40.0 | set_lightness: 70.0 }}08);
+    gloss-input: linear-gradient(to bottom, {{ colors.primary.default.hex | set_saturation: 15.0 | set_lightness: 98.0 }}a3, {{ colors.primary.default.hex | set_saturation: 40.0 | set_lightness: 35.0 }}24);
+    gloss-tile: linear-gradient(to bottom, {{ colors.primary.default.hex | set_saturation: 20.0 | set_lightness: 96.0 }}4d, {{ colors.primary.default.hex | set_saturation: 40.0 | set_lightness: 50.0 }}00);
+    gloss-gel: linear-gradient(to bottom, {{ colors.primary.default.hex | set_saturation: 10.0 | set_lightness: 99.0 }}c4, {{ colors.primary.default.hex | set_saturation: 40.0 | set_lightness: 88.0 }}33, {{ colors.source_color.default.hex | set_lightness: 8.0 | set_saturation: 45.0 }}4d);
+<* else *>
+    foreground: {{ colors.on_surface.default.hex | set_lightness: 12.0 }};
+    muted: {{ colors.on_surface_variant.default.hex | set_lightness: 28.0 }};
+    accent: {{ colors.primary.default.hex | set_saturation: 78.0 | set_lightness: 40.0 }};
+    scrollbar: {{ colors.primary.default.hex | set_saturation: 72.0 | set_lightness: 40.0 }};
+    gel-text: {{ colors.primary.default.hex | set_saturation: 20.0 | set_lightness: 98.0 }};
+    gel-urgent-text: {{ colors.primary.default.hex | set_hue: 8.0 | set_saturation: 20.0 | set_lightness: 98.0 }};
+    gel-active-text: {{ colors.primary.default.hex | set_hue: 300.0 | set_saturation: 20.0 | set_lightness: 98.0 }};
+    text-hl: bold {{ colors.primary.default.hex | set_saturation: 80.0 | set_lightness: 36.0 }};
+
+    glass: {{ colors.source_color.default.hex | set_saturation: 28.0 | set_lightness: 93.0 }}99;
+    glass-input: {{ colors.primary.default.hex | set_saturation: 35.0 | set_lightness: 86.0 }}8c;
+    tile: {{ colors.primary.default.hex | set_saturation: 40.0 | set_lightness: 80.0 }}18;
+    gel: {{ colors.primary.default.hex | set_saturation: 86.0 | set_lightness: 48.0 }}d9;
+    gel-urgent: {{ colors.primary.default.hex | set_hue: 8.0 | set_saturation: 88.0 | set_lightness: 48.0 }}d9;
+    gel-active: {{ colors.primary.default.hex | set_hue: 300.0 | set_saturation: 72.0 | set_lightness: 46.0 }}d9;
+    error-glass: {{ colors.error_container.default.hex }}a8;
+
+    rim: {{ colors.primary.default.hex | set_saturation: 40.0 | set_lightness: 100.0 }}cc;
+    rim-input: {{ colors.primary.default.hex | set_saturation: 20.0 | set_lightness: 100.0 }}e6;
+    rim-tile: {{ colors.primary.default.hex | set_saturation: 50.0 | set_lightness: 70.0 }}4d;
+    rim-gel: {{ colors.primary.default.hex | set_saturation: 15.0 | set_lightness: 100.0 }}f0;
+
+    gloss-window: linear-gradient(to bottom, {{ colors.primary.default.hex | set_saturation: 10.0 | set_lightness: 100.0 }}8c, {{ colors.primary.default.hex | set_saturation: 30.0 | set_lightness: 90.0 }}0a);
+    gloss-input: linear-gradient(to bottom, {{ colors.primary.default.hex | set_saturation: 8.0 | set_lightness: 100.0 }}c4, {{ colors.primary.default.hex | set_saturation: 40.0 | set_lightness: 82.0 }}2e);
+    gloss-tile: linear-gradient(to bottom, {{ colors.primary.default.hex | set_saturation: 10.0 | set_lightness: 100.0 }}66, {{ colors.primary.default.hex | set_saturation: 30.0 | set_lightness: 80.0 }}00);
+    gloss-gel: linear-gradient(to bottom, {{ colors.primary.default.hex | set_saturation: 8.0 | set_lightness: 100.0 }}d9, {{ colors.primary.default.hex | set_saturation: 50.0 | set_lightness: 72.0 }}2e, {{ colors.source_color.default.hex | set_saturation: 28.0 | set_lightness: 16.0 }}59);
+<* endif *>
 }

@@ -7,6 +7,7 @@
 - [git](https://git-scm.com/)
 - [hyprland](https://github.com/hyprwm/Hyprland) (+`hyprland-guiutils`)
 - [brightnessctl](https://github.com/Hummer12007/brightnessctl)
+- [Source Sans 3 font](https://packagehub.suse.com/packages/adobe-sourcesanspro-fonts/)
 - [greetd](https://sr.ht/~kennylevinsen/greetd/)
 - [hyprlogin](https://github.com/AuthenticSm1les/hyprlogin)
 - [wayvnc](https://github.com/any1/wayvnc)
