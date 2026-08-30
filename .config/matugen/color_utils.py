@@ -18,13 +18,13 @@ Examples:
     python color_utils.py image.jpg           # Get color name from image
     python color_utils.py -hex image.jpg      # Get hex color from image
     python color_utils.py -color2hex red      # Convert 'red' to hex
-    python color_utils.py -hex2color '#3232ff'  # Nearest named color from hex
+    python color_utils.py -hex2color '#3232ff'  # Named color from hex (by hue)
     python color_utils.py -hex -lighten img.jpg  # Get lightened hex from image
 """
 
 import sys
 from PIL import Image
-from collections import Counter
+from collections import defaultdict
 import colorsys
 
 COLOR_MAP = {
@@ -40,12 +40,13 @@ COLOR_MAP = {
 
 def get_dominant_color(image_path):
     """
-    Extract the most dominant color from an image.
+    Extract the color a viewer would call dominant.
 
-    Opens the image, resizes it to 150x150 pixels for faster processing,
-    and finds the most frequently occurring color. Very dark (sum < 50)
-    and very light (sum > 700) pixels are filtered out to avoid
-    blacks/whites dominating the result.
+    Frequency of a single RGB triple is a poor proxy: dark wallpapers
+    (navy subway, charcoal shards) have one near-black pixel repeated
+    thousands of times. Instead, ignore gray/black/white, weight the
+    rest by saturation² × value², and take the weighted-average RGB of
+    the strongest 10° hue bin.
 
     Args:
         image_path: Path to the image file to analyze.
@@ -56,19 +57,27 @@ def get_dominant_color(image_path):
     """
     img = Image.open(image_path)
     img = img.convert('RGB')
-    img = img.resize((150, 150))  # Reduce size for faster processing
-    
-    pixels = list(img.get_flattened_data())
-    
-    # Filter out very dark and very light pixels
-    pixels = [p for p in pixels if sum(p) > 50 and sum(p) < 700]
-    
-    if not pixels:
-        return (128, 128, 128)  # Fallback
-    
-    # Find the most common color
-    most_common = Counter(pixels).most_common(1)[0][0]
-    return most_common
+    img = img.resize((150, 150), Image.Resampling.BOX)
+
+    # hue_bin -> [weight, r*w, g*w, b*w]
+    buckets = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0])
+    for r, g, b in img.get_flattened_data():
+        h, s, v = colorsys.rgb_to_hsv(r / 255.0, g / 255.0, b / 255.0)
+        if s < 0.30 or v < 0.25 or v > 0.95:
+            continue
+        weight = (s ** 2) * (v ** 2)
+        hue_bin = int((h * 360) // 10) % 36
+        agg = buckets[hue_bin]
+        agg[0] += weight
+        agg[1] += r * weight
+        agg[2] += g * weight
+        agg[3] += b * weight
+
+    if not buckets:
+        return (128, 128, 128)
+
+    weight, wr, wg, wb = max(buckets.values(), key=lambda item: item[0])
+    return (int(wr / weight), int(wg / weight), int(wb / weight))
 
 def rgb_to_hex(rgb):
     """
@@ -125,21 +134,13 @@ def hex_to_rgb(hex_color):
 
 def hex_to_nearest_color_name(hex_color):
     """
-    Map a hex color to the nearest named palette color.
+    Map a hex color to a named palette color by hue.
 
-    Distance is Euclidean in RGB against COLOR_MAP (the same names used
-    by -color2hex and crystal-remix icon themes).
+    Uses the same HSV ranges as rgb_to_color_name, so -hex2color matches
+    the no-flag image → name path. RGB distance to COLOR_MAP swatches is
+    not used: a dark navy is blue, not the nearest dark green chip.
     """
-    r, g, b = hex_to_rgb(hex_color)
-    nearest = None
-    nearest_dist = None
-    for name, palette_hex in COLOR_MAP.items():
-        pr, pg, pb = hex_to_rgb(palette_hex)
-        dist = (r - pr) ** 2 + (g - pg) ** 2 + (b - pb) ** 2
-        if nearest_dist is None or dist < nearest_dist:
-            nearest = name
-            nearest_dist = dist
-    return nearest
+    return rgb_to_color_name(hex_to_rgb(hex_color))
 
 def lighten_hex_color(hex_color, hue_shift=45):
     """
@@ -190,15 +191,17 @@ def rgb_to_color_name(rgb):
     Convert an RGB color to a human-readable color name.
 
     Maps the RGB color to one of eight basic color names based on the
-    hue value in HSV color space. The hue ranges (in degrees) are:
+    hue value in HSV color space. Ranges include every COLOR_MAP swatch
+    so -color2hex and -hex2color stay inverses. Cyan (180–185+) counts
+    as blue — that is what these wallpapers look like, not teal/green.
         - red:    345-360 and 0-15
-        - orange: 15-35
-        - yellow: 35-65
+        - orange: 15-45
+        - yellow: 45-65
         - green:  65-150
-        - teal:   150-180
-        - blue:   180-260
-        - purple: 260-290
-        - pink:   290-345 (with brightness consideration near red)
+        - teal:   150-185
+        - blue:   185-260
+        - purple: 260-290, or 290-330 when dark
+        - pink:   290-345 when bright (split with red near 330)
 
     Args:
         rgb: A tuple of (R, G, B) integer values (0-255 each).
@@ -218,31 +221,29 @@ def rgb_to_color_name(rgb):
     # Convert hue (0-1) to degrees (0-360)
     hue = h * 360
     
-    # Map hue to colors
+    # Map hue to colors. Bounds are chosen so each COLOR_MAP hex
+    # (orange 39°, teal 180°, purple/pink both 300°) maps back to itself.
     if hue < 15 or hue >= 345:
         return "red"
-    elif 15 <= hue < 35:
+    elif hue < 45:
         return "orange"
-    elif 35 <= hue < 65:
+    elif hue < 65:
         return "yellow"
-    elif 65 <= hue < 150:
+    elif hue < 150:
         return "green"
-    elif 150 <= hue < 180:
+    elif hue < 185:
         return "teal"
-    elif 180 <= hue < 260:
+    elif hue < 260:
         return "blue"
-    elif 260 <= hue < 290:
+    elif hue < 290:
         return "purple"
-    elif 290 <= hue < 330:
-        return "pink"
-    elif 330 <= hue < 345:
-        # Area between pink and red - decision based on brightness
-        if v > 0.6:
-            return "pink"
-        else:
-            return "red"
+    elif hue < 330:
+        # Purple and pink share ~300°; pink is the bright swatch.
+        return "pink" if v > 0.75 else "purple"
+    elif hue < 345:
+        return "pink" if v > 0.6 else "red"
     else:
-        return "blue"  # Fallback
+        return "blue"
 
 def main():
     """
@@ -252,7 +253,7 @@ def main():
         - No flags: Extract dominant color name from image
         - -hex: Output color as hex code instead of name
         - -color2hex: Convert a color name to hex code
-        - -hex2color: Convert a hex code to the nearest named palette color
+        - -hex2color: Convert a hex code to a named palette color by hue
         - -lighten: Apply hue shift to lighten the resulting color
 
     The flags can be combined (e.g., -hex -lighten).
