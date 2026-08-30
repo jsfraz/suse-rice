@@ -1,62 +1,24 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
-
-	"github.com/go-playground/validator/v10"
 )
 
-type Config struct {
-	Background        string `json:"background"`
-	Mode              string `json:"mode" validate:"required,oneof=light dark auto"`
-	ForceMode         bool   `json:"force_mode"`
-	Color             string `json:"color" validate:"required,oneof=auto blue green orange pink purple red teal yellow"`
-	ForceColor        bool   `json:"force_color"`
-	EnableNightLight  bool   `json:"enable_night_light"`
-	AutoclickEnabled  bool   `json:"autoclick_enabled"`
-	AutoclickInterval int    `json:"autoclick_interval" validate:"required"`
-	Keyboard          string `json:"keyboard" validate:"required,oneof=cz us"`
-	Screensaver       string `json:"screensaver" validate:"required,oneof=none random matrix pipes aquarium lavalamp hollywood train weather"`
-}
+// Config is a dynamically keyed property store. Values are native JSON types
+// (string, bool, int64, float64) inferred when a property is set.
+type Config map[string]any
 
-var (
-	defaultConfig = Config{
-		Background:        "",
-		Mode:              "auto",
-		ForceMode:         false,
-		Color:             "auto",
-		ForceColor:        false,
-		EnableNightLight:  true,
-		AutoclickEnabled:  false,
-		AutoclickInterval: 1000,
-		Keyboard:          "cz",
-		Screensaver:       "matrix",
-	}
-
-	validate = validator.New()
-)
-
-// getConfigPath returns the absolute path to the configuration file and ensures
-// the parent directory exists.
-//
-// Behavior:
-//   - Gets the user's home directory
-//   - Creates the ~/.rcm directory if it doesn't exist (with 0755 permissions)
-//   - Returns the full path to ~/.rcm/config.json
-//
-// Returns:
-//   - string: The absolute path to the config file
-//   - error: Any error from getting home directory or creating the directory
 func getConfigPath() (string, error) {
-	homeDir, err := os.UserHomeDir()
+	configHome, err := os.UserConfigDir()
 	if err != nil {
-		return "", fmt.Errorf("failed to get home directory: %w", err)
+		return "", fmt.Errorf("failed to get config directory: %w", err)
 	}
 
-	configDir := filepath.Join(homeDir, ".rcm")
+	configDir := filepath.Join(configHome, "rcm")
 	if err := os.MkdirAll(configDir, 0755); err != nil {
 		return "", fmt.Errorf("failed to create config directory: %w", err)
 	}
@@ -64,20 +26,11 @@ func getConfigPath() (string, error) {
 	return filepath.Join(configDir, "config.json"), nil
 }
 
-// writeConfig writes the given configuration to the specified file as formatted JSON.
-//
-// Behavior:
-//   - Creates or overwrites the config file at the given path
-//   - Encodes the Config struct as JSON with 2-space indentation
-//   - Automatically closes the file when done (via defer)
-//
-// Parameters:
-//   - config: The Config struct to write
-//   - configFile: The absolute path where the config should be written
-//
-// Returns:
-//   - error: Any error from creating the file or encoding JSON
 func writeConfig(config Config, configFile string) error {
+	if config == nil {
+		config = Config{}
+	}
+
 	file, err := os.Create(configFile)
 	if err != nil {
 		return fmt.Errorf("failed to create config file: %w", err)
@@ -93,69 +46,78 @@ func writeConfig(config Config, configFile string) error {
 	return nil
 }
 
-// GetConfig loads and validates the application configuration from ~/.rcm/config.json.
-//
-// Behavior:
-//   - If the config file doesn't exist, creates it with default values and returns
-//     the default configuration
-//   - If the config file exists, reads and parses it as JSON
-//   - Validates the loaded configuration using struct validation tags (mode, color,
-//     keyboard, screensaver values, etc.)
-//   - If validation fails, overwrites the corrupted config with default values
-//     and returns the default configuration
-//   - Returns the successfully loaded and validated configuration
-//
-// Returns:
-//   - Config: The loaded configuration, or default values if file doesn't exist
-//     or validation fails
-//   - error: Any error from file operations, JSON decoding, or path resolution
+// GetConfig loads the property store from ~/.config/rcm/config.json.
+// A missing or empty file is treated as an empty store and created on disk.
 func GetConfig() (Config, error) {
 	configFile, err := getConfigPath()
 	if err != nil {
-		return Config{}, err
+		return nil, err
 	}
 
-	// Check if config file exists
-	if _, err := os.Stat(configFile); os.IsNotExist(err) {
-		if err := writeConfig(defaultConfig, configFile); err != nil {
-			return Config{}, err
-		}
-		return defaultConfig, nil
-	}
-
-	// Read existing config
-	file, err := os.Open(configFile)
+	data, err := os.ReadFile(configFile)
 	if err != nil {
-		return Config{}, fmt.Errorf("failed to open config file: %w", err)
-	}
-	defer file.Close()
-
-	var config Config
-	if err := json.NewDecoder(file).Decode(&config); err != nil {
-		return Config{}, fmt.Errorf("failed to parse config file: %w", err)
-	}
-
-	// Validate config
-	if err := validate.Struct(config); err != nil {
-		// Create file with default config if validation fails
-		if err := writeConfig(defaultConfig, configFile); err != nil {
-			return Config{}, err
+		if os.IsNotExist(err) {
+			empty := Config{}
+			if err := writeConfig(empty, configFile); err != nil {
+				return nil, err
+			}
+			return empty, nil
 		}
-		return defaultConfig, nil
+		return nil, fmt.Errorf("failed to read config file: %w", err)
 	}
 
-	return config, nil
+	if len(bytes.TrimSpace(data)) == 0 {
+		return Config{}, nil
+	}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.UseNumber()
+
+	var raw any
+	if err := decoder.Decode(&raw); err != nil {
+		return nil, fmt.Errorf("failed to parse config file: %w", err)
+	}
+
+	obj, ok := raw.(map[string]any)
+	if !ok {
+		return nil, fmt.Errorf("config file must be a JSON object")
+	}
+
+	return Config(normalizeValue(obj).(map[string]any)), nil
 }
 
-// Save persists the current Config instance to ~/.rcm/config.json.
-//
-// Behavior:
-//   - Gets the config file path (ensures ~/.rcm directory exists)
-//   - Overwrites the existing config file with the current Config values
-//   - Writes the configuration as formatted JSON with 2-space indentation
-//
-// Returns:
-//   - error: Any error from path resolution, file creation, or JSON encoding
+// Get returns the stored value for key, or fallback when the key is absent.
+func (c Config) Get(key string, fallback any) any {
+	if c == nil {
+		return fallback
+	}
+	value, ok := c[key]
+	if !ok {
+		return fallback
+	}
+	return value
+}
+
+// GetOrSet returns the stored value for key. When the key is missing, fallback
+// is written into the map and wrote is true so the caller can persist it.
+func (c Config) GetOrSet(key string, fallback any) (value any, wrote bool) {
+	if c == nil {
+		return fallback, false
+	}
+	value, ok := c[key]
+	if ok {
+		return value, false
+	}
+	c[key] = fallback
+	return fallback, true
+}
+
+// Set stores value under key, creating the property if it does not exist.
+func (c Config) Set(key string, value any) {
+	c[key] = value
+}
+
+// Save persists the property store to ~/.config/rcm/config.json.
 func (c Config) Save() error {
 	configFile, err := getConfigPath()
 	if err != nil {

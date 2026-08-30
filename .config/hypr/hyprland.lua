@@ -34,8 +34,7 @@ hl.monitor({
 -- Set programs that you use
 local terminal    = "kitty"
 local fileManager = "dolphin"
--- TODO icons
-local menu        = "rofi -show combi -combi-modes \"drun,ssh\" -modes combi -theme ~/.config/rofi/launcher.rasi -show-icons -icon-theme crystal-remix-blue"
+local menu        = "rofi -show combi -combi-modes \"drun,ssh\" -modes combi -theme ~/.config/rofi/launcher.rasi -show-icons -icon-theme crystal-remix-$(rcm get color -b blue)"
 
 
 -------------------

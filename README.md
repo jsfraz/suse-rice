@@ -6,6 +6,8 @@
 
 - [git](https://git-scm.com/)
 - [hyprland](https://github.com/hyprwm/Hyprland) (+`hyprland-guiutils`)
+- [golang 1.27.0](https://go.dev/dl/)
+- [rcm](rcm/README.md)
 - [brightnessctl](https://github.com/Hummer12007/brightnessctl)
 - [Source Sans 3 font](https://packagehub.suse.com/packages/adobe-sourcesanspro-fonts/)
 - [greetd](https://sr.ht/~kennylevinsen/greetd/)
@@ -109,6 +111,17 @@ sudo systemctl set-default graphical.target
 ```
 
 Then reboot.
+
+### rcm
+
+A tool for managing SwayWM rice environment configuration. To install `rcm`, run the following command:
+
+```bash
+chmod +x ./install_rcm.sh
+./install_rcm.sh
+```
+
+The script compiles as your user (so it finds `go` on your PATH) and asks for sudo only to install into `/usr/local/bin`.
 
 ### wayvnc
 
