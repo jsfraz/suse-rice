@@ -48,15 +48,14 @@ window {
     cursor:                      "default";
 }
 
-/*****----- Main Box (inner white highlight) -----*****/
+/*****----- Main Box -----*****/
 mainbox {
     enabled:                     true;
     spacing:                     8px;
-    margin:                      2px;
+    margin:                      4px;
     padding:                     8px 8px 10px 8px;
-    border:                      1px;
-    border-radius:               14px;
-    border-color:                @rim;
+    border:                      0px;
+    border-radius:               0px;
     background-color:            transparent;
     children:                    [ "inputbar", "message", "body" ];
 }
@@ -110,19 +109,16 @@ entry {
     cursor-color:                @accent;
 }
 
-/*****----- Body (window-body surface) -----*****/
+/*****----- Body (open glass, tiles float on the pane) -----*****/
 body {
     enabled:                     true;
     expand:                      true;
     orientation:                 vertical;
     spacing:                     0px;
     margin:                      0px;
-    padding:                     8px;
-    border:                      1px;
-    border-radius:               10px;
-    border-color:                @rim;
-    background-color:            @body;
-    background-image:            @gloss-body;
+    padding:                     4px;
+    border:                      0px;
+    background-color:            transparent;
     children:                    [ "listview" ];
 }
 
@@ -224,9 +220,8 @@ message {
     enabled:                     true;
     margin:                      0px;
     padding:                     8px 12px;
-    border:                      1px;
-    border-radius:               10px;
-    background-image:            @gloss-body;
+    border:                      0px;
+    background-color:            transparent;
     text-color:                  @foreground;
 }
 error-message {
