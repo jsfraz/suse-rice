@@ -11,7 +11,7 @@
 -- Please note not all available settings / options are set here.
 -- For a full list, see the wiki
 
--- Split config: generated palette from matugen
+-- Generated palette from matugen
 local colors = require("colors")
 
 ------------------
@@ -31,10 +31,10 @@ hl.monitor({
 ---- MY PROGRAMS ----
 ---------------------
 
--- Set programs that you use
+-- Set programs
 local terminal    = "kitty"
 local fileManager = "dolphin"
-local menu        = "rofi -show combi -combi-modes \"drun,ssh\" -modes combi -theme ~/.config/rofi/launcher.rasi -show-icons -icon-theme crystal-remix-$(rcm get color -b blue)"
+local appLauncher        = "rofi -show combi -combi-modes 'drun,ssh' -modes combi -theme ~/.config/rofi/launcher.rasi -show-icons -icon-theme crystal-remix-$(rcm get color -b blue)"
 
 
 -------------------
@@ -42,11 +42,37 @@ local menu        = "rofi -show combi -combi-modes \"drun,ssh\" -modes combi -th
 -------------------
 
 -- See https://wiki.hypr.land/Configuring/Basics/Autostart/
---
--- wayvnc listens on 0.0.0.0:5900
--- TODO layout
 hl.on("hyprland.start", function()
-    hl.exec_cmd("wayvnc 0.0.0.0 -f 60 -k cz -r")
+    -- Set wallpaper
+    -- hyprpaper IPC is not ready on the first hyprctl tick; retry until it is
+    hl.exec_cmd([[sh -c '
+        export PATH="$PATH:/usr/local/bin:${HOME}/.local/bin"
+        pgrep -x hyprpaper >/dev/null || hyprpaper &
+        wallpaper=$(rcm get wallpaper -b /usr/share/hypr/wall0.png)
+        wallpaper=${wallpaper:-/usr/share/hypr/wall0.png}
+        i=0
+        while [ "$i" -lt 50 ]; do
+            if hyprctl hyprpaper wallpaper ",$wallpaper"; then
+                exit 0
+            fi
+            i=$((i + 1))
+            sleep 0.1
+        done
+        exit 1
+    ']])
+    -- Themes
+    hl.exec_cmd([[sh -c '
+        color=$(rcm get color -b blue)
+        icons=crystal-remix-$color
+        # GTK: gsettings list-recursively org.gnome.desktop.interface
+        # gsettings set org.gnome.desktop.interface gtk-theme 'TODO'
+        # gsettings set org.gnome.desktop.interface color-scheme 'prefer-TODO'
+        gsettings set org.gnome.desktop.interface icon-theme $icons
+        # QT
+        kwriteconfig6 --file kdeglobals --group Icons --key Theme $icons
+    ']])
+    -- TODO secure wayvnc
+    hl.exec_cmd("wayvnc 0.0.0.0 -f 60 -k $(rcm get keyboard -b cz) -r")
 end)
 
 
@@ -123,8 +149,8 @@ hl.config({
 
         blur = {
             enabled   = true,
-            size      = 12,
-            passes    = 4,
+            size      = 3,
+            passes    = 3,
             vibrancy  = 0.45,
             popups    = true,
         },
@@ -264,7 +290,7 @@ local closeWindowBind = hl.bind(mainMod .. " + C", hl.dsp.window.close())
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
-hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))
+hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(appLauncher))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 

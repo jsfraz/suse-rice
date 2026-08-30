@@ -6,6 +6,7 @@
 
 - [git](https://git-scm.com/)
 - [hyprland](https://github.com/hyprwm/Hyprland) (+`hyprland-guiutils`)
+- [hyprpaper](https://github.com/hyprwm/hyprpaper)
 - [golang 1.27.0](https://go.dev/dl/)
 - [rcm](rcm/README.md)
 - [brightnessctl](https://github.com/Hummer12007/brightnessctl)
@@ -165,7 +166,4 @@ Clones [crystal-remix-icon-theme-color-variants](https://github.com/jsfraz/cryst
 ```bash
 chmod +x ./build_crystal_remix.sh
 ./build_crystal_remix.sh
-
-gsettings set org.gnome.desktop.interface icon-theme 'crystal-remix-blue'
-kwriteconfig6 --file kdeglobals --group Icons --key Theme crystal-remix-blue
 ```
