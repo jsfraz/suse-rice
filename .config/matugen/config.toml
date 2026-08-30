@@ -18,6 +18,7 @@ post_hook = "bash ~/.config/matugen/install_greeter_colors.sh"
 [templates.kitty]
 input_path = "~/.config/matugen/templates/kitty.conf"
 output_path = "~/.config/kitty/colors.conf"
+post_hook = "killall -SIGUSR1 kitty 2>/dev/null || true"
 
 [templates.starship]
 input_path = "~/.config/matugen/templates/starship.toml"

@@ -5,4 +5,4 @@
 .config/hypr/colors.lua
 .config/hyprlogin/colors.conf
 .config/kitty/colors.conf
-.config/rofi/colors.conf
+.config/rofi/colors.rasi
