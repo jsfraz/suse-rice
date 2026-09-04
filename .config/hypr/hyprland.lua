@@ -43,13 +43,12 @@ local appLauncher        = "rofi -show combi -combi-modes 'drun,ssh' -modes comb
 
 -- See https://wiki.hypr.land/Configuring/Basics/Autostart/
 hl.on("hyprland.start", function()
-    -- Set wallpaper
+    -- Set wallpaper (via uwsm so it runs as a session unit)
     -- hyprpaper IPC is not ready on the first hyprctl tick; retry until it is
-    hl.exec_cmd([[sh -c '
+    hl.exec_cmd([[uwsm app -- sh -c '
         export PATH="$PATH:/usr/local/bin:${HOME}/.local/bin"
         pgrep -x hyprpaper >/dev/null || hyprpaper &
         wallpaper=$(rcm get wallpaper -b /usr/share/hypr/wall0.png)
-        wallpaper=${wallpaper:-/usr/share/hypr/wall0.png}
         i=0
         while [ "$i" -lt 50 ]; do
             if hyprctl hyprpaper wallpaper ",$wallpaper"; then
@@ -61,9 +60,9 @@ hl.on("hyprland.start", function()
         exit 1
     ']])
     -- Themes
-    hl.exec_cmd([[sh -c '~/.config/matugen/matugen.sh']])
+    hl.exec_cmd([[uwsm app -- sh -c '~/.config/matugen/matugen.sh']])
     -- TODO secure wayvnc
-    hl.exec_cmd("wayvnc 0.0.0.0 -f 60 -k $(rcm get keyboard -b cz) -r")
+    hl.exec_cmd("uwsm app -- sh -c 'wayvnc 0.0.0.0 -f 60 -k $(rcm get keyboard -b cz) -r'")
 end)
 
 

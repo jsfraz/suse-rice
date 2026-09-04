@@ -1,11 +1,9 @@
 # Sources
-/hyprlogin/
 crystal-remix-icon-theme-color-variants/
 darkman/
 
 # Generated config
 .config/hypr/colors.lua
-.config/hyprlogin/colors.conf
 .config/kitty/colors.conf
 .config/rofi/colors.rasi
 

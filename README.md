@@ -5,14 +5,13 @@
 ## Dependencies
 
 - [git](https://git-scm.com/)
+- [uwsm](https://github.com/Vladimir-csp/uwsm)
 - [hyprland](https://github.com/hyprwm/Hyprland) (`hyprland-guiutils`)
 - [hyprpaper](https://github.com/hyprwm/hyprpaper)
 - [golang 1.27.0](https://go.dev/dl/)
 - [rcm](rcm/README.md)
 - [brightnessctl](https://github.com/Hummer12007/brightnessctl)
 - [Source Sans 3 font](https://packagehub.suse.com/packages/adobe-sourcesanspro-fonts/)
-- [greetd](https://sr.ht/~kennylevinsen/greetd/)
-- [hyprlogin](https://github.com/AuthenticSm1les/hyprlogin)
 - [wayvnc](https://github.com/any1/wayvnc)
 - [matugen](https://github.com/InioX/matugen)
 - [python-pillow](https://pypi.org/project/pillow/) package
@@ -69,14 +68,12 @@ your_username ALL=(ALL) NOPASSWD: ALL
 
 ```bash
 rm -r ~/.config/hypr
-rm -r ~/.config/hyprlogin
 rm -r ~/.config/matugen
 rm -r ~/.config/kitty
 rm -r ~/.config/rofi
 rm -r ~/.config/darkman
 rm -r ~/.local/share/darkman
 ln -sf $PWD/.config/hypr ~/.config/hypr
-ln -sf $PWD/.config/hyprlogin ~/.config/hyprlogin
 ln -sf $PWD/.config/matugen ~/.config/matugen
 ln -sf $PWD/.config/kitty ~/.config/kitty
 ln -sf $PWD/.config/rofi ~/.config/rofi
@@ -84,45 +81,58 @@ ln -sf $PWD/.config/darkman ~/.config/darkman
 ln -sf $PWD/.local/share/darkman ~/.local/share/darkman
 ```
 
-### Hyprland / greetd / hyprlogin
+### Hyprland / tty1 autologin / UWSM
 
-The greeter session runs as user `greeter`, which cannot read `$HOME`. Put
-greeter configs in `/etc/hyprlogin/`, not under `/home`.
+Boot flow: LUKS unlock → getty autologin on tty1 → `uwsm start hyprland.desktop`. No greeter, so you only enter the LUKS password.
+
+See [Hyprland Systemd startup](https://wiki.hypr.land/Useful-Utilities/Systemd-start/).
 
 ```bash
-chmod +x build_hyprlogin.sh
-./build_hyprlogin.sh
-sudo usermod -aG video,render greeter
-sudo install -Dm644 ~/.config/hyprlogin/hyprland-greeter.lua /etc/hyprlogin/hyprland-greeter.lua
-sudo install -Dm644 ~/.config/hyprlogin/hyprlogin.conf /etc/hyprlogin/hyprlogin.conf
+sudo zypper in uwsm
 chmod +x ~/.config/matugen/matugen.sh
 chmod +x ~/.config/matugen/color_utils.py
 ```
 
-> Set `sessions:default_user` in [hyprlogin.conf](.config/hyprlogin/hyprlogin.conf) before installing.
-> `matugen` installs the generated palette into `/etc/hyprlogin/` (greeter cannot read `$HOME`).
-
-Edit `/etc/greetd/config.toml`:
-
-```toml
-[terminal]
-vt = 1
-
-[default_session]
-command = "start-hyprland -- --config /etc/hyprlogin/hyprland-greeter.lua"
-user = "greeter"
-```
+Boot to a console, not a display manager. `multi-user.target` skips `graphical.target`, so UWSM must not wait for it (`-g 0` / `-g -1` below). Disable any greeter YaST may have enabled (`sddm`, `gdm`, `greetd`, …):
 
 ```bash
-sudo systemctl enable greetd.service
-sudo systemctl set-default graphical.target
+sudo systemctl set-default multi-user.target
+sudo systemctl disable --now display-manager.service sddm.service gdm.service greetd.service
+sudo systemctl daemon-reload
+```
+
+If this machine previously used greetd/hyprlogin, also unmask the console (those units stay masked after the greeter is removed; boot then stops on a raw console):
+
+```bash
+sudo systemctl unmask getty@tty1.service plymouth-quit.service
+sudo systemctl daemon-reload
+```
+
+Enable passwordless login on tty1 (replace `USERNAME`):
+
+```bash
+sudo mkdir -p /etc/systemd/system/getty@tty1.service.d
+sudo tee /etc/systemd/system/getty@tty1.service.d/autologin.conf >/dev/null <<'EOF'
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin USERNAME --noclear %I $TERM
+EOF
+sudo systemctl daemon-reload
+```
+
+Add to `~/.profile` (login shell on tty1; do not put this in `/etc/profile`):
+
+```bash
+if command -v uwsm >/dev/null && uwsm check may-start -g 0; then
+    exec uwsm start -g -1 hyprland.desktop
+fi
 ```
 
 Then reboot.
 
 ### rcm
 
-A tool for managing SwayWM rice environment configuration. To install `rcm`, run the following command:
+Tool for managing rice environment configuration as dynamically named properties. To install `rcm`, run the following command:
 
 ```bash
 chmod +x ./build_rcm.sh

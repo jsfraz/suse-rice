@@ -13,7 +13,6 @@ block_postfix = "*>"
 [templates.hyprland]
 input_path = "~/.config/matugen/templates/hyprland.lua"
 output_path = "~/.config/hypr/colors.lua"
-post_hook = "bash ~/.config/matugen/install_greeter_colors.sh"
 
 [templates.kitty]
 input_path = "~/.config/matugen/templates/kitty.conf"
