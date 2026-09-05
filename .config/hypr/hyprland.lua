@@ -34,7 +34,7 @@ hl.monitor({
 -- Set programs
 local terminal    = "kitty"
 local fileManager = "dolphin"
-local appLauncher        = "rofi -show combi -combi-modes 'drun,ssh' -modes combi -theme ~/.config/rofi/launcher.rasi -show-icons -icon-theme crystal-remix-$(rcm get color -b blue)"
+local appLauncher        = "rofi -show combi -combi-modes 'drun,ssh' -modes combi -theme ~/.config/rofi/launcher.rasi -show-icons -icon-theme crystal-remix-$(rcm get color)"
 
 
 -------------------
@@ -42,13 +42,21 @@ local appLauncher        = "rofi -show combi -combi-modes 'drun,ssh' -modes comb
 -------------------
 
 -- See https://wiki.hypr.land/Configuring/Basics/Autostart/
+-- Rice defaults live here. Each autostart unit seeds them before any rcm get.
+local function rcmAutostart(body)
+    return string.format([=[uwsm app -- sh -c '
+        export PATH="$PATH:/usr/local/bin:${HOME}/.local/bin"
+        rcm set-fallback color blue wallpaper /usr/share/hypr/wall0.png keyboard cz forcedColor false colorFromWallpaper false forcedBrightnessMode false brightness_mode light
+        %s
+    ']=], body)
+end
+
 hl.on("hyprland.start", function()
     -- Set wallpaper (via uwsm so it runs as a session unit)
     -- hyprpaper IPC is not ready on the first hyprctl tick; retry until it is
-    hl.exec_cmd([[uwsm app -- sh -c '
-        export PATH="$PATH:/usr/local/bin:${HOME}/.local/bin"
+    hl.exec_cmd(rcmAutostart([=[
         pgrep -x hyprpaper >/dev/null || hyprpaper &
-        wallpaper=$(rcm get wallpaper -b /usr/share/hypr/wall0.png)
+        wallpaper=$(rcm get wallpaper)
         i=0
         while [ "$i" -lt 50 ]; do
             if hyprctl hyprpaper wallpaper ",$wallpaper"; then
@@ -58,11 +66,11 @@ hl.on("hyprland.start", function()
             sleep 0.1
         done
         exit 1
-    ']])
+    ]=]))
     -- Themes
-    hl.exec_cmd([[uwsm app -- sh -c '~/.config/matugen/matugen.sh']])
+    hl.exec_cmd(rcmAutostart([=[~/.config/matugen/matugen.sh]=]))
     -- TODO secure wayvnc
-    hl.exec_cmd("uwsm app -- sh -c 'wayvnc 0.0.0.0 -f 60 -k $(rcm get keyboard -b cz) -r'")
+    hl.exec_cmd(rcmAutostart([=[wayvnc 0.0.0.0 -f 60 -k "$(rcm get keyboard)" -r]=]))
 end)
 
 

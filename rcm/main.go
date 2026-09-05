@@ -24,6 +24,8 @@ func main() {
 		cmd = GetCommand{}
 	case "set":
 		cmd = SetCommand{}
+	case "set-fallback", "setFallback":
+		cmd = SetFallbackCommand{}
 	case "help":
 		cmd = HelpCommand{}
 	default:

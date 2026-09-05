@@ -2,6 +2,8 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
+	"path/filepath"
 	"testing"
 )
 
@@ -52,74 +54,229 @@ func TestFormatValue(t *testing.T) {
 	}
 }
 
-func TestConfigGetFallback(t *testing.T) {
-	cfg := Config{"mode": "dark"}
-
-	if got := cfg.Get("mode", "auto"); got != "dark" {
-		t.Errorf("Get existing = %#v, want dark", got)
-	}
-	if got := cfg.Get("missing", parseValue("auto")); got != "auto" {
-		t.Errorf("Get missing string = %#v, want auto", got)
-	}
-	if got := cfg.Get("interval", parseValue("1000")); got != int64(1000) {
-		t.Errorf("Get missing int = %#v, want 1000", got)
-	}
-	if got := Config(nil).Get("mode", "auto"); got != "auto" {
-		t.Errorf("Get on nil config = %#v, want auto", got)
+func TestConfigResolve(t *testing.T) {
+	cfg := Config{
+		Value:    map[string]any{"mode": "dark"},
+		Fallback: map[string]any{},
 	}
 
-	cfg = Config{"mode": "dark"}
-	got, wrote := cfg.GetOrSet("mode", "auto")
-	if got != "dark" || wrote {
-		t.Errorf("GetOrSet existing = %#v wrote=%v, want dark/false", got, wrote)
+	got, wrote, err := cfg.Resolve("mode", "auto", true)
+	if err != nil || got != "dark" || !wrote {
+		t.Errorf("Resolve existing value = %#v wrote=%v err=%v, want dark/true/nil", got, wrote, err)
 	}
-	got, wrote = cfg.GetOrSet("color", "blue")
-	if got != "blue" || !wrote {
-		t.Errorf("GetOrSet missing = %#v wrote=%v, want blue/true", got, wrote)
+	if cfg.Fallback["mode"] != "auto" {
+		t.Errorf("Resolve did not seed fallback, fallback=%v", cfg.Fallback)
 	}
-	if cfg["color"] != "blue" {
-		t.Errorf("GetOrSet did not store fallback, map=%v", cfg)
+	if cfg.Value["mode"] != "dark" {
+		t.Errorf("Resolve wrote fallback into value, value=%v", cfg.Value)
+	}
+
+	got, wrote, err = cfg.Resolve("mode", "light", true)
+	if err != nil || got != "dark" || wrote {
+		t.Errorf("Resolve existing fallback = %#v wrote=%v err=%v, want dark/false/nil", got, wrote, err)
+	}
+	if cfg.Fallback["mode"] != "auto" {
+		t.Errorf("Resolve overwrote fallback, fallback=%v", cfg.Fallback)
+	}
+
+	got, wrote, err = cfg.Resolve("color", "blue", true)
+	if err != nil || got != "blue" || !wrote {
+		t.Errorf("Resolve missing = %#v wrote=%v err=%v, want blue/true/nil", got, wrote, err)
+	}
+	if cfg.Fallback["color"] != "blue" {
+		t.Errorf("Resolve did not store fallback, fallback=%v", cfg.Fallback)
+	}
+	if _, ok := cfg.Value["color"]; ok {
+		t.Errorf("Resolve stored fallback in value, value=%v", cfg.Value)
+	}
+
+	got, wrote, err = cfg.Resolve("color", "red", false)
+	if err != nil || got != "blue" || wrote {
+		t.Errorf("Resolve stored fallback = %#v wrote=%v err=%v, want blue/false/nil", got, wrote, err)
+	}
+
+	_, _, err = cfg.Resolve("missing", nil, false)
+	if err == nil {
+		t.Error("expected error when value and fallback are missing")
+	}
+}
+
+func TestConfigSetSeparatesStores(t *testing.T) {
+	cfg := emptyConfig()
+	cfg.Set("mode", "dark")
+	cfg.SetFallback("mode", "auto")
+
+	if cfg.Value["mode"] != "dark" {
+		t.Errorf("Set wrote value=%#v, want dark", cfg.Value["mode"])
+	}
+	if cfg.Fallback["mode"] != "auto" {
+		t.Errorf("SetFallback wrote fallback=%#v, want auto", cfg.Fallback["mode"])
+	}
+
+	got, wrote, err := cfg.Resolve("mode", "light", true)
+	if err != nil || got != "dark" || wrote {
+		t.Errorf("user value should win: %#v wrote=%v err=%v", got, wrote, err)
 	}
 }
 
 func TestParseGetArgs(t *testing.T) {
-	field, backup, err := parseGetArgs([]string{"mode", "-b", "auto"})
+	field, fallback, fallbackSet, err := parseGetArgs([]string{"mode", "-f", "auto"})
 	if err != nil {
 		t.Fatalf("parseGetArgs: %v", err)
 	}
-	if field != "mode" || backup != "auto" {
-		t.Errorf("got field=%q backup=%#v, want mode/auto", field, backup)
+	if field != "mode" || fallback != "auto" || !fallbackSet {
+		t.Errorf("got field=%q fallback=%#v set=%v, want mode/auto/true", field, fallback, fallbackSet)
 	}
 
-	field, backup, err = parseGetArgs([]string{"-b", "1000", "interval"})
+	field, fallback, fallbackSet, err = parseGetArgs([]string{"-f", "1000", "interval"})
 	if err != nil {
 		t.Fatalf("parseGetArgs flag first: %v", err)
 	}
-	if field != "interval" || backup != int64(1000) {
-		t.Errorf("got field=%q backup=%#v, want interval/1000", field, backup)
+	if field != "interval" || fallback != int64(1000) || !fallbackSet {
+		t.Errorf("got field=%q fallback=%#v set=%v, want interval/1000/true", field, fallback, fallbackSet)
 	}
 
-	field, backup, err = parseGetArgs([]string{"force_mode", "--backup", "false"})
+	field, fallback, fallbackSet, err = parseGetArgs([]string{"force_mode", "--fallback", "false"})
 	if err != nil {
-		t.Fatalf("parseGetArgs --backup: %v", err)
+		t.Fatalf("parseGetArgs --fallback: %v", err)
 	}
-	if field != "force_mode" || backup != false {
-		t.Errorf("got field=%q backup=%#v, want force_mode/false", field, backup)
+	if field != "force_mode" || fallback != false || !fallbackSet {
+		t.Errorf("got field=%q fallback=%#v set=%v, want force_mode/false/true", field, fallback, fallbackSet)
 	}
 
-	field, backup, err = parseGetArgs([]string{"color", "-b=blue"})
+	field, fallback, fallbackSet, err = parseGetArgs([]string{"color", "-f=blue"})
 	if err != nil {
-		t.Fatalf("parseGetArgs -b=: %v", err)
+		t.Fatalf("parseGetArgs -f=: %v", err)
 	}
-	if field != "color" || backup != "blue" {
-		t.Errorf("got field=%q backup=%#v, want color/blue", field, backup)
+	if field != "color" || fallback != "blue" || !fallbackSet {
+		t.Errorf("got field=%q fallback=%#v set=%v, want color/blue/true", field, fallback, fallbackSet)
 	}
 
-	if _, _, err := parseGetArgs([]string{"mode"}); err == nil {
-		t.Error("expected error when -b is missing")
+	field, fallback, fallbackSet, err = parseGetArgs([]string{"mode"})
+	if err != nil {
+		t.Fatalf("parseGetArgs without -f: %v", err)
 	}
-	if _, _, err := parseGetArgs([]string{"-b", "auto"}); err == nil {
+	if field != "mode" || fallbackSet {
+		t.Errorf("got field=%q set=%v, want mode/false", field, fallbackSet)
+	}
+
+	if _, _, _, err := parseGetArgs([]string{"-f", "auto"}); err == nil {
 		t.Error("expected error when field is missing")
+	}
+	if _, _, _, err := parseGetArgs([]string{"mode", "-b", "auto"}); err == nil {
+		t.Error("expected error for removed -b flag")
+	}
+}
+
+func TestConfigFromJSON(t *testing.T) {
+	cfg, migrated, err := configFromJSON([]byte(`{
+		"value": {"mode": "dark"},
+		"fallback": {"mode": "auto", "interval": 1500}
+	}`))
+	if err != nil {
+		t.Fatalf("configFromJSON new format: %v", err)
+	}
+	if migrated {
+		t.Error("new format should not migrate")
+	}
+	if cfg.Value["mode"] != "dark" {
+		t.Errorf("value.mode = %#v, want dark", cfg.Value["mode"])
+	}
+	if cfg.Fallback["interval"] != int64(1500) {
+		t.Errorf("fallback.interval = %#v (%T), want int64(1500)", cfg.Fallback["interval"], cfg.Fallback["interval"])
+	}
+
+	cfg, migrated, err = configFromJSON([]byte(`{"color": "blue", "force_mode": true}`))
+	if err != nil {
+		t.Fatalf("configFromJSON legacy: %v", err)
+	}
+	if !migrated {
+		t.Error("flat object should migrate into value")
+	}
+	if cfg.Value["color"] != "blue" || cfg.Value["force_mode"] != true {
+		t.Errorf("migrated value = %#v", cfg.Value)
+	}
+	if len(cfg.Fallback) != 0 {
+		t.Errorf("migrated fallback should be empty, got %#v", cfg.Fallback)
+	}
+
+	cfg, migrated, err = configFromJSON([]byte(`{"value": "blue"}`))
+	if err != nil {
+		t.Fatalf("configFromJSON property named value: %v", err)
+	}
+	if !migrated {
+		t.Error("string value key should be treated as legacy")
+	}
+	if cfg.Value["value"] != "blue" {
+		t.Errorf("legacy value key = %#v, want blue", cfg.Value["value"])
+	}
+
+	cfg, migrated, err = configFromJSON([]byte(`{
+  "value": {},
+  "fallback": {}
+}
+ "brightness_mode": "light"
+}
+`))
+	if err != nil {
+		t.Fatalf("configFromJSON torn file: %v", err)
+	}
+	if !migrated {
+		t.Error("trailing garbage should force a rewrite")
+	}
+	if len(cfg.Value) != 0 || len(cfg.Fallback) != 0 {
+		t.Errorf("torn first object = value %#v fallback %#v", cfg.Value, cfg.Fallback)
+	}
+}
+
+func TestParseFieldValuePairs(t *testing.T) {
+	pairs, err := parseFieldValuePairs([]string{"color", "blue", "forcedColor", "false"}, "usage")
+	if err != nil {
+		t.Fatalf("parseFieldValuePairs: %v", err)
+	}
+	if len(pairs) != 2 || pairs[0].field != "color" || pairs[0].value != "blue" || pairs[1].value != false {
+		t.Errorf("pairs = %#v", pairs)
+	}
+	if _, err := parseFieldValuePairs([]string{"color"}, "usage"); err == nil {
+		t.Error("expected error for incomplete pair")
+	}
+}
+
+func TestConcurrentSetFallback(t *testing.T) {
+	dir := t.TempDir()
+	configPathOverride = filepath.Join(dir, "config.json")
+	t.Cleanup(func() { configPathOverride = "" })
+
+	const workers = 8
+	done := make(chan error, workers)
+	for i := 0; i < workers; i++ {
+		i := i
+		go func() {
+			_, err := withConfig(func(cfg *Config) (bool, error) {
+				cfg.SetFallback(fmt.Sprintf("k%d", i), int64(i))
+				return true, nil
+			})
+			done <- err
+		}()
+	}
+	for i := 0; i < workers; i++ {
+		if err := <-done; err != nil {
+			t.Fatalf("worker: %v", err)
+		}
+	}
+
+	cfg, err := GetConfig()
+	if err != nil {
+		t.Fatalf("GetConfig: %v", err)
+	}
+	if _, ok := cfg.Value["k0"]; ok {
+		t.Errorf("fallback leaked into value: %#v", cfg.Value)
+	}
+	for i := 0; i < workers; i++ {
+		key := fmt.Sprintf("k%d", i)
+		if cfg.Fallback[key] != int64(i) {
+			t.Errorf("fallback %s = %#v, want %d; file=%v", key, cfg.Fallback[key], i, cfg.Fallback)
+		}
 	}
 }
 

@@ -7,6 +7,7 @@
 - [git](https://git-scm.com/)
 - [uwsm](https://github.com/Vladimir-csp/uwsm)
 - [hyprland](https://github.com/hyprwm/Hyprland) (`hyprland-guiutils`)
+- [xwayland](https://gitlab.freedesktop.org/xorg/xserver) (needed by Steam and other X11 apps)
 - [hyprpaper](https://github.com/hyprwm/hyprpaper)
 - [golang 1.27.0](https://go.dev/dl/)
 - [rcm](rcm/README.md)
@@ -132,7 +133,7 @@ Then reboot.
 
 ### rcm
 
-Tool for managing rice environment configuration as dynamically named properties. To install `rcm`, run the following command:
+Tool for managing rice environment configuration as dynamically named properties. User values (`rcm set`) and fallbacks (`rcm set-fallback`) are stored separately in `~/.config/rcm/config.json`. Hyprland seeds rice fallbacks on start in `.config/hypr/hyprland.lua`. To install `rcm`, run the following command:
 
 ```bash
 chmod +x ./build_rcm.sh

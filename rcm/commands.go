@@ -14,52 +14,83 @@ type Command interface {
 // GetCommand handles reading config values
 type GetCommand struct{}
 
-// SetCommand handles writing config values
+// SetCommand handles writing user config values
 type SetCommand struct{}
+
+// SetFallbackCommand handles writing fallback config values
+type SetFallbackCommand struct{}
 
 // HelpCommand displays usage information
 type HelpCommand struct{}
 
-const getUsage = "Usage: rcm get <field> -b <fallback>"
+const getUsage = "Usage: rcm get <field> [-f <fallback>]"
+const setUsage = "Usage: rcm set <field> <value>"
+const setFallbackUsage = "Usage: rcm set-fallback <field> <value> [<field> <value> ...]"
 
-func parseGetArgs(args []string) (field string, backup any, err error) {
+func parseGetArgs(args []string) (field string, fallback any, fallbackSet bool, err error) {
 	var fieldName string
-	var backupRaw string
-	var backupSet bool
+	var fallbackRaw string
 
 	for i := 0; i < len(args); i++ {
 		arg := args[i]
 		name, value, hasValue := splitFlag(arg)
 
 		switch {
-		case name == "b" || name == "backup":
+		case name == "f" || name == "fallback":
 			if !hasValue {
 				if i+1 >= len(args) {
-					return "", nil, fmt.Errorf("flag -%s needs an argument\n%s", name, getUsage)
+					return "", nil, false, fmt.Errorf("flag -%s needs an argument\n%s", name, getUsage)
 				}
 				i++
 				value = args[i]
 			}
-			backupRaw = value
-			backupSet = true
+			fallbackRaw = value
+			fallbackSet = true
 		case strings.HasPrefix(arg, "-"):
-			return "", nil, fmt.Errorf("unknown flag: %s\n%s", arg, getUsage)
+			return "", nil, false, fmt.Errorf("unknown flag: %s\n%s", arg, getUsage)
 		default:
 			if fieldName != "" {
-				return "", nil, fmt.Errorf("unexpected argument: %s\n%s", arg, getUsage)
+				return "", nil, false, fmt.Errorf("unexpected argument: %s\n%s", arg, getUsage)
 			}
 			fieldName = arg
 		}
 	}
 
 	if fieldName == "" {
-		return "", nil, fmt.Errorf("missing field name\n%s", getUsage)
-	}
-	if !backupSet {
-		return "", nil, fmt.Errorf("missing backup flag\n%s", getUsage)
+		return "", nil, false, fmt.Errorf("missing field name\n%s", getUsage)
 	}
 
-	return fieldName, parseValue(backupRaw), nil
+	if fallbackSet {
+		return fieldName, parseValue(fallbackRaw), true, nil
+	}
+	return fieldName, nil, false, nil
+}
+
+func parseFieldValue(args []string, usage string) (field string, value any, err error) {
+	if len(args) < 2 {
+		return "", nil, fmt.Errorf("missing field name or value\n%s", usage)
+	}
+	return args[0], parseValue(strings.Join(args[1:], " ")), nil
+}
+
+func parseFieldValuePairs(args []string, usage string) ([]struct {
+	field string
+	value any
+}, error) {
+	if len(args) < 2 || len(args)%2 != 0 {
+		return nil, fmt.Errorf("missing field name or value\n%s", usage)
+	}
+	pairs := make([]struct {
+		field string
+		value any
+	}, 0, len(args)/2)
+	for i := 0; i < len(args); i += 2 {
+		pairs = append(pairs, struct {
+			field string
+			value any
+		}{args[i], parseValue(args[i+1])})
+	}
+	return pairs, nil
 }
 
 func splitFlag(arg string) (name, value string, hasValue bool) {
@@ -78,23 +109,23 @@ func splitFlag(arg string) (name, value string, hasValue bool) {
 	return name, "", false
 }
 
-// Execute prints a property value, or the provided fallback when the key is missing.
+// Execute prints a property value. User value wins over stored fallback.
+// Optional -f seeds fallback when it is not already stored.
 func (c GetCommand) Execute(args []string) error {
-	fieldName, fallback, err := parseGetArgs(args)
+	fieldName, fallback, fallbackSet, err := parseGetArgs(args)
 	if err != nil {
 		return err
 	}
 
-	config, err := GetConfig()
+	var value any
+	_, err = withConfig(func(config *Config) (bool, error) {
+		var wrote bool
+		var resolveErr error
+		value, wrote, resolveErr = config.Resolve(fieldName, fallback, fallbackSet)
+		return wrote, resolveErr
+	})
 	if err != nil {
 		return err
-	}
-
-	value, wrote := config.GetOrSet(fieldName, fallback)
-	if wrote {
-		if err := config.Save(); err != nil {
-			return err
-		}
 	}
 
 	fmt.Println(formatValue(value))
@@ -102,36 +133,32 @@ func (c GetCommand) Execute(args []string) error {
 }
 
 func (c GetCommand) Help() string {
-	return `Usage: rcm get <field> -b <fallback>
+	return `Usage: rcm get <field> [-f <fallback>]
 
-Get a configuration value by name. If the property is not set, the fallback
-from -b / --backup is stored in the config file and printed. Fallback type
-is inferred the same way as for 'rcm set'.
+Get a configuration value by name. Returns the user value from 'rcm set'
+when present, otherwise the stored fallback. If neither exists, -f /
+--fallback is stored under fallback and printed. -f does not overwrite an
+existing fallback. Type is inferred the same way as for 'rcm set'.
 
 Examples:
-  rcm get mode -b auto
-  rcm get autoclick_interval -b 1000
-  rcm get force_mode -b false
-  rcm get background -b /home/user/wallpaper.jpg`
+  rcm get mode
+  rcm get mode -f auto
+  rcm get autoclick_interval -f 1000
+  rcm get force_mode -f false
+  rcm get background -f /home/user/wallpaper.jpg`
 }
 
-// Execute stores a property, inferring bool, integer, float, or string from the value.
+// Execute stores a user property, inferring bool, integer, float, or string.
 func (c SetCommand) Execute(args []string) error {
-	if len(args) < 2 {
-		return fmt.Errorf("missing field name or value\nUsage: rcm set <field> <value>")
-	}
-
-	fieldName := args[0]
-	value := parseValue(strings.Join(args[1:], " "))
-
-	config, err := GetConfig()
+	fieldName, value, err := parseFieldValue(args, setUsage)
 	if err != nil {
 		return err
 	}
 
-	config.Set(fieldName, value)
-
-	if err := config.Save(); err != nil {
+	if _, err := withConfig(func(config *Config) (bool, error) {
+		config.Set(fieldName, value)
+		return true, nil
+	}); err != nil {
 		return err
 	}
 
@@ -142,7 +169,8 @@ func (c SetCommand) Execute(args []string) error {
 func (c SetCommand) Help() string {
 	return `Usage: rcm set <field> <value>
 
-Set a configuration value by name. The data type is inferred from the value:
+Set a user configuration value by name. Stored under value and preferred
+by 'rcm get' over fallback. The data type is inferred from the value:
 
   true / false  - boolean
   1500          - integer
@@ -159,6 +187,44 @@ Examples:
   rcm set background /home/user/wallpaper.jpg`
 }
 
+// Execute stores fallback properties used when the user value is unset.
+func (c SetFallbackCommand) Execute(args []string) error {
+	pairs, err := parseFieldValuePairs(args, setFallbackUsage)
+	if err != nil {
+		return err
+	}
+
+	if _, err := withConfig(func(config *Config) (bool, error) {
+		for _, pair := range pairs {
+			config.SetFallback(pair.field, pair.value)
+		}
+		return true, nil
+	}); err != nil {
+		return err
+	}
+
+	for _, pair := range pairs {
+		fmt.Printf("Successfully set fallback %s to: %s\n", pair.field, formatValue(pair.value))
+	}
+	return nil
+}
+
+func (c SetFallbackCommand) Help() string {
+	return `Usage: rcm set-fallback <field> <value> [<field> <value> ...]
+
+Set one or more fallbacks used by 'rcm get' when the user value is unset.
+Stored under fallback and does not change a value written by 'rcm set'.
+Type inference matches 'rcm set'. Alias: setFallback.
+
+Examples:
+  rcm set-fallback mode auto
+  rcm set-fallback keyboard cz
+  rcm set-fallback color blue wallpaper /usr/share/hypr/wall0.png
+  rcm set-fallback autoclick_interval 1000
+  rcm set-fallback force_mode false
+  rcm set-fallback background /home/user/wallpaper.jpg`
+}
+
 func (c HelpCommand) Execute(args []string) error {
 	if len(args) > 0 {
 		switch args[0] {
@@ -166,6 +232,8 @@ func (c HelpCommand) Execute(args []string) error {
 			fmt.Println(GetCommand{}.Help())
 		case "set":
 			fmt.Println(SetCommand{}.Help())
+		case "set-fallback", "setFallback":
+			fmt.Println(SetFallbackCommand{}.Help())
 		default:
 			return fmt.Errorf("unknown command: %s", args[0])
 		}
@@ -178,9 +246,10 @@ Usage:
   rcm <command> [arguments]
 
 Available commands:
-  get <field> -b <fallback>  Get a configuration value (fallback if unset)
-  set <field> <value>     Set a configuration value (type autodetected)
-  help [command]          Show help information
+  get <field> [-f <fallback>]     Get a configuration value
+  set <field> <value>             Set a user configuration value
+  set-fallback <field> <value> ...  Set fallbacks for get
+  help [command]                  Show help information
 
 Run 'rcm help <command>' for more information about a command.
 

@@ -6,31 +6,31 @@ export PATH="${HOME}/.cargo/bin:${HOME}/.local/bin:/usr/local/bin:${PATH:-/usr/b
 # TODO check if anything changed since last run or just optimize the code
 
 # colors
-forced_color=$(rcm get forcedColor -b false)
+forced_color=$(rcm get forcedColor)
 
 if [ $forced_color = true ]; then
     # color set by force
-    color=$(rcm get color -b blue)
+    color=$(rcm get color)
     color_hex=$(~/.config/matugen/color_utils.py -color2hex $color)
 else
-    color_from_wallpaper=$(rcm get colorFromWallpaper -b false)
+    color_from_wallpaper=$(rcm get colorFromWallpaper)
     if [ $color_from_wallpaper = true ]; then
         # color based on the wallpaper
-        color_hex=$(~/.config/matugen/color_utils.py -hex $(rcm get wallpaper -b /usr/share/hypr/wall0.png))
+        color_hex=$(~/.config/matugen/color_utils.py -hex $(rcm get wallpaper))
         color=$(~/.config/matugen/color_utils.py -hex2color $color_hex)
     else
         # color from palette based on the wallpaper
-        color_hex=$(~/.config/matugen/color_utils.py -hex $(rcm get wallpaper -b /usr/share/hypr/wall0.png))
+        color_hex=$(~/.config/matugen/color_utils.py -hex $(rcm get wallpaper))
         color=$(~/.config/matugen/color_utils.py -hex2color $color_hex)
         color_hex=$(~/.config/matugen/color_utils.py -color2hex $color)
     fi
 fi
 
 # brightness mode
-forced_brightness_mode=$(rcm get forcedBrightnessMode -b false)
+forced_brightness_mode=$(rcm get forcedBrightnessMode)
 if [ $forced_brightness_mode = true ]; then
     # brightness mode set by force
-    brightness_mode=$(rcm get brightness_mode -b light)
+    brightness_mode=$(rcm get brightness_mode)
 else
     # brightness mode based on darkman
     brightness_mode=$(darkman get)
