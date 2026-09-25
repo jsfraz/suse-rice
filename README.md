@@ -22,9 +22,10 @@
 - [fastfetch](https://github.com/fastfetch-cli/fastfetch)
 - [btop](https://github.com/aristocratos/btop)
 - [rofi](https://github.com/davatorium/rofi)
-- [dolphin](https://apps.kde.org/dolphin/) (`qt6-wayland`, `libxcb-cursor0`)
+- [nemo](https://github.com/linuxmint/nemo)
 - [Crystal Remix icon theme — color variants](https://github.com/jsfraz/crystal-remix-icon-theme-color-variants)
 - [darkman](https://gitlab.com/WhyNotHugo/darkman)
+- [waybar](https://github.com/alexays/waybar)
 
 ## Recommanded installation setup
 - disk encryption + verification using **Only password** method

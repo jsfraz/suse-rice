@@ -33,7 +33,7 @@ hl.monitor({
 
 -- Set programs
 local terminal    = "kitty"
-local fileManager = "dolphin"
+local fileManager = "nemo"
 local appLauncher        = "rofi -show combi -combi-modes 'drun,ssh' -modes combi -theme ~/.config/rofi/launcher.rasi -show-icons -icon-theme crystal-remix-$(rcm get color)"
 
 
@@ -182,9 +182,9 @@ hl.animation({ leaf = "layersIn",      enabled = true,  speed = 4,    bezier = "
 hl.animation({ leaf = "layersOut",     enabled = true,  speed = 1.5,  bezier = "linear",       style = "fade" })
 hl.animation({ leaf = "fadeLayersIn",  enabled = true,  speed = 1.79, bezier = "almostLinear" })
 hl.animation({ leaf = "fadeLayersOut", enabled = true,  speed = 1.39, bezier = "almostLinear" })
-hl.animation({ leaf = "workspaces",    enabled = true,  speed = 1.94, bezier = "almostLinear", style = "fade" })
-hl.animation({ leaf = "workspacesIn",  enabled = true,  speed = 1.21, bezier = "almostLinear", style = "fade" })
-hl.animation({ leaf = "workspacesOut", enabled = true,  speed = 1.94, bezier = "almostLinear", style = "fade" })
+hl.animation({ leaf = "workspaces",    enabled = true,  speed = 2, bezier = "almostLinear", style = "slide" })
+hl.animation({ leaf = "workspacesIn",  enabled = true,  speed = 2, bezier = "almostLinear", style = "slide" })
+hl.animation({ leaf = "workspacesOut", enabled = true,  speed = 2, bezier = "almostLinear", style = "slide" })
 hl.animation({ leaf = "zoomFactor",    enabled = true,  speed = 7,    bezier = "quick" })
 
 -- Ref https://wiki.hypr.land/Configuring/Basics/Workspace-Rules/
@@ -256,7 +256,7 @@ hl.config({
         sensitivity = 0, -- -1.0 - 1.0, 0 means no modification.
 
         touchpad = {
-            natural_scroll = false,
+            natural_scroll = true,
         },
     },
 })
@@ -298,17 +298,22 @@ hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
 hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
 
--- Switch workspaces with mainMod + [0-9]
--- Move active window to a workspace with mainMod + SHIFT + [0-9]
-for i = 1, 10 do
-    local key = i % 10 -- 10 maps to key 0
-    hl.bind(mainMod .. " + " .. key,             hl.dsp.focus({ workspace = i}))
-    hl.bind(mainMod .. " + SHIFT + " .. key,     hl.dsp.window.move({ workspace = i }))
+-- cz number row without Shift is + ě š č ř ž ý á í é; digits exist only with Shift,
+-- so SUPER+1 never matches. Bind the level-0 keysyms. SHIFT+digit still moves a
+-- window, because holding Shift turns the keysym into 1–0.
+local workspaceKeys = {
+    "plus", "ecaron", "scaron", "ccaron", "rcaron",
+    "zcaron", "yacute", "aacute", "iacute", "eacute",
+}
+for i, key in ipairs(workspaceKeys) do
+    hl.bind(mainMod .. " + " .. key,              hl.dsp.focus({ workspace = i }))
+    hl.bind(mainMod .. " + SHIFT + " .. key,      hl.dsp.window.move({ workspace = i, follow = false }))
+    hl.bind(mainMod .. " + SHIFT + " .. (i % 10), hl.dsp.window.move({ workspace = i, follow = false }))
 end
 
 -- Example special workspace (scratchpad)
 hl.bind(mainMod .. " + S",         hl.dsp.workspace.toggle_special("magic"))
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:magic" }))
+hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:magic", follow = false }))
 
 -- Scroll through existing workspaces with mainMod + scroll
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
@@ -364,13 +369,6 @@ hl.window_rule({
     },
 
     no_focus = true,
-})
-
--- Qt draws a client-side shadow in the surface; Hyprland would add a second one
-hl.window_rule({
-    name  = "dolphin-no-double-shadow",
-    match = { class = "^org\\.kde\\.dolphin$", float = true },
-    no_shadow = true,
 })
 
 -- Frosted glass behind Rofi (layer-shell, not a regular window)
