@@ -34,7 +34,7 @@ hl.monitor({
 -- Set programs
 local terminal    = "kitty"
 local fileManager = "nemo"
-local appLauncher        = "rofi -show combi -combi-modes 'drun,ssh' -modes combi -theme ~/.config/rofi/launcher.rasi -show-icons -icon-theme crystal-remix-$(rcm get color)"
+local appLauncher = "rofi -show combi -combi-modes 'drun,ssh' -modes combi -theme ~/.config/rofi/launcher.rasi -show-icons -icon-theme crystal-remix-$(rcm get color)"
 
 
 -------------------
@@ -69,6 +69,16 @@ hl.on("hyprland.start", function()
     ]=]))
     -- Themes
     hl.exec_cmd(rcmAutostart([=[~/.config/matugen/matugen.sh]=]))
+    -- Waybar imports colors.css, which matugen writes. Wait for it, then stay up as the unit.
+    hl.exec_cmd(rcmAutostart([=[
+        pgrep -x waybar >/dev/null && exit 0
+        i=0
+        while [ ! -f "${HOME}/.config/waybar/colors.css" ] && [ "$i" -lt 100 ]; do
+            i=$((i + 1))
+            sleep 0.1
+        done
+        exec waybar
+    ]=]))
     -- TODO secure wayvnc
     hl.exec_cmd(rcmAutostart([=[wayvnc 0.0.0.0 -f 60 -k "$(rcm get keyboard)" -r]=]))
 end)
@@ -99,6 +109,7 @@ hl.env("HYPRCURSOR_SIZE", "24")
 -- })
 
 hl.permission("/usr/(bin|local/bin)/grim", "screencopy", "allow")
+hl.permission("/usr/(bin|local/bin)/hyprpicker", "screencopy", "allow")
 -- hl.permission("/usr/(lib|libexec|lib64)/xdg-desktop-portal-hyprland", "screencopy", "allow")
 -- hl.permission("/usr/(bin|local/bin)/hyprpm", "plugin", "allow")
 
@@ -111,7 +122,7 @@ hl.permission("/usr/(bin|local/bin)/grim", "screencopy", "allow")
 hl.config({
     general = {
         gaps_in  = 5,
-        gaps_out = 15,
+        gaps_out = 10,
 
         border_size = 2,
 

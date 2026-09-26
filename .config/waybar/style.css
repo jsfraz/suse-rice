@@ -1,9 +1,9 @@
 @import url("colors.css");
 
 * {
-    font-family: "FiraCode Nerd Font Mono", monospace;
+    font-family: "Source Sans 3";
     font-weight: 500;
-    font-size: 14px;
+    font-size: 15px;
     border: none;
     border-radius: 0;
     min-height: 0;
@@ -28,21 +28,13 @@ window#waybar > box {
 #custom-net,
 #battery,
 #clock,
+.slide-clock,
 #tray {
     color: @primary_fixed;
     background-color: transparent;
     padding: 0 4px;
     border-radius: 20px;
     text-shadow: 0 1px 2px alpha(@shadow, 0.3);
-}
-
-#custom-os:hover,
-#custom-runcat:hover,
-#custom-net:hover,
-#battery:hover,
-#clock:hover,
-#tray:hover {
-    background-color: alpha(@surface, 0.1);
 }
 
 #custom-os,
@@ -94,17 +86,18 @@ window#waybar > box {
 
 #custom-net,
 #battery {
-    font-size: 16px;
+    font-size: 18px;
     padding: 0 6px;
 }
 
-#custom-workspace {
+.slide-workspace {
     color: @primary_fixed;
     background-color: alpha(@primary_container, 0.15);
     border: 1px solid alpha(@primary_container, 0.5);
-    border-radius: 3px;
-    padding: 0 6px;
-    margin: 0 2px;
+    border-radius: 4px;
+    padding: 0 5px;
+    margin: 4px 4px;
+    min-height: 0;
     text-shadow: 0 1px 2px alpha(@shadow, 0.3);
 }
 
@@ -127,6 +120,7 @@ window#waybar > box {
     background-color: alpha(@surface, 0.1);
 }
 
-#clock {
+#clock,
+.slide-clock {
     padding: 0 8px;
 }

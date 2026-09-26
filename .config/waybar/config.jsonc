@@ -12,13 +12,15 @@
     "modules-left": [
         "custom/os"
     ],
+    "modules-center": [
+        "cffi/clock"
+    ],
     "modules-right": [
         "tray",
         "custom/runcat",
         "custom/net",
-        "custom/workspace",
-        "battery",
-        "clock"
+        "cffi/workspace",
+        "battery"
     ],
     "tray": {
         "icon-size": 21,
@@ -39,9 +41,9 @@
         "return-type": "json",
         "interval": 2
     },
-    "custom/workspace": {
-        "exec": "~/.config/waybar/scripts/workspace.sh",
-        "return-type": "json",
+    "cffi/workspace": {
+        "module_path": "/home/razj/.config/waybar/cffi/libslides.so",
+        "kind": "workspace",
         "tooltip": false
     },
     "battery": {
@@ -63,9 +65,9 @@
             "critical": 15
         }
     },
-    "clock": {
-        "interval": 1,
-        "format": "{:%H:%M:%S}",
+    "cffi/clock": {
+        "module_path": "/home/razj/.config/waybar/cffi/libslides.so",
+        "kind": "clock",
         "tooltip": false
     }
 }

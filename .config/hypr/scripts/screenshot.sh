@@ -71,11 +71,38 @@ window_geometries() {
     '
 }
 
+freeze_pid=
+
+end_freeze() {
+    if [ -n "${freeze_pid:-}" ]; then
+        kill "$freeze_pid" 2>/dev/null || true
+        wait "$freeze_pid" 2>/dev/null || true
+        freeze_pid=
+    fi
+}
+
+trap end_freeze EXIT INT TERM
+
+# Hold a still frame of every output before the picker appears. -z hides the zoom lens.
+begin_freeze() {
+    hyprpicker -rzdq >/dev/null 2>&1 &
+    freeze_pid=$!
+    sleep 0.2
+    if ! kill -0 "$freeze_pid" 2>/dev/null; then
+        notify -u critical "Snímek obrazovky" "Obrazovku se nepodařilo zmrazit."
+        freeze_pid=
+        exit 1
+    fi
+}
+
 require grim
 require slurp
+require hyprpicker
 require jq
 require rofi
 require hyprctl
+
+begin_freeze
 
 color=$(rcm get color 2>/dev/null || true)
 [ -n "$color" ] || color=blue
