@@ -98,7 +98,7 @@ hl.env("HYPRCURSOR_SIZE", "24")
 --   },
 -- })
 
--- hl.permission("/usr/(bin|local/bin)/grim", "screencopy", "allow")
+hl.permission("/usr/(bin|local/bin)/grim", "screencopy", "allow")
 -- hl.permission("/usr/(lib|libexec|lib64)/xdg-desktop-portal-hyprland", "screencopy", "allow")
 -- hl.permission("/usr/(bin|local/bin)/hyprpm", "plugin", "allow")
 
@@ -289,6 +289,8 @@ hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(appLauncher))
+-- Region, window, or a whole screen. Permission above needs a Hyprland restart.
+hl.bind("Print", hl.dsp.exec_cmd("~/.config/hypr/scripts/screenshot.sh"))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 
@@ -378,6 +380,13 @@ hl.layer_rule({
     blur         = true,
     ignore_alpha = 0.1,
     animation    = "popin",
+})
+
+hl.layer_rule({
+    name         = "waybar-glass",
+    match        = { namespace = "waybar" },
+    blur         = true,
+    ignore_alpha = 0.1,
 })
 
 -- Hyprland-run windowrule

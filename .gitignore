@@ -6,6 +6,10 @@ darkman/
 .config/hypr/colors.lua
 .config/kitty/colors.conf
 .config/rofi/colors.rasi
+.config/waybar/colors.css
 
 # Go
 rcm/rcm
+
+# HyprCapture
+HyprCapture/

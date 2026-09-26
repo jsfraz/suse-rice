@@ -1,0 +1,132 @@
+@import url("colors.css");
+
+* {
+    font-family: "FiraCode Nerd Font Mono", monospace;
+    font-weight: 500;
+    font-size: 14px;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+}
+
+window#waybar {
+    background: alpha(@primary_container, 0.2);
+    color: @primary_fixed;
+    border-style: solid;
+    border-width: 1px;
+    border-color: alpha(@primary_container, 0.25);
+    border-top-color: alpha(@primary_container, 0.4);
+    border-radius: 28px;
+}
+
+window#waybar > box {
+    padding: 0 8px;
+}
+
+#custom-os,
+#custom-runcat,
+#custom-net,
+#battery,
+#clock,
+#tray {
+    color: @primary_fixed;
+    background-color: transparent;
+    padding: 0 4px;
+    border-radius: 20px;
+    text-shadow: 0 1px 2px alpha(@shadow, 0.3);
+}
+
+#custom-os:hover,
+#custom-runcat:hover,
+#custom-net:hover,
+#battery:hover,
+#clock:hover,
+#tray:hover {
+    background-color: alpha(@surface, 0.1);
+}
+
+#custom-os,
+#custom-runcat {
+    min-width: 28px;
+    min-height: 28px;
+    padding: 0 6px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 22px 22px;
+    font-size: 0;
+}
+
+#custom-os.arch {
+    background-image: url("icons/os/arch.svg");
+}
+
+#custom-os.opensuse {
+    background-image: url("icons/os/opensuse.svg");
+}
+
+#custom-os.linux {
+    background-image: url("icons/os/linux.svg");
+}
+
+#custom-runcat.idle {
+    background-image: url("icons/runcat/idle/sprite-0-symbolic.svg");
+}
+
+#custom-runcat.frame-0 {
+    background-image: url("icons/runcat/active/sprite-0-symbolic.svg");
+}
+
+#custom-runcat.frame-1 {
+    background-image: url("icons/runcat/active/sprite-1-symbolic.svg");
+}
+
+#custom-runcat.frame-2 {
+    background-image: url("icons/runcat/active/sprite-2-symbolic.svg");
+}
+
+#custom-runcat.frame-3 {
+    background-image: url("icons/runcat/active/sprite-3-symbolic.svg");
+}
+
+#custom-runcat.frame-4 {
+    background-image: url("icons/runcat/active/sprite-4-symbolic.svg");
+}
+
+#custom-net,
+#battery {
+    font-size: 16px;
+    padding: 0 6px;
+}
+
+#custom-workspace {
+    color: @primary_fixed;
+    background-color: alpha(@primary_container, 0.15);
+    border: 1px solid alpha(@primary_container, 0.5);
+    border-radius: 3px;
+    padding: 0 6px;
+    margin: 0 2px;
+    text-shadow: 0 1px 2px alpha(@shadow, 0.3);
+}
+
+#battery,
+#battery.charging,
+#battery.warning,
+#battery.critical,
+#battery.full,
+#battery.plugged {
+    color: @primary_fixed;
+    background-color: transparent;
+}
+
+#battery:hover,
+#battery.charging:hover,
+#battery.warning:hover,
+#battery.critical:hover,
+#battery.full:hover,
+#battery.plugged:hover {
+    background-color: alpha(@surface, 0.1);
+}
+
+#clock {
+    padding: 0 8px;
+}

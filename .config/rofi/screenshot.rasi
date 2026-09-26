@@ -1,0 +1,114 @@
+/**
+ * Screenshot picker — three Aero gel tiles on the same glass as the launcher.
+ **/
+
+configuration {
+    show-icons:                 true;
+    hover-select:               true;
+    me-select-entry:            "";
+    me-accept-entry:            "MousePrimary";
+}
+
+@import                         "colors.rasi"
+
+* {
+    font:                       "Source Sans 3 13";
+}
+
+window {
+    transparency:               "real";
+    location:                   center;
+    anchor:                     center;
+    fullscreen:                 false;
+    width:                      520px;
+    x-offset:                   0px;
+    y-offset:                   0px;
+    margin:                     0px;
+    padding:                    0px;
+    border:                     2px 1px 1px 1px;
+    border-radius:              16px;
+    border-color:               @rim;
+    background-color:           @glass;
+    background-image:           @gloss-window;
+    cursor:                     "default";
+}
+
+mainbox {
+    spacing:                    0px;
+    margin:                     4px;
+    padding:                    10px;
+    border:                     0px;
+    background-color:           transparent;
+    children:                   [ "listview" ];
+}
+
+inputbar {
+    enabled:                    false;
+}
+
+message {
+    enabled:                    false;
+}
+
+listview {
+    columns:                    3;
+    lines:                      1;
+    cycle:                      true;
+    dynamic:                    false;
+    scrollbar:                  false;
+    layout:                     vertical;
+    fixed-height:               true;
+    fixed-columns:              true;
+    spacing:                    8px;
+    margin:                     0px;
+    padding:                    2px;
+    border:                     0px;
+    background-color:           transparent;
+    text-color:                 @foreground;
+    cursor:                     "default";
+}
+
+element {
+    spacing:                    8px;
+    margin:                     0px;
+    padding:                    16px 8px 12px 8px;
+    border:                     1px;
+    border-radius:              12px;
+    border-color:               @rim-tile;
+    background-color:           @tile;
+    background-image:           @gloss-tile;
+    text-color:                 @foreground;
+    orientation:                vertical;
+    cursor:                     pointer;
+}
+element normal.normal,
+element alternate.normal {
+    background-color:           @tile;
+    background-image:           @gloss-tile;
+    border-color:               @rim-tile;
+    text-color:                 @foreground;
+}
+element selected.normal {
+    background-color:           @gel;
+    background-image:           @gloss-gel;
+    border:                     2px 1px 1px 1px;
+    border-radius:              12px;
+    border-color:               @rim-gel;
+    text-color:                 @gel-text;
+}
+
+element-icon {
+    background-color:           transparent;
+    text-color:                 inherit;
+    size:                       64px;
+    cursor:                     inherit;
+    horizontal-align:           0.5;
+}
+element-text {
+    background-color:           transparent;
+    text-color:                 inherit;
+    cursor:                     inherit;
+    font:                       "Source Sans 3 Medium 12";
+    vertical-align:             0.5;
+    horizontal-align:           0.5;
+}

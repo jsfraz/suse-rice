@@ -1,0 +1,4 @@
+@define-color primary_container {{ colors.primary_container.default.hex }};
+@define-color primary_fixed {{ colors.primary_fixed.default.hex }};
+@define-color surface {{ colors.surface.default.hex }};
+@define-color shadow {{ colors.shadow.default.hex }};
