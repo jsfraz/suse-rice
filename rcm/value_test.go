@@ -215,7 +215,7 @@ func TestConfigFromJSON(t *testing.T) {
   "value": {},
   "fallback": {}
 }
- "brightness_mode": "light"
+ "brightnessMode": "light"
 }
 `))
 	if err != nil {

@@ -1,4 +1,23 @@
-@define-color primary_container {{ colors.primary_container.default.hex }};
-@define-color primary_fixed {{ colors.primary_fixed.default.hex }};
-@define-color surface {{ colors.surface.default.hex }};
+/* Aero glass stops. Lightness follows dark/light; hue stays on the wallpaper seed. */
+<* if {{ is_dark_mode }} *>
+@define-color foreground {{ colors.on_surface.default.hex }};
+@define-color glass {{ colors.primary.default.hex | set_saturation: 48.0 | set_lightness: 22.0 }};
+@define-color glass_deep {{ colors.primary.default.hex | set_saturation: 52.0 | set_lightness: 12.0 }};
+@define-color highlight {{ colors.primary.default.hex | set_saturation: 12.0 | set_lightness: 96.0 }};
+@define-color gel {{ colors.primary.default.hex | set_saturation: 46.0 | set_lightness: 48.0 }};
+@define-color gel_hi {{ colors.primary.default.hex | set_saturation: 28.0 | set_lightness: 78.0 }};
+@define-color gel_deep {{ colors.primary.default.hex | set_saturation: 58.0 | set_lightness: 28.0 }};
+@define-color gel_active {{ colors.primary.default.hex | set_saturation: 78.0 | set_lightness: 52.0 }};
+@define-color rim {{ colors.primary.default.hex | set_saturation: 22.0 | set_lightness: 92.0 }};
+<* else *>
+@define-color foreground {{ colors.primary.default.hex | set_saturation: 12.0 | set_lightness: 99.0 }};
+@define-color glass {{ colors.primary.default.hex | set_saturation: 68.0 | set_lightness: 52.0 }};
+@define-color glass_deep {{ colors.primary.default.hex | set_saturation: 74.0 | set_lightness: 34.0 }};
+@define-color highlight {{ colors.primary.default.hex | set_saturation: 8.0 | set_lightness: 100.0 }};
+@define-color gel {{ colors.primary.default.hex | set_saturation: 42.0 | set_lightness: 82.0 }};
+@define-color gel_hi {{ colors.primary.default.hex | set_saturation: 18.0 | set_lightness: 98.0 }};
+@define-color gel_deep {{ colors.primary.default.hex | set_saturation: 62.0 | set_lightness: 48.0 }};
+@define-color gel_active {{ colors.primary.default.hex | set_saturation: 82.0 | set_lightness: 58.0 }};
+@define-color rim {{ colors.primary.default.hex | set_saturation: 16.0 | set_lightness: 100.0 }};
+<* endif *>
 @define-color shadow {{ colors.shadow.default.hex }};

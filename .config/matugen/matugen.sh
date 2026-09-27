@@ -30,7 +30,7 @@ fi
 forced_brightness_mode=$(rcm get forcedBrightnessMode)
 if [ $forced_brightness_mode = true ]; then
     # brightness mode set by force
-    brightness_mode=$(rcm get brightness_mode)
+    brightness_mode=$(rcm get brightnessMode)
 else
     # brightness mode based on darkman
     brightness_mode=$(darkman get)

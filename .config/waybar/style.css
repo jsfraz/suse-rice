@@ -2,68 +2,94 @@
 
 * {
     font-family: "Source Sans 3";
-    font-weight: 500;
-    font-size: 16px;
+    font-weight: 600;
+    font-size: 15px;
     border: none;
-    border-radius: 0;
+    border-radius: 15px;
     min-height: 0;
 }
 
 window#waybar {
-    background: alpha(@primary_container, 0.2);
-    color: @primary_fixed;
-    border-style: solid;
-    border-width: 1px;
-    border-color: alpha(@primary_container, 0.25);
-    border-top-color: alpha(@primary_container, 0.4);
-    border-radius: 28px;
+    background-color: alpha(@glass, 0.46);
+    background-image: linear-gradient(
+        to bottom,
+        alpha(@highlight, 0.32),
+        alpha(@highlight, 0.05) 18%,
+        alpha(@glass, 0.04) 46%,
+        alpha(@glass_deep, 0.62)
+    );
+    color: @foreground;
+    border-top: 1px solid alpha(@rim, 0.62);
+    box-shadow: inset 0 1px 0 alpha(@highlight, 0.42);
 }
 
 window#waybar > box {
-    padding: 0 8px;
-}
-
-#custom-os,
-#custom-runcat,
-#custom-net,
-#battery,
-#clock,
-.slide-clock,
-#tray {
-    color: @primary_fixed;
-    background-color: transparent;
     padding: 0 4px;
-    border-radius: 20px;
-    text-shadow: 0 1px 2px alpha(@shadow, 0.3);
-}
-
-#custom-os,
-#custom-runcat {
-    min-width: 28px;
-    min-height: 28px;
-    padding: 0 6px;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 22px 22px;
-    font-size: 0;
 }
 
 #custom-os {
-    margin-left: -8px;
+    min-width: 25px;
+    min-height: 25px;
+    margin: 4px 8px 4px 4px;
+    padding: 0;
+    border: none;
+    border-radius: 13px;
     color: transparent;
+    font-size: 0;
     text-shadow: none;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 20px 20px;
+    box-shadow: none;
+    transition: box-shadow 160ms ease-out;
 }
 
-#custom-os.arch {
-    background-image: url("icons/os/arch.svg");
+#custom-os:hover,
+#custom-os:active {
+    background-color: transparent;
 }
 
-#custom-os.opensuse {
-    background-image: url("icons/os/opensuse.svg");
+#custom-os:hover {
+    box-shadow: 0 0 3px alpha(@gel_active, 0.45);
 }
 
-#custom-os.linux {
-    background-image: url("icons/os/linux.svg");
+#custom-os:active {
+    box-shadow: 0 0 2px alpha(@gel_active, 0.28);
+}
+
+#custom-os.arch { background-image: url("icons/os/arch.svg"); }
+#custom-os.opensuse { background-image: url("icons/os/opensuse.svg"); }
+#custom-os.linux { background-image: url("icons/os/linux.svg"); }
+
+#tray {
+    margin-left: 8px;
+    padding: 0 8px 0 10px;
+    background: transparent;
+}
+
+#battery {
+    margin-right: 8px;
+}
+
+#custom-runcat,
+#network,
+#battery,
+.slide-clock {
+    color: @foreground;
+    background-color: transparent;
+    text-shadow: 0 1px 2px alpha(@shadow, 0.45);
+}
+
+#custom-runcat {
+    min-width: 22px;
+    min-height: 22px;
+    margin: 0 4px;
+    padding: 0;
+    font-size: 0;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 24px 24px;
 }
 
 #custom-runcat.idle {
@@ -90,47 +116,112 @@ window#waybar > box {
     background-image: url("icons/runcat/active/sprite-4-symbolic.svg");
 }
 
-#battery {
-    margin-right: 5px;
-}
-
-#custom-net,
+#network,
 #battery {
     font-size: 18px;
     padding: 0 6px;
 }
 
-.slide-workspace {
-    color: @primary_fixed;
-    background-color: alpha(@primary_container, 0.15);
-    border: 1px solid alpha(@primary_container, 0.5);
-    border-radius: 4px;
-    padding: 0 5px;
-    margin: 4px 4px;
-    min-height: 0;
-    text-shadow: 0 1px 2px alpha(@shadow, 0.3);
-}
-
-#battery,
 #battery.charging,
 #battery.warning,
 #battery.critical,
 #battery.full,
 #battery.plugged {
-    color: @primary_fixed;
+    color: @foreground;
     background-color: transparent;
 }
 
-#battery:hover,
-#battery.charging:hover,
-#battery.warning:hover,
-#battery.critical:hover,
-#battery.full:hover,
-#battery.plugged:hover {
-    background-color: alpha(@surface, 0.1);
+#battery.warning,
+#battery.critical,
+#network.disconnected,
+#network.disabled {
+    color: @highlight;
+}
+
+.slide-workspace {
+    margin: 4px;
+    padding: 0 4px;
+    min-width: 20px;
+    border-radius: 6px;
+    border: 1px solid alpha(@rim, 0.5);
+    color: @foreground;
+    text-shadow: 0 1px 2px alpha(@shadow, 0.45);
+    background-color: alpha(@gel, 0.3);
+    background-image: linear-gradient(
+        to bottom,
+        alpha(@highlight, 0.55),
+        alpha(@highlight, 0.1) 48%,
+        alpha(@gel_deep, 0.25)
+    );
+    box-shadow: inset 0 1px 0 alpha(@highlight, 0.7);
 }
 
 #clock,
 .slide-clock {
     padding: 0 8px;
+}
+
+window.popup {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+menu,
+popover {
+    background-color: alpha(@glass, 0.88);
+    background-image: linear-gradient(
+        to bottom,
+        alpha(@highlight, 0.42),
+        alpha(@highlight, 0.06) 22%,
+        transparent 52%,
+        alpha(@glass_deep, 0.28)
+    );
+    border: 1px solid alpha(@rim, 0.3);
+    border-radius: 10px;
+    padding: 3px;
+    box-shadow:
+        inset 0 1px 0 alpha(@highlight, 0.75),
+        0 10px 22px alpha(@shadow, 0.32);
+}
+
+menuitem,
+popover modelbutton {
+    color: @foreground;
+    font-size: 13px;
+    background-color: transparent;
+    border-radius: 6px;
+    padding: 1px 8px;
+    margin: 0;
+    min-height: 0;
+}
+
+menuitem:hover,
+menuitem:selected,
+popover modelbutton:hover {
+    color: @foreground;
+    background-color: alpha(@gel_active, 0.55);
+    background-image: linear-gradient(
+        to bottom,
+        alpha(@highlight, 0.5),
+        alpha(@highlight, 0.1) 48%,
+        alpha(@gel_deep, 0.22)
+    );
+    box-shadow: inset 0 1px 0 alpha(@highlight, 0.65);
+}
+
+menuitem:disabled,
+popover modelbutton:disabled {
+    color: alpha(@foreground, 0.45);
+    background-color: transparent;
+    background-image: none;
+    box-shadow: none;
+}
+
+menu separator,
+popover separator {
+    background-color: alpha(@rim, 0.4);
+    min-height: 1px;
+    margin: 2px 6px;
+    border-radius: 1px;
 }

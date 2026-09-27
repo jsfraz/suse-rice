@@ -46,7 +46,7 @@ local appLauncher = "rofi -show combi -combi-modes 'drun,ssh' -modes combi -them
 local function rcmAutostart(body)
     return string.format([=[uwsm app -- sh -c '
         export PATH="$PATH:/usr/local/bin:${HOME}/.local/bin"
-        rcm set-fallback color blue wallpaper /usr/share/hypr/wall0.png keyboard cz forcedColor false colorFromWallpaper false forcedBrightnessMode false brightness_mode light
+        rcm set-fallback color blue wallpaper /usr/share/hypr/wall0.png keyboard cz forcedColor false colorFromWallpaper false forcedBrightnessMode false brightnessMode light
         %s
     ']=], body)
 end
@@ -77,7 +77,7 @@ hl.on("hyprland.start", function()
             i=$((i + 1))
             sleep 0.1
         done
-        exec waybar
+        exec env GTK_MODULES="${HOME}/.config/waybar/modules/libmenucolor.so" waybar
     ]=]))
     -- TODO secure wayvnc
     hl.exec_cmd(rcmAutostart([=[wayvnc 0.0.0.0 -f 60 -k "$(rcm get keyboard)" -r]=]))
@@ -141,7 +141,7 @@ hl.config({
     },
 
     decoration = {
-        rounding       = 18,
+        rounding       = 15,
         rounding_power = 2,
 
         -- Focused apps stay solid; inactive ones recede slightly

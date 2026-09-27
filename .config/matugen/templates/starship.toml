@@ -322,7 +322,7 @@ show_always = true
 format = '[$user](bold primary)'
 
 [character]
-success_symbol = '[❯](bold primary)'
+success_symbol = '[❯](bold tertiary)'
 error_symbol = '[❯](bold fail)'
 
 [vagrant]

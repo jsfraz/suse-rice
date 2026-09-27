@@ -60,6 +60,9 @@ GtkWidget *gtk_box_new(int orientation, int spacing);
 void gtk_box_pack_start(GtkBox *box, GtkWidget *child, int expand, int fill, unsigned int padding);
 void gtk_widget_set_valign(GtkWidget *widget, int align);
 void gtk_widget_set_halign(GtkWidget *widget, int align);
+void gtk_widget_set_hexpand(GtkWidget *widget, int expand);
+void gtk_label_set_xalign(GtkWidget *label, float xalign);
+void gtk_box_set_center_widget(GtkBox *box, GtkWidget *widget);
 void gtk_widget_show(GtkWidget *widget);
 void gtk_widget_show_all(GtkWidget *widget);
 GtkStyleContext *gtk_widget_get_style_context(GtkWidget *widget);
@@ -153,6 +156,7 @@ static void add_named(GtkWidget *stack, const char *name) {
     GtkWidget *label = gtk_label_new(name);
     gtk_widget_set_halign(label, GTK_ALIGN_CENTER);
     gtk_widget_set_valign(label, GTK_ALIGN_CENTER);
+    gtk_label_set_xalign(label, 0.5f);
     gtk_stack_add_named((GtkStack *)stack, label, name);
 }
 
@@ -378,9 +382,15 @@ static void *make_workspace(GtkContainer *root) {
     GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_style_context_add_class(gtk_widget_get_style_context(box), "slide-workspace");
     gtk_widget_set_valign(box, GTK_ALIGN_CENTER);
+    gtk_widget_set_halign(box, GTK_ALIGN_CENTER);
+    gtk_widget_set_hexpand(box, FALSE);
 
+    /* Natural width of the current digit, then centered in the chip.
+     * A homogeneous stack would reserve room for "10" and park "1" on the left. */
     module->workspace = digit_stack(GTK_STACK_TRANSITION_TYPE_SLIDE_LEFT_RIGHT, 1, 10);
-    gtk_box_pack_start((GtkBox *)box, module->workspace, FALSE, FALSE, 0);
+    gtk_stack_set_hhomogeneous((GtkStack *)module->workspace, FALSE);
+    gtk_widget_set_halign(module->workspace, GTK_ALIGN_CENTER);
+    gtk_box_set_center_widget((GtkBox *)box, module->workspace);
     show_workspace_id(module, read_active_workspace());
 
     gtk_container_add(root, box);

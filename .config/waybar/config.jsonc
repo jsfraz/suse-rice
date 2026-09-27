@@ -1,12 +1,12 @@
 {
     "layer": "top",
     "position": "top",
-    "height": 32,
+    "height": 35,
     "margin-top": 10,
     "margin-right": 10,
     "margin-bottom": 0,
     "margin-left": 10,
-    "spacing": 5,
+    "spacing": 2,
     "exclusive": true,
     "reload_style_on_change": true,
     "modules-left": [
@@ -17,14 +17,13 @@
     ],
     "modules-right": [
         "tray",
-        "custom/runcat",
-        "custom/net",
         "cffi/workspace",
+        "custom/runcat",
+        "network",
         "battery"
     ],
     "tray": {
-        "icon-size": 20,
-        "margin-left": 15,
+        "icon-size": 18,
         "spacing": 10
     },
     "custom/os": {
@@ -32,17 +31,32 @@
         "return-type": "json",
         "interval": "once",
         "tooltip": false,
-        "format": " "
+        "format": " ",
+        "on-click": "sh -c 'rofi -show combi -combi-modes drun,ssh -modes combi -theme ~/.config/rofi/launcher.rasi -show-icons -icon-theme crystal-remix-$(rcm get color)'"
     },
     "custom/runcat": {
         "exec": "~/.config/waybar/scripts/runcat.sh",
         "return-type": "json",
         "format": " "
     },
-    "custom/net": {
-        "exec": "~/.config/waybar/scripts/network.sh",
-        "return-type": "json",
-        "interval": 2
+    "network": {
+        "interval": 2,
+        "format-wifi": "{icon}",
+        "format-ethernet": "{icon}",
+        "format-linked": "{icon}",
+        "format-disconnected": "{icon}",
+        "format-disabled": "{icon}",
+        "tooltip-format-wifi": "{signalStrength}%",
+        "tooltip-format-ethernet": "{ifname}",
+        "tooltip-format-disconnected": "No connection",
+        "tooltip-format-disabled": "Disabled",
+        "format-icons": {
+            "wifi": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
+            "ethernet": "󰈀",
+            "linked": "󰈂",
+            "disconnected": "󰤭",
+            "disabled": "󰤭"
+        }
     },
     "cffi/workspace": {
         "module_path": "/home/razj/.config/waybar/cffi/libslides.so",
@@ -56,14 +70,49 @@
         "format-plugged": "{icon}",
         "format-full": "{icon}",
         "tooltip-format": "{capacity}%",
-        "margin-right": 5,
-        "format-icons": [
-            "",
-            "",
-            "",
-            "",
-            ""
-        ],
+        "format-icons": {
+            "default": [
+                "󰂃",
+                "󰁺",
+                "󰁻",
+                "󰁼",
+                "󰁽",
+                "󰁾",
+                "󰁿",
+                "󰂀",
+                "󰂁",
+                "󰂂",
+                "󰁹"
+            ],
+            "discharging": [
+                "󰂃",
+                "󰁺",
+                "󰁻",
+                "󰁼",
+                "󰁽",
+                "󰁾",
+                "󰁿",
+                "󰂀",
+                "󰂁",
+                "󰂂",
+                "󰁹"
+            ],
+            "charging": [
+                "󰂆",
+                "󰂆",
+                "󰂆",
+                "󰂇",
+                "󰂈",
+                "󰂈",
+                "󰂉",
+                "󰂉",
+                "󰂊",
+                "󰂋",
+                "󰂅"
+            ],
+            "plugged": "󰁹",
+            "full": "󰁹"
+        },
         "states": {
             "warning": 20,
             "critical": 15
