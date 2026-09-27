@@ -30,7 +30,8 @@
         "exec": "~/.config/waybar/scripts/os-icon.sh",
         "return-type": "json",
         "interval": "once",
-        "tooltip": false
+        "tooltip": false,
+        "format": " "
     },
     "custom/runcat": {
         "exec": "~/.config/waybar/scripts/runcat.sh",

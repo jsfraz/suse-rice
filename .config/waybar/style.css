@@ -48,6 +48,11 @@ window#waybar > box {
     font-size: 0;
 }
 
+#custom-os {
+    color: transparent;
+    text-shadow: none;
+}
+
 #custom-os.arch {
     background-image: url("icons/os/arch.svg");
 }
