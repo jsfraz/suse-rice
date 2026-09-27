@@ -32,6 +32,7 @@
 - [wl-clipboard](https://github.com/bugaevc/wl-clipboard)
 - [gthumb](https://gitlab.gnome.org/GNOME/gthumb)
 . [mako](https://github.com/emersion/mako)
+- [avizo](https://github.com/heyjuvi/avizo)
 
 ## Recommanded installation setup
 - disk encryption + verification using **Only password** method
@@ -209,3 +210,12 @@ systemctl --user enable --now darkman.service
 ```
 
 You can edit `lat` and `lng` in `~/.config/darkman/config.yml`.
+
+### avizo
+
+OSD for volume and brightness keys.
+
+```bash
+chmod +x ./build_avizo.sh
+./build_avizo.sh
+```

@@ -1,6 +1,7 @@
 # Sources
 crystal-remix-icon-theme-color-variants/
 darkman/
+avizo/
 
 # Generated config
 .config/hypr/colors.lua

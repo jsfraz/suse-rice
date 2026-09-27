@@ -71,6 +71,11 @@ hl.on("hyprland.start", function()
         pgrep -f '[m]icmute.sh watch' >/dev/null && exit 0
         exec ~/.config/hypr/scripts/micmute.sh watch
     ]=]))
+    -- OSD for volume and brightness. Keys below talk to it through avizo-client.
+    hl.exec_cmd(rcmAutostart([=[
+        pgrep -x avizo-service >/dev/null && exit 0
+        exec avizo-service
+    ]=]))
 end)
 
 
@@ -296,14 +301,23 @@ hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
--- Laptop multimedia keys for volume and LCD brightness
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),      { locked = true, repeating = true })
-hl.bind("XF86AudioMute",        hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),     { locked = true, repeating = true })
+-- Laptop multimedia keys. Volume goes through volumectl and shows Avizo.
+-- -d picks the light icon set when darkman is in dark mode.
+local function avizo(bin, args)
+    return string.format(
+        [[sh -c 'd=; darkman get 2>/dev/null | grep -qx dark && d=-d; exec %s $d %s']],
+        bin, args)
+end
+
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(avizo("volumectl", "-u up")),         { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(avizo("volumectl", "-u down")),       { locked = true, repeating = true })
+hl.bind("XF86AudioMute",        hl.dsp.exec_cmd(avizo("volumectl", "toggle-mute")),   { locked = true })
 -- T14 Gen 1 mic is the ACP DMIC; the kernel LED trigger watches the HDA codec and stays lit.
-hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("~/.config/hypr/scripts/micmute.sh toggle"),        { locked = true })
-hl.bind("XF86MonBrightnessUp",  hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"),                  { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown",hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"),                  { locked = true, repeating = true })
+-- micmute.sh toggles via wpctl, drives the LED, then asks Avizo to draw the OSD.
+hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("~/.config/hypr/scripts/micmute.sh toggle"), { locked = true })
+-- lightctl has no minimum brightness. Keep the 2% floor so the panel cannot go black.
+hl.bind("XF86MonBrightnessUp",  hl.dsp.exec_cmd("~/.config/hypr/scripts/brightness.sh up"),   { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown",hl.dsp.exec_cmd("~/.config/hypr/scripts/brightness.sh down"), { locked = true, repeating = true })
 
 -- Requires playerctl
 hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("playerctl next"),       { locked = true })
@@ -366,6 +380,13 @@ hl.layer_rule({
     match        = { namespace = "notifications" },
     blur         = true,
     ignore_alpha = 0.1,
+})
+
+hl.layer_rule({
+    name         = "avizo-glass",
+    match        = { namespace = "avizo" },
+    blur         = true,
+    ignore_alpha = 0.2,
 })
 
 -- Hyprland-run windowrule

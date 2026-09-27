@@ -28,10 +28,24 @@ sync_led() {
     printf '%s\n' "$val" >"$led"
 }
 
+notify_avizo() {
+    local line volume image=mic_unmuted progress
+    line=$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@)
+    volume=${line#Volume: }
+    volume=${volume%% *}
+    [[ $line == *'[MUTED]'* ]] && image=mic_muted
+    if darkman get 2>/dev/null | grep -qx dark; then
+        image=${image}_dark
+    fi
+    progress=$(awk -v v="$volume" 'BEGIN { if (v+0 > 1) v = 1; printf "%.2f", v+0 }')
+    avizo-client --image-resource="$image" --progress="$progress"
+}
+
 case ${1:-sync} in
     toggle)
         wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
         sync_led
+        notify_avizo || true
         ;;
     watch)
         sync_led
