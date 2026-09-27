@@ -31,6 +31,7 @@
 - [hyprpicker](https://github.com/hyprwm/hyprpicker)
 - [wl-clipboard](https://github.com/bugaevc/wl-clipboard)
 - [gthumb](https://gitlab.gnome.org/GNOME/gthumb)
+. [mako](https://github.com/emersion/mako)
 
 ## Recommanded installation setup
 - disk encryption + verification using **Only password** method

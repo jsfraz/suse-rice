@@ -400,6 +400,13 @@ hl.layer_rule({
     ignore_alpha = 0.1,
 })
 
+hl.layer_rule({
+    name         = "mako-glass",
+    match        = { namespace = "notifications" },
+    blur         = true,
+    ignore_alpha = 0.1,
+})
+
 -- Hyprland-run windowrule
 hl.window_rule({
     name  = "move-hyprland-run",
