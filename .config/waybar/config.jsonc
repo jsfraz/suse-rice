@@ -24,8 +24,7 @@
     ],
     "tray": {
         "icon-size": 21,
-        "spacing": 10,
-        "margin-left": 10
+        "margin-left": 15
     },
     "custom/os": {
         "exec": "~/.config/waybar/scripts/os-icon.sh",
@@ -56,6 +55,7 @@
         "format-plugged": "{icon}",
         "format-full": "{icon}",
         "tooltip-format": "{capacity}%",
+        "margin-right": 5,
         "format-icons": [
             "",
             "",
@@ -66,6 +66,10 @@
         "states": {
             "warning": 20,
             "critical": 15
+        },
+        "events": {
+            "on-discharging-critical": "notify-send -u critical -i battery-low \"Low Battery\" \"Battery level is at $(cat /sys/class/power_supply/BAT*/capacity | head -1)%\"",
+            "on-charging-100": "notify-send -u normal -i battery-full-charged \"Battery Fully Charged\" \"Battery is at 100%\""
         }
     },
     "cffi/clock": {

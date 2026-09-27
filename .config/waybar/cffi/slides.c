@@ -2,6 +2,8 @@
  * Rebuild: gcc -shared -fPIC -o libslides.so slides.c $(pkg-config --cflags --libs gtk+-3.0)
  */
 #include <errno.h>
+#include <langinfo.h>
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -107,14 +109,31 @@ typedef struct {
     GString *pending;
 } SlideModule;
 
-/* tm_wday starts at Sunday. Months are genitive, as in "27. září". */
-static const char *weekdays[] = {
-    "neděle", "pondělí", "úterý", "středa", "čtvrtek", "pátek", "sobota"
-};
-static const char *months[] = {
-    "ledna", "února", "března", "dubna", "května", "června",
-    "července", "srpna", "září", "října", "listopadu", "prosince"
-};
+/* Filled from LC_TIME. DAY_1 is Sunday, matching tm_wday. MON_* is the
+ * month form used inside a date (genitive in Czech, nominative in English). */
+static char weekday_names[7][128];
+static char month_names[12][128];
+static const char *weekdays[7];
+static const char *months[12];
+
+static void copy_locale_name(char *dst, size_t len, nl_item item) {
+    const char *name = nl_langinfo(item);
+    if (name == NULL || name[0] == '\0')
+        name = "?";
+    snprintf(dst, len, "%s", name);
+}
+
+static void load_locale_names(void) {
+    setlocale(LC_TIME, "");
+    for (int i = 0; i < 7; i++) {
+        copy_locale_name(weekday_names[i], sizeof weekday_names[i], DAY_1 + i);
+        weekdays[i] = weekday_names[i];
+    }
+    for (int i = 0; i < 12; i++) {
+        copy_locale_name(month_names[i], sizeof month_names[i], MON_1 + i);
+        months[i] = month_names[i];
+    }
+}
 
 static const int clock_index[6] = {0, 1, 3, 4, 6, 7};
 
@@ -311,6 +330,7 @@ static const char *config_value(const wbcffi_config_entry *entries, size_t len, 
 }
 
 static void *make_clock(GtkContainer *root) {
+    load_locale_names();
     SlideModule *module = calloc(1, sizeof *module);
     module->clock = TRUE;
     module->fd = -1;

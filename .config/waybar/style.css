@@ -90,11 +90,14 @@ window#waybar > box {
     background-image: url("icons/runcat/active/sprite-4-symbolic.svg");
 }
 
+#battery {
+    margin-right: 5px;
+}
+
 #custom-net,
 #battery {
     font-size: 18px;
     padding: 0 6px;
-    margin-right: 3px;
 }
 
 .slide-workspace {
