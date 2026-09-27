@@ -24,7 +24,8 @@
     ],
     "tray": {
         "icon-size": 21,
-        "spacing": 5
+        "spacing": 10,
+        "margin-left": 10
     },
     "custom/os": {
         "exec": "~/.config/waybar/scripts/os-icon.sh",
@@ -35,7 +36,8 @@
     },
     "custom/runcat": {
         "exec": "~/.config/waybar/scripts/runcat.sh",
-        "return-type": "json"
+        "return-type": "json",
+        "format": " "
     },
     "custom/net": {
         "exec": "~/.config/waybar/scripts/network.sh",

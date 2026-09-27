@@ -50,7 +50,7 @@ while true; do
         read_cpu
         last_cpu=$now
     fi
-    if [ "$cpu" -le 5 ]; then
+    if [ "$cpu" -le 3 ]; then
         emit idle
         sleep 0.25
     else
