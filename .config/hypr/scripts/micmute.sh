@@ -34,7 +34,7 @@ notify_avizo() {
     volume=${line#Volume: }
     volume=${volume%% *}
     [[ $line == *'[MUTED]'* ]] && image=mic_muted
-    if darkman get 2>/dev/null | grep -qx dark; then
+    if [ "$(~/.config/hypr/scripts/brightness-mode.sh)" = dark ]; then
         image=${image}_dark
     fi
     progress=$(awk -v v="$volume" 'BEGIN { if (v+0 > 1) v = 1; printf "%.2f", v+0 }')

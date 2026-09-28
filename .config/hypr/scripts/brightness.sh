@@ -25,7 +25,7 @@ elif [ "$light" -le 66 ]; then
 else
     image=brightness_high
 fi
-if darkman get 2>/dev/null | grep -qx dark; then
+if [ "$(~/.config/hypr/scripts/brightness-mode.sh)" = dark ]; then
     image=${image}_dark
 fi
 

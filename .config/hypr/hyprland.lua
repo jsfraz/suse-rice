@@ -302,10 +302,10 @@ hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
 -- Laptop multimedia keys. Volume goes through volumectl and shows Avizo.
--- -d picks the light icon set when darkman is in dark mode.
+-- -d is Avizo's light glyph set, used when the rice brightness mode is dark.
 local function avizo(bin, args)
     return string.format(
-        [[sh -c 'd=; darkman get 2>/dev/null | grep -qx dark && d=-d; exec %s $d %s']],
+        [[sh -c 'd=; [ "$(~/.config/hypr/scripts/brightness-mode.sh)" = dark ] && d=-d; exec %s $d %s']],
         bin, args)
 end
 
