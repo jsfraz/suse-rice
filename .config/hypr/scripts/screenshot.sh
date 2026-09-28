@@ -9,7 +9,7 @@ notify() {
 
 require() {
     if ! command -v "$1" >/dev/null 2>&1; then
-        notify -u critical "Snímek obrazovky" "Chybí příkaz: $1"
+        notify -u critical "Screenshot" "Missing command: $1"
         exit 1
     fi
 }
@@ -46,13 +46,13 @@ save_shot() {
     mkdir -p "$dir"
     file="${dir}/Screenshot-$(date +%Y-%m-%d-%H%M%S).png"
     if ! grim "$@" "$file"; then
-        notify -u critical "Snímek obrazovky" "Snímek se nepodařilo pořídit."
+        notify -u critical "Screenshot" "Could not take the screenshot."
         exit 1
     fi
     if command -v wl-copy >/dev/null 2>&1; then
         wl-copy -t image/png <"$file"
     fi
-    notify -i "$file" "Snímek obrazovky" "$(basename "$file")"
+    notify -i "$file" "Screenshot" "$(basename "$file")"
 }
 
 window_geometries() {
@@ -89,7 +89,7 @@ begin_freeze() {
     freeze_pid=$!
     sleep 0.2
     if ! kill -0 "$freeze_pid" 2>/dev/null; then
-        notify -u critical "Snímek obrazovky" "Obrazovku se nepodařilo zmrazit."
+        notify -u critical "Screenshot" "Could not freeze the screen."
         freeze_pid=
         exit 1
     fi
@@ -107,7 +107,7 @@ begin_freeze
 color=$(rcm get color 2>/dev/null || true)
 [ -n "$color" ] || color=blue
 
-choice=$(printf 'Výběr\0icon\x1fedit-select\nOkno\0icon\x1fpreferences-system-windows\nObrazovka\0icon\x1fvideo-display\n' \
+choice=$(printf 'Region\0icon\x1fedit-select\nWindow\0icon\x1fpreferences-system-windows\nScreen\0icon\x1fvideo-display\n' \
     | rofi -dmenu -no-custom -show-icons \
         -icon-theme "crystal-remix-${color}" \
         -theme "${XDG_CONFIG_HOME:-${HOME}/.config}/rofi/screenshot.rasi") || exit 0
@@ -117,22 +117,22 @@ choice=$(printf 'Výběr\0icon\x1fedit-select\nOkno\0icon\x1fpreferences-system-
 slurp_style
 
 case "$choice" in
-    Výběr)
+    Region)
         geom=$(run_slurp -d) || exit 0
         [ -n "$geom" ] || exit 0
         save_shot -g "$geom"
         ;;
-    Okno)
+    Window)
         geoms=$(window_geometries)
         if [ -z "$geoms" ]; then
-            notify "Snímek obrazovky" "Žádné okno k zachycení."
+            notify "Screenshot" "No window to capture."
             exit 1
         fi
         geom=$(printf '%s\n' "$geoms" | run_slurp -r) || exit 0
         [ -n "$geom" ] || exit 0
         save_shot -g "$geom"
         ;;
-    Obrazovka)
+    Screen)
         count=$(hyprctl monitors -j | jq 'length')
         if [ "${count:-0}" -gt 1 ]; then
             # -o offers each output; -r accepts only a whole screen. %o is its name.

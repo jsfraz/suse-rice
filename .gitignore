@@ -5,6 +5,7 @@ avizo/
 
 # Generated config
 .config/hypr/colors.lua
+.config/hypr/hyprlock-colors.conf
 .config/kitty/colors.conf
 .config/rofi/colors.rasi
 .config/waybar/colors.css

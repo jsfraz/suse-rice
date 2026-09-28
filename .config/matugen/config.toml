@@ -48,3 +48,7 @@ post_hook = "makoctl reload 2>/dev/null || true"
 [templates.avizo]
 input_path = "~/.config/matugen/templates/avizo.ini"
 output_path = "~/.config/avizo/config.ini"
+
+[templates.hyprlock]
+input_path = "~/.config/matugen/templates/hyprlock.conf"
+output_path = "~/.config/hypr/hyprlock-colors.conf"

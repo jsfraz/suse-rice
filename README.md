@@ -33,6 +33,9 @@
 - [gthumb](https://gitlab.gnome.org/GNOME/gthumb)
 . [mako](https://github.com/emersion/mako)
 - [avizo](https://github.com/heyjuvi/avizo)
+- [hypridle](https://github.com/hyprwm/hypridle)
+- [hyprlock](https://github.com/hyprwm/hyprlock)
+- [hyprsaver](https://github.com/maravexa/hyprsaver)
 
 ## Recommanded installation setup
 - disk encryption + verification using **Only password** method

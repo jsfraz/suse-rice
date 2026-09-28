@@ -1,0 +1,11 @@
+# Shader overlay. hypridle starts it; a key, click, or pointer motion dismisses it.
+# screensaver.sh chooses the shader from `rcm get screensaver` and writes a
+# gradient palette from the rice accent (same resolution as matugen.sh).
+
+[general]
+shader_cycle_interval = 120
+palette_cycle_interval = 60
+
+[behavior]
+fade_in_ms = 200
+dismiss_on = ["key", "mouse_move", "mouse_click", "touch"]

@@ -31,7 +31,7 @@ local appLauncher = "rofi -show combi -combi-modes 'drun,ssh' -modes combi -them
 local function rcmAutostart(body)
     return string.format([=[uwsm app -- sh -c '
         export PATH="$PATH:/usr/local/bin:${HOME}/.local/bin"
-        rcm set-fallback color blue wallpaper /usr/share/hypr/wall0.png keyboard cz forcedColor false colorFromWallpaper false forcedBrightnessMode false brightnessMode light
+        rcm set-fallback color blue wallpaper /usr/share/hypr/wall0.png keyboard cz forcedColor false colorFromWallpaper false forcedBrightnessMode false brightnessMode light screensaver cycle
         %s
     ']=], body)
 end
@@ -75,6 +75,11 @@ hl.on("hyprland.start", function()
     hl.exec_cmd(rcmAutostart([=[
         pgrep -x avizo-service >/dev/null && exit 0
         exec avizo-service
+    ]=]))
+    -- Screensaver at 10 minutes, lock and DPMS off at 60. See hypridle.conf.
+    hl.exec_cmd(rcmAutostart([=[
+        pgrep -x hypridle >/dev/null && exit 0
+        exec hypridle
     ]=]))
 end)
 
@@ -250,6 +255,13 @@ hl.gesture({
     action = "workspace"
 })
 
+-- Same 10 minutes as the screensaver. think-sway hides the pointer for 600000 ms.
+hl.config({
+    cursor = {
+        inactive_timeout = 600,
+    },
+})
+
 
 ---------------------
 ---- KEYBINDINGS ----
@@ -262,6 +274,7 @@ hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
 local closeWindowBind = hl.bind(mainMod .. " + C", hl.dsp.window.close())
 -- closeWindowBind:set_enabled(false)
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
+hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("~/.config/hypr/scripts/lockscreen.sh"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(appLauncher))
@@ -318,6 +331,11 @@ hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("~/.config/hypr/scripts/micmute.
 -- lightctl has no minimum brightness. Keep the 2% floor so the panel cannot go black.
 hl.bind("XF86MonBrightnessUp",  hl.dsp.exec_cmd("~/.config/hypr/scripts/brightness.sh up"),   { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown",hl.dsp.exec_cmd("~/.config/hypr/scripts/brightness.sh down"), { locked = true, repeating = true })
+-- T14 Gen 1: Fn+Space cycles tpacpi::kbd_backlight (off, low, high).
+-- The firmware only emits the key; kbdlight.sh writes the LED.
+hl.bind("XF86KbdLightOnOff",     hl.dsp.exec_cmd("~/.config/hypr/scripts/kbdlight.sh cycle"), { locked = true })
+hl.bind("XF86KbdBrightnessUp",   hl.dsp.exec_cmd("~/.config/hypr/scripts/kbdlight.sh up"),    { locked = true })
+hl.bind("XF86KbdBrightnessDown", hl.dsp.exec_cmd("~/.config/hypr/scripts/kbdlight.sh down"),  { locked = true })
 
 -- Requires playerctl
 hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("playerctl next"),       { locked = true })
