@@ -43,6 +43,12 @@ else
 	git clone --depth 1 "${REPO_URL}" "${SRC_DIR}"
 fi
 
+PATCH="${SCRIPT_DIR}/patches/avizo-rounded-level.patch"
+if [[ -f "${PATCH}" ]]; then
+	log "Rounding the level indicator..."
+	git -C "${SRC_DIR}" apply "${PATCH}"
+fi
+
 log "Configuring..."
 rm -rf "${SRC_DIR}/build"
 meson setup "${SRC_DIR}/build" "${SRC_DIR}" --prefix="${PREFIX}"

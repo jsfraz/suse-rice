@@ -31,7 +31,7 @@ local appLauncher = "rofi -show combi -combi-modes 'drun,ssh' -modes combi -them
 local function rcmAutostart(body)
     return string.format([=[uwsm app -- sh -c '
         export PATH="$PATH:/usr/local/bin:${HOME}/.local/bin"
-        rcm set-fallback color blue wallpaper /usr/share/hypr/wall0.png keyboard cz forcedColor false colorFromWallpaper false forcedBrightnessMode false brightnessMode light screensaver cycle
+        rcm set-fallback color blue wallpaper /usr/share/hypr/wall0.png keyboard cz keyboardVariant - monitors - idleKbd 150 idleScreensaver 600 idleLock 3600 forcedColor false colorFromWallpaper false forcedBrightnessMode false brightnessMode light screensaver cycle
         %s
     ']=], body)
 end
@@ -64,6 +64,9 @@ hl.on("hyprland.start", function()
         done
         exec env GTK_MODULES="${HOME}/.config/waybar/modules/libmenucolor.so" waybar
     ]=]))
+    -- Keyboard layout and any saved monitor layout, before wayvnc reads `keyboard`.
+    hl.exec_cmd(rcmAutostart([=[~/.config/quickshell/scripts/apply-keyboard.sh]=]))
+    hl.exec_cmd(rcmAutostart([=[~/.config/quickshell/scripts/apply-monitors.sh]=]))
     -- TODO secure wayvnc
     hl.exec_cmd(rcmAutostart([=[wayvnc 0.0.0.0 -f 60 -k "$(rcm get keyboard)" -r]=]))
     -- Mic-mute LED follows PipeWire, including mutes that did not come from the key.
@@ -76,10 +79,13 @@ hl.on("hyprland.start", function()
         pgrep -x avizo-service >/dev/null && exit 0
         exec avizo-service
     ]=]))
-    -- Screensaver at 10 minutes, lock and DPMS off at 60. See hypridle.conf.
+    -- Timeouts come from rcm (idleKbd, idleScreensaver, idleLock). The generated
+    -- file lives outside the repo so saving them does not dirty hypridle.conf.
+    hl.exec_cmd(rcmAutostart([=[~/.config/quickshell/scripts/apply-idle.sh --if-absent]=]))
+    -- Settings window stays hidden until Super+N (qs ipc call settings toggle).
     hl.exec_cmd(rcmAutostart([=[
-        pgrep -x hypridle >/dev/null && exit 0
-        exec hypridle
+        pgrep -x qs >/dev/null && exit 0
+        exec qs
     ]=]))
 end)
 
@@ -278,6 +284,8 @@ hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("~/.config/hypr/scripts/lockscreen.sh
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(appLauncher))
+-- System settings. The wrapper starts qs when it is not up, then toggles the window.
+hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("~/.config/quickshell/scripts/settings-toggle.sh"))
 -- Region, window, or a whole screen. Permission above needs a Hyprland restart.
 hl.bind("Print", hl.dsp.exec_cmd("~/.config/hypr/scripts/screenshot.sh"))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
@@ -405,6 +413,26 @@ hl.layer_rule({
     match        = { namespace = "avizo" },
     blur         = true,
     ignore_alpha = 0.2,
+})
+
+-- Translucent toplevel: global blur shows through the window. no_blur stays off.
+-- Layer rules cannot match an xdg window, so ignore_alpha lives on the surface alpha.
+hl.window_rule({
+    name    = "settings-glass",
+    match   = { title = "^Nastavení systému$" },
+    float   = true,
+    center  = true,
+    size    = "1120 740",
+    rounding = 16,
+})
+
+-- File chooser opened from Look & Feel. Pin keeps it above the floating settings window.
+hl.window_rule({
+    name   = "wallpaper-picker",
+    match  = { title = "^Tapeta$" },
+    float  = true,
+    center = true,
+    pin    = true,
 })
 
 -- Hyprland-run windowrule

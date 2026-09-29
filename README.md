@@ -26,6 +26,11 @@
 - [Crystal Remix icon theme — color variants](https://github.com/jsfraz/crystal-remix-icon-theme-color-variants)
 - [darkman](https://gitlab.com/WhyNotHugo/darkman)
 - [waybar](https://github.com/alexays/waybar)
+- [quickshell](https://quickshell.org/) (`qs`; on openSUSE the package that provides it is `noctalia-qs`)
+- [bluez](https://software.opensuse.org/package/bluez)
+- [zenity](https://gitlab.gnome.org/GNOME/zenity)
+- [cups](https://github.com/openprinting/cups)
+upower
 - [grim](https://gitlab.freedesktop.org/emersion/grim)
 - [slurp](https://github.com/emersion/slurp)
 - [hyprpicker](https://github.com/hyprwm/hyprpicker)
@@ -38,6 +43,7 @@
 - [hyprsaver](https://github.com/maravexa/hyprsaver)
 
 ## Recommanded installation setup
+
 - disk encryption + verification using **Only password** method
 - `/` BTRFS, enable snapshots
 - `/home` XFS
@@ -85,6 +91,7 @@ rm -r ~/.config/kitty
 rm -r ~/.config/rofi
 rm -r ~/.config/darkman
 rm -r ~/.config/waybar
+rm -r ~/.config/quickshell
 rm -r ~/.local/share/darkman
 ln -sf $PWD/.config/hypr ~/.config/hypr
 ln -sf $PWD/.config/matugen ~/.config/matugen
@@ -92,9 +99,11 @@ ln -sf $PWD/.config/kitty ~/.config/kitty
 ln -sf $PWD/.config/rofi ~/.config/rofi
 ln -sf $PWD/.config/darkman ~/.config/darkman
 ln -sf $PWD/.config/waybar ~/.config/waybar
+ln -sf $PWD/.config/quickshell ~/.config/quickshell
 ln -sf $PWD/.local/share/darkman ~/.local/share/darkman
 chmod +x ~/.config/waybar/scripts/*.sh
 chmod +x ~/.config/hypr/scripts/*.sh
+chmod +x ~/.config/quickshell/scripts/*.sh ~/.config/quickshell/scripts/*.py
 ```
 
 ### Hyprland / tty1 autologin / UWSM
@@ -156,6 +165,17 @@ chmod +x ./build_rcm.sh
 ```
 
 The script compiles as your user (so it finds `go` on your PATH) and asks for sudo only to install into `/usr/local/bin`.
+
+### Settings
+
+Hyprland seeds these fallbacks on every start. `rcm set` still wins over them:
+
+- Look & Feel: `color`, `wallpaper`, `forcedColor`, `colorFromWallpaper`, `forcedBrightnessMode`, `brightnessMode`, `screensaver`
+- Keyboard: `keyboard` (also the wayvnc `-k` layout), `keyboardVariant` (`-` means none)
+- Displays: `monitors` (`-` keeps the `hl.monitor` default in `hyprland.lua`)
+- Power timeouts, in seconds: `idleKbd`, `idleScreensaver`, `idleLock`
+
+Date and time changes use `sudo -n timedatectl`, which matches the passwordless sudo setup above. Idle timeouts are written to `~/.local/state/suse-rice/hypridle.conf` from `.config/hypr/hypridle.conf`, so saving them does not edit the repo copy.
 
 ### wayvnc
 

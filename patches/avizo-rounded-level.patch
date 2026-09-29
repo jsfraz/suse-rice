@@ -1,0 +1,82 @@
+diff --git a/src/avizo_service.vala b/src/avizo_service.vala
+index daa705f..af3a2b0 100644
+--- a/src/avizo_service.vala
++++ b/src/avizo_service.vala
+@@ -210,34 +210,46 @@ public class AvizoWindow : Gtk.Window
+ 
+ 		Gdk.cairo_set_source_rgba(ctx, bar_bg_color);
+ 
+-		for (int i = 0; i < block_count; i++)
++		// Pill ends: radius is half the bar height, clamped when a block is narrower.
++		double bar_radius = block_height / 2.0;
++
++		if (block_spacing > 0)
++		{
++			double block_radius = Math.fmin(bar_radius, block_width / 2.0);
++			for (int i = 0; i < block_count; i++)
++			{
++				draw_round_rect(ctx, blocks_x + (block_width + block_spacing) * i,
++				                     blocks_y,
++				                     block_width,
++				                     block_height,
++				                     block_radius);
++			}
++		}
++		else
+ 		{
+-			draw_rect(ctx, blocks_x + (block_width + block_spacing) * i,
+-			               blocks_y,
+-			               block_width,
+-			               block_height);
++			draw_round_rect(ctx, blocks_x, blocks_y,
++			                     block_width * block_count, block_height, bar_radius);
+ 		}
+ 
+ 		Gdk.cairo_set_source_rgba(ctx, bar_fg_color);
+ 
+ 		if (block_spacing > 0)
+ 		{
++			double block_radius = Math.fmin(bar_radius, block_width / 2.0);
+ 			for (int i = 0; i < (int) (block_count * progress); i++)
+ 			{
+-				draw_rect(ctx, blocks_x + (block_width + block_spacing) * i,
+-				               blocks_y,
+-				               block_width,
+-				               block_height);
++				draw_round_rect(ctx, blocks_x + (block_width + block_spacing) * i,
++				                     blocks_y,
++				                     block_width,
++				                     block_height,
++				                     block_radius);
+ 			}
+ 		}
+ 		else
+ 		{
+ 			var width = block_width * block_count * progress;
+-			var height = block_height;
+-			draw_rect(ctx, blocks_x,
+-			               blocks_y,
+-			               width,
+-			               height);
++			if (width > 0)
++				draw_round_rect(ctx, blocks_x, blocks_y, width, block_height, bar_radius);
+ 		}
+ 
+ 		ctx.set_operator(Cairo.Operator.OVER);
+@@ -257,6 +269,16 @@ public class AvizoWindow : Gtk.Window
+ 
+ 	private void draw_round_rect(Cairo.Context ctx, double x, double y, double w, double h, double r)
+ 	{
++		if (w <= 0 || h <= 0)
++			return;
++
++		r = Math.fmin(r, Math.fmin(w, h) / 2.0);
++		if (r < 0.5)
++		{
++			draw_rect(ctx, x, y, w, h);
++			return;
++		}
++
+ 		ctx.move_to(x + r, y);
+ 		ctx.line_to(x + w - r, y);
+ 
