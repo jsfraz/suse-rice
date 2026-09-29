@@ -106,9 +106,9 @@ Item {
                 border.width: 1
                 border.color: Theme.line
                 gradient: Gradient {
-                    GradientStop { position: 0; color: Theme.sheen(0.42) }
-                    GradientStop { position: 0.18; color: Theme.tint(Theme.glass, 0.94) }
-                    GradientStop { position: 1; color: Theme.tint(Theme.glassDeep, 0.96) }
+                    GradientStop { position: 0; color: Theme.sheen(0.36) }
+                    GradientStop { position: 0.18; color: Theme.tint(Theme.glass, 0.52) }
+                    GradientStop { position: 1; color: Theme.tint(Theme.glassDeep, 0.58) }
                 }
                 AeroSheen { curve: Theme.radius; strength: 0.7 }
             }

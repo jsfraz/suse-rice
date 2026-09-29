@@ -26,10 +26,10 @@ Singleton {
     readonly property color ink: foreground
     readonly property color inkSoft: tint(foreground, 0.78)
     readonly property color line: tint(rim, 0.55)
-    readonly property color window: tint(glass, 0.48)
-    readonly property color sidebar: tint(glassDeep, 0.72)
-    readonly property color cardTop: sheen(0.3)
-    readonly property color cardBottom: tint(glassDeep, 0.62)
+    readonly property color window: tint(glass, 0.38)
+    readonly property color sidebar: tint(glassDeep, 0.46)
+    readonly property color cardTop: sheen(0.22)
+    readonly property color cardBottom: tint(glassDeep, 0.40)
 
     // Kept so older call sites still compile. Gel, not a separate mint palette.
     readonly property color glossTop: highlight

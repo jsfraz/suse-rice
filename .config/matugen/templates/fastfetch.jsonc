@@ -4,8 +4,8 @@
       "type": "small",
       "color": {
 <* if {{ is_dark_mode }} *>
-        "1": "{{ colors.primary.default.hex | set_saturation: 80.0 | set_lightness: 55.0 }}",
-        "2": "{{ colors.primary.default.hex | set_hue: 185.0 | set_saturation: 82.0 | set_lightness: 50.0 }}"
+        "1": "{{ colors.primary.default.hex | set_saturation: 86.0 | set_lightness: 40.0 }}",
+        "2": "{{ colors.primary.default.hex | set_hue: 185.0 | set_saturation: 82.0 | set_lightness: 30.0 }}"
 <* else *>
         "1": "{{ colors.primary.default.hex | set_saturation: 86.0 | set_lightness: 40.0 }}",
         "2": "{{ colors.primary.default.hex | set_hue: 185.0 | set_saturation: 82.0 | set_lightness: 30.0 }}"
@@ -26,8 +26,8 @@
       },
       "color": {
 <* if {{ is_dark_mode }} *>
-        "keys": "{{ colors.primary.default.hex | set_hue: 140.0 | set_saturation: 78.0 | set_lightness: 48.0 }}",
-        "title": "{{ colors.primary.default.hex | set_saturation: 78.0 | set_lightness: 72.0 }}"
+        "keys": "{{ colors.primary.default.hex | set_hue: 148.0 | set_saturation: 88.0 | set_lightness: 28.0 }}",
+        "title": "{{ colors.primary.default.hex | set_saturation: 80.0 | set_lightness: 44.0 }}"
 <* else *>
         "keys": "{{ colors.primary.default.hex | set_hue: 148.0 | set_saturation: 88.0 | set_lightness: 28.0 }}",
         "title": "{{ colors.primary.default.hex | set_saturation: 80.0 | set_lightness: 44.0 }}"

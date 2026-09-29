@@ -10,13 +10,13 @@
 }
 
 window#waybar {
-    background-color: alpha(@glass, 0.46);
+    background-color: alpha(@glass, 0.34);
     background-image: linear-gradient(
         to bottom,
-        alpha(@highlight, 0.32),
-        alpha(@highlight, 0.05) 18%,
-        alpha(@glass, 0.04) 46%,
-        alpha(@glass_deep, 0.62)
+        alpha(@highlight, 0.28),
+        alpha(@highlight, 0.04) 18%,
+        alpha(@glass, 0.02) 46%,
+        alpha(@glass_deep, 0.22)
     );
     color: @foreground;
     border-top: 1px solid alpha(@rim, 0.62);
@@ -58,10 +58,6 @@ window#waybar > box {
     box-shadow: 0 0 2px alpha(@gel_active, 0.28);
 }
 
-#custom-os.arch { background-image: url("icons/os/arch.svg"); }
-#custom-os.opensuse { background-image: url("icons/os/opensuse.svg"); }
-#custom-os.linux { background-image: url("icons/os/linux.svg"); }
-
 #tray {
     margin-left: 8px;
     padding: 0 8px 0 10px;
@@ -92,30 +88,6 @@ window#waybar > box {
     background-size: 24px 24px;
 }
 
-#custom-runcat.idle {
-    background-image: url("icons/runcat/idle/sprite-0-symbolic.svg");
-}
-
-#custom-runcat.frame-0 {
-    background-image: url("icons/runcat/active/sprite-0-symbolic.svg");
-}
-
-#custom-runcat.frame-1 {
-    background-image: url("icons/runcat/active/sprite-1-symbolic.svg");
-}
-
-#custom-runcat.frame-2 {
-    background-image: url("icons/runcat/active/sprite-2-symbolic.svg");
-}
-
-#custom-runcat.frame-3 {
-    background-image: url("icons/runcat/active/sprite-3-symbolic.svg");
-}
-
-#custom-runcat.frame-4 {
-    background-image: url("icons/runcat/active/sprite-4-symbolic.svg");
-}
-
 #network,
 #battery {
     font-size: 18px;
@@ -135,7 +107,7 @@ window#waybar > box {
 #battery.critical,
 #network.disconnected,
 #network.disabled {
-    color: @highlight;
+    color: @gel_active;
 }
 
 .slide-workspace {
@@ -146,7 +118,7 @@ window#waybar > box {
     border: 1px solid alpha(@rim, 0.5);
     color: @foreground;
     text-shadow: 0 1px 2px alpha(@shadow, 0.45);
-    background-color: alpha(@gel, 0.3);
+    background-color: alpha(@gel, 0.22);
     background-image: linear-gradient(
         to bottom,
         alpha(@highlight, 0.55),
@@ -169,13 +141,13 @@ window.popup {
 
 menu,
 popover {
-    background-color: alpha(@glass, 0.88);
+    background-color: alpha(@glass, 0.48);
     background-image: linear-gradient(
         to bottom,
-        alpha(@highlight, 0.42),
-        alpha(@highlight, 0.06) 22%,
+        alpha(@highlight, 0.36),
+        alpha(@highlight, 0.05) 22%,
         transparent 52%,
-        alpha(@glass_deep, 0.28)
+        alpha(@glass_deep, 0.16)
     );
     border: 1px solid alpha(@rim, 0.3);
     border-radius: 10px;

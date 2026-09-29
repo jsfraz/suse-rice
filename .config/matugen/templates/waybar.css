@@ -1,15 +1,7 @@
-/* Aero glass stops. Lightness follows dark/light; hue stays on the wallpaper seed. */
+/* Aero glass stops. Hue stays on the wallpaper seed.
+   Dark mode keeps the previous light recipe (vivid gel, white type).
+   Light mode matches rofi: pale seed glass, dark ink, saturated gel. */
 <* if {{ is_dark_mode }} *>
-@define-color foreground {{ colors.on_surface.default.hex }};
-@define-color glass {{ colors.primary.default.hex | set_saturation: 48.0 | set_lightness: 22.0 }};
-@define-color glass_deep {{ colors.primary.default.hex | set_saturation: 52.0 | set_lightness: 12.0 }};
-@define-color highlight {{ colors.primary.default.hex | set_saturation: 12.0 | set_lightness: 96.0 }};
-@define-color gel {{ colors.primary.default.hex | set_saturation: 46.0 | set_lightness: 48.0 }};
-@define-color gel_hi {{ colors.primary.default.hex | set_saturation: 28.0 | set_lightness: 78.0 }};
-@define-color gel_deep {{ colors.primary.default.hex | set_saturation: 58.0 | set_lightness: 28.0 }};
-@define-color gel_active {{ colors.primary.default.hex | set_saturation: 78.0 | set_lightness: 52.0 }};
-@define-color rim {{ colors.primary.default.hex | set_saturation: 22.0 | set_lightness: 92.0 }};
-<* else *>
 @define-color foreground {{ colors.primary.default.hex | set_saturation: 12.0 | set_lightness: 99.0 }};
 @define-color glass {{ colors.primary.default.hex | set_saturation: 68.0 | set_lightness: 52.0 }};
 @define-color glass_deep {{ colors.primary.default.hex | set_saturation: 74.0 | set_lightness: 34.0 }};
@@ -19,5 +11,35 @@
 @define-color gel_deep {{ colors.primary.default.hex | set_saturation: 62.0 | set_lightness: 48.0 }};
 @define-color gel_active {{ colors.primary.default.hex | set_saturation: 82.0 | set_lightness: 58.0 }};
 @define-color rim {{ colors.primary.default.hex | set_saturation: 16.0 | set_lightness: 100.0 }};
+
+#custom-os.arch { background-image: url("icons/os/arch.svg"); }
+#custom-os.opensuse { background-image: url("icons/os/opensuse.svg"); }
+#custom-os.linux { background-image: url("icons/os/linux.svg"); }
+#custom-runcat.idle { background-image: url("icons/runcat/idle/sprite-0-symbolic.svg"); }
+#custom-runcat.frame-0 { background-image: url("icons/runcat/active/sprite-0-symbolic.svg"); }
+#custom-runcat.frame-1 { background-image: url("icons/runcat/active/sprite-1-symbolic.svg"); }
+#custom-runcat.frame-2 { background-image: url("icons/runcat/active/sprite-2-symbolic.svg"); }
+#custom-runcat.frame-3 { background-image: url("icons/runcat/active/sprite-3-symbolic.svg"); }
+#custom-runcat.frame-4 { background-image: url("icons/runcat/active/sprite-4-symbolic.svg"); }
+<* else *>
+@define-color foreground {{ colors.on_surface.default.hex | set_lightness: 12.0 }};
+@define-color glass {{ colors.source_color.default.hex | set_saturation: 28.0 | set_lightness: 93.0 }};
+@define-color glass_deep {{ colors.source_color.default.hex | set_saturation: 34.0 | set_lightness: 82.0 }};
+@define-color highlight {{ colors.primary.default.hex | set_saturation: 8.0 | set_lightness: 100.0 }};
+@define-color gel {{ colors.primary.default.hex | set_saturation: 40.0 | set_lightness: 80.0 }};
+@define-color gel_hi {{ colors.primary.default.hex | set_saturation: 8.0 | set_lightness: 100.0 }};
+@define-color gel_deep {{ colors.primary.default.hex | set_saturation: 50.0 | set_lightness: 70.0 }};
+@define-color gel_active {{ colors.primary.default.hex | set_saturation: 86.0 | set_lightness: 48.0 }};
+@define-color rim {{ colors.primary.default.hex | set_saturation: 40.0 | set_lightness: 100.0 }};
+
+#custom-os.arch { background-image: url("icons/os/light/arch.svg"); }
+#custom-os.opensuse { background-image: url("icons/os/light/opensuse.svg"); }
+#custom-os.linux { background-image: url("icons/os/light/linux.svg"); }
+#custom-runcat.idle { background-image: url("icons/runcat/light/idle/sprite-0-symbolic.svg"); }
+#custom-runcat.frame-0 { background-image: url("icons/runcat/light/active/sprite-0-symbolic.svg"); }
+#custom-runcat.frame-1 { background-image: url("icons/runcat/light/active/sprite-1-symbolic.svg"); }
+#custom-runcat.frame-2 { background-image: url("icons/runcat/light/active/sprite-2-symbolic.svg"); }
+#custom-runcat.frame-3 { background-image: url("icons/runcat/light/active/sprite-3-symbolic.svg"); }
+#custom-runcat.frame-4 { background-image: url("icons/runcat/light/active/sprite-4-symbolic.svg"); }
 <* endif *>
 @define-color shadow {{ colors.shadow.default.hex }};

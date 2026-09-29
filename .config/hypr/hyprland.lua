@@ -144,9 +144,9 @@ hl.config({
         rounding       = 15,
         rounding_power = 2,
 
-        -- Focused apps stay solid; inactive ones recede slightly
+        -- Focused apps stay readable; inactive ones sit further back in the glass
         active_opacity   = 1.0,
-        inactive_opacity = 0.92,
+        inactive_opacity = 0.86,
 
         shadow = {
             enabled      = true,
@@ -158,9 +158,9 @@ hl.config({
 
         blur = {
             enabled   = true,
-            size      = 3,
+            size      = 6,
             passes    = 3,
-            vibrancy  = 0.45,
+            vibrancy  = 0.55,
             popups    = true,
         },
     },
