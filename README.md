@@ -2,6 +2,44 @@
 
 [![wakatime](https://wakatime.com/badge/user/992c0ad1-7dae-4115-9198-1ba533452d32/project/419b7c20-068d-40d9-b9d9-2fecfa2b4968.svg)](https://wakatime.com/badge/user/992c0ad1-7dae-4115-9198-1ba533452d32/project/419b7c20-068d-40d9-b9d9-2fecfa2b4968)
 
+## Recommanded installation setup
+
+- disk encryption + verification using **Only password** method
+- `/` BTRFS, enable snapshots
+- `/home` XFS
+- disable swap
+
+### [Move Docker data](https://evodify.com/change-docker-storage-location/) to `/home`
+
+Edit `/etc/docker/daemon.json` (**change username to your user!**):
+
+```json
+{
+  "data-root": "/home/razj/.docker_data"
+}
+```
+
+And restart Docker:
+
+```bash
+sudo systemctl restart docker
+```
+
+### [zram](https://software.opensuse.org/package/systemd-zram-service)
+
+```bash
+sudo zypper in systemd-zram-service
+sudo systemctl enable --now zramswap.service
+```
+
+### `sudo` without password
+
+Edit `sudoers` file using `sudo EDITOR=nano visudo` and add line for your user:
+
+```txt
+your_username ALL=(ALL) NOPASSWD: ALL
+```
+
 ## Dependencies
 
 - [git](https://git-scm.com/)
@@ -40,7 +78,6 @@
 - [slurp](https://github.com/emersion/slurp)
 - [hyprpicker](https://github.com/hyprwm/hyprpicker)
 - [wl-clipboard](https://github.com/bugaevc/wl-clipboard)
-- [gthumb](https://gitlab.gnome.org/GNOME/gthumb)
 . [mako](https://github.com/emersion/mako)
 - [avizo](https://github.com/heyjuvi/avizo)
 - [hypridle](https://github.com/hyprwm/hypridle)
@@ -50,46 +87,37 @@
 ### Recommanded dependencies
 
 - [alacarte](https://gitlab.gnome.org/GNOME/alacarte) ([fix the rofi launcher](#alacarte))
+- [vlc](https://github.com/videolan/vlc)
+- [qualculate-gtk](https://github.com/Qalculate/qalculate-gtk)
+- [gimp](https://gitlab.gnome.org/GNOME/gimp)
+- [gthumb](https://gitlab.gnome.org/GNOME/gthumb)
+- [qbittorrent](https://github.com/qbittorrent/qbittorrent)
+- [qdirstat](https://github.com/shundhammer/qdirstat)
+- [audacity](https://github.com/audacity/audacity)
+- [gparted](https://gitlab.gnome.org/GNOME/gparted)
+- [obs-studio](https://github.com/obsproject/obs-studio)
+- [rustdesk](https://github.com/rustdesk/rustdesk)
+- [MEGA Desktop App](https://mega.io/desktop#download)
+- [virtualbox](https://www.virtualbox.org/)
+- [blender](https://store.steampowered.com/app/365670/Blender/)
+- [krita](https://github.com/kde/krita)
+- [kdenlive](https://github.com/kde/kdenlive)
+- [remmina](https://github.com/freerdp/remmina)
+- [mousepad](https://gitlab.xfce.org/apps/mousepad)
 - [flatpak](https://flathub.org/cs/setup)
+- [flatseal](https://github.com/tchx84/flatseal)
 - [localsend](https://github.com/localsend/localsend) ([firewalld settings needs to be adjusted](https://github.com/localsend/localsend/issues/2592))
+- [OnlyOffice](https://github.com/ONLYOFFICE/DesktopEditors)
+- [MQTTX](https://github.com/emqx/MQTTX)
+- [aisleriot](https://gitlab.gnome.org/GNOME/aisleriot)
+- [HeroicGamesLauncher](https://github.com/Heroic-Games-Launcher/HeroicGamesLauncher)
 
-## Recommanded installation setup
+#### Games
 
-- disk encryption + verification using **Only password** method
-- `/` BTRFS, enable snapshots
-- `/home` XFS
-- disable swap
-
-### [Move Docker data](https://evodify.com/change-docker-storage-location/) to `/home`
-
-Edit `/etc/docker/daemon.json` (**change username to your user!**):
-
-```json
-{
-  "data-root": "/home/razj/.docker_data"
-}
-```
-
-And restart Docker:
-
-```bash
-sudo systemctl restart docker
-```
-
-### [zram](https://software.opensuse.org/package/systemd-zram-service)
-
-```bash
-sudo zypper in systemd-zram-service
-sudo systemctl enable --now zramswap.service
-```
-
-### `sudo` without password
-
-Edit `sudoers` file using `sudo EDITOR=nano visudo` and add line for your user:
-
-```txt
-your_username ALL=(ALL) NOPASSWD: ALL
-```
+- [steam](https://store.steampowered.com/)
+- [PrismLauncher](https://github.com/prismlauncher/PrismLauncher)
+- [sober](https://sober.vinegarhq.org/)
+- [r2modman](https://github.com/ebkr/r2modmanPlus)
 
 ## Config
 

@@ -102,6 +102,14 @@ require jq
 require rofi
 require hyprctl
 
+# One rofi at a time: drop the app launcher so Print can open this dmenu over it.
+"${HOME}/.config/quickshell/scripts/close-app-launcher.sh"
+i=0
+while pgrep -f '[r]ofi .*launcher.rasi' >/dev/null 2>&1 && [ "$i" -lt 20 ]; do
+    i=$((i + 1))
+    sleep 0.05
+done
+
 begin_freeze
 
 color=$(rcm get color 2>/dev/null || true)

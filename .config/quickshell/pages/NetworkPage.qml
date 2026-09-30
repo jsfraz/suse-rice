@@ -20,6 +20,18 @@ Item {
         return out
     }
 
+    function savedWifiName(ssid) {
+        var saved = snapshot.saved || []
+        for (var i = 0; i < saved.length; ++i) {
+            var item = saved[i]
+            if (!item || item.type !== "wifi")
+                continue
+            if (item.ssid === ssid || item.name === ssid)
+                return item.name
+        }
+        return ""
+    }
+
     function openEditor() {
         if (!editorReady)
             return
@@ -240,7 +252,8 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         onClicked: {
                             var open = !modelData.security || modelData.security === "--"
-                            if (open) {
+                            var known = root.savedWifiName(modelData.ssid)
+                            if (open || known) {
                                 root.busy = true
                                 proc.run(["python3", root.script(), "connect", modelData.ssid])
                             } else {

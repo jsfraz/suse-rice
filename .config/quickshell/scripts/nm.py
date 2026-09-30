@@ -103,6 +103,13 @@ def devices():
     return ethernet
 
 
+def wifi_ssid(name):
+    code, out, err = run(["nmcli", "-g", "802-11-wireless.ssid", "connection", "show", name])
+    if code != 0:
+        return ""
+    return out.strip()
+
+
 def saved_connections():
     code, out, err = run(["nmcli", "-t", "-f", "NAME,TYPE,DEVICE", "connection", "show"])
     items = []
@@ -115,13 +122,24 @@ def saved_connections():
         name, kind, device = fields[0], fields[1], fields[2]
         if kind not in ("802-11-wireless", "802-3-ethernet"):
             continue
+        wifi = kind == "802-11-wireless"
         items.append({
             "name": name,
-            "type": "wifi" if kind == "802-11-wireless" else "ethernet",
+            "ssid": wifi_ssid(name) if wifi else "",
+            "type": "wifi" if wifi else "ethernet",
             "active": bool(device),
             "device": device,
         })
     return items
+
+
+def saved_wifi_name(ssid):
+    for item in saved_connections():
+        if item["type"] != "wifi":
+            continue
+        if item["ssid"] == ssid or item["name"] == ssid:
+            return item["name"]
+    return ""
 
 
 def snapshot(rescan=False):
@@ -140,6 +158,12 @@ def snapshot(rescan=False):
 
 
 def connect(ssid, password):
+    # Disconnect only deactivates the profile. Reuse it so the saved PSK is kept.
+    if not password:
+        name = saved_wifi_name(ssid)
+        if name:
+            connection_cmd("up", name)
+            return
     cmd = ["nmcli", "device", "wifi", "connect", ssid]
     if password:
         cmd += ["password", password]

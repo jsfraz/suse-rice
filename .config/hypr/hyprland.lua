@@ -474,6 +474,14 @@ hl.window_rule({
     center = true,
 })
 
+-- Qalculate! calculator.
+hl.window_rule({
+    name   = "qalculate-gtk",
+    match  = { class = "^qalculate-gtk$" },
+    float  = true,
+    center = true,
+})
+
 -- Hyprland-run windowrule
 hl.window_rule({
     name  = "move-hyprland-run",
