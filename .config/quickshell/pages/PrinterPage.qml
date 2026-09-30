@@ -82,7 +82,7 @@ Item {
                         text: modelData.name + (modelData.name === root.defaultPrinter ? "  ·  výchozí" : "")
                         color: Theme.ink
                         font.family: Theme.fontFamily
-                        font.pixelSize: 16
+                        font.pixelSize: 14
                         font.weight: 640
                     }
                     BodyText { text: modelData.enabled ? "Zapnutá" : "Pozastavená" }

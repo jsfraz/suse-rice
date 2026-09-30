@@ -9,7 +9,7 @@ Item {
     property real step: 1
     signal moved(real value)
 
-    implicitHeight: 36
+    implicitHeight: 28
 
     function _setFromX(x) {
         var span = Math.max(1, width - thumb.width)
@@ -27,8 +27,8 @@ Item {
         id: track
         anchors.verticalCenter: parent.verticalCenter
         width: parent.width
-        height: 14
-        radius: 7
+        height: 10
+        radius: 5
         gradient: Gradient {
             GradientStop { position: 0; color: Theme.sheen(0.28) }
             GradientStop { position: 1; color: Theme.tint(Theme.glassDeep, 0.55) }
@@ -39,7 +39,7 @@ Item {
         Rectangle {
             height: parent.height
             width: Math.max(height, (root.value - root.from) / Math.max(0.0001, root.to - root.from) * parent.width)
-            radius: 7
+            radius: 5
             gradient: Gradient {
                 GradientStop { position: 0; color: Theme.sheen(0.55) }
                 GradientStop { position: 0.48; color: Theme.gelActive }
@@ -50,9 +50,9 @@ Item {
 
     Rectangle {
         id: thumb
-        width: 28
-        height: 28
-        radius: 14
+        width: 20
+        height: 20
+        radius: 10
         y: (parent.height - height) / 2
         x: {
             var span = Math.max(1, root.width - width)
@@ -62,8 +62,8 @@ Item {
         border.width: 1
         border.color: Theme.highlight
         gradient: Gradient {
-            GradientStop { position: 0; color: Theme.highlight }
-            GradientStop { position: 0.45; color: Theme.gelHi }
+            GradientStop { position: 0; color: Theme.gloss(Theme.highlight) }
+            GradientStop { position: 0.45; color: Theme.gloss(Theme.gelHi) }
             GradientStop { position: 1; color: Theme.gel }
         }
     }

@@ -47,9 +47,12 @@ def wifi_radio():
     return out.strip() == "enabled"
 
 
-def wifi_networks():
+def wifi_networks(rescan=False):
+    # "auto" waits on a fresh scan and holds the settings page for seconds.
+    # Status reads the cache; only an explicit search asks NetworkManager to rescan.
     code, out, err = run([
-        "nmcli", "-t", "-f", "IN-USE,SSID,SIGNAL,SECURITY,BSSID", "device", "wifi", "list",
+        "nmcli", "-t", "-f", "IN-USE,SSID,SIGNAL,SECURITY,BSSID",
+        "device", "wifi", "list", "--rescan", "yes" if rescan else "no",
     ])
     if code != 0:
         return []
@@ -124,12 +127,11 @@ def saved_connections():
 def snapshot(rescan=False):
     if shutil.which("nmcli") is None:
         fail("nmcli není nainstalované")
-    if rescan:
-        run(["nmcli", "device", "wifi", "rescan"])
+    enabled = wifi_radio()
     payload = {
         "ok": True,
-        "wifiEnabled": wifi_radio(),
-        "networks": wifi_networks() if wifi_radio() else [],
+        "wifiEnabled": enabled,
+        "networks": wifi_networks(rescan) if enabled else [],
         "saved": saved_connections(),
         "ethernet": devices(),
     }

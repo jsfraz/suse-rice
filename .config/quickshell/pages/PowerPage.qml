@@ -72,6 +72,30 @@ Item {
 
         AeroCard {
             width: parent.width
+            SectionLabel { text: "Profil"; width: parent.width }
+            Row {
+                spacing: 10
+                AeroButton {
+                    visible: PowerProfiles.hasPerformanceProfile
+                    text: "Výkon"
+                    accent: PowerProfiles.profile === PowerProfile.Performance
+                    onClicked: PowerProfiles.profile = PowerProfile.Performance
+                }
+                AeroButton {
+                    text: "Rovnováha"
+                    accent: PowerProfiles.profile === PowerProfile.Balanced
+                    onClicked: PowerProfiles.profile = PowerProfile.Balanced
+                }
+                AeroButton {
+                    text: "Úsporný"
+                    accent: PowerProfiles.profile === PowerProfile.PowerSaver
+                    onClicked: PowerProfiles.profile = PowerProfile.PowerSaver
+                }
+            }
+        }
+
+        AeroCard {
+            width: parent.width
             visible: root.brightness >= 0
             SectionLabel { text: "Jas displeje"; width: parent.width }
             BodyText { text: root.brightness + " %" }

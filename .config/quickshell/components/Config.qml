@@ -13,4 +13,11 @@ Singleton {
         return decodeURIComponent(url)
     }
     readonly property string scripts: dir + "/scripts"
+
+    property var settingsWindow
+
+    function dismissSettings() {
+        if (settingsWindow)
+            settingsWindow.dismiss()
+    }
 }

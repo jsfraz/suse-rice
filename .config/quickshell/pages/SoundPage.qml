@@ -82,7 +82,7 @@ Item {
                             text: root.labelFor(modelData) + (modelData === Pipewire.defaultAudioSink ? "  ·  výchozí" : "")
                             color: Theme.ink
                             font.family: Theme.fontFamily
-                            font.pixelSize: 16
+                            font.pixelSize: 14
                             font.weight: 620
                             elide: Text.ElideRight
                         }
@@ -96,7 +96,7 @@ Item {
                     Item {
                         id: sinkRow
                         width: parent.width
-                        height: 44
+                        height: 34
                         readonly property int muteWidth: 148
                         AeroSlider {
                             anchors.left: parent.left
@@ -144,7 +144,7 @@ Item {
                             text: root.labelFor(modelData) + (modelData === Pipewire.defaultAudioSource ? "  ·  výchozí" : "")
                             color: Theme.ink
                             font.family: Theme.fontFamily
-                            font.pixelSize: 16
+                            font.pixelSize: 14
                             font.weight: 620
                             elide: Text.ElideRight
                         }
@@ -158,7 +158,7 @@ Item {
                     Item {
                         id: sourceRow
                         width: parent.width
-                        height: 44
+                        height: 34
                         readonly property int muteWidth: 148
                         AeroSlider {
                             anchors.left: parent.left
@@ -202,14 +202,14 @@ Item {
                         text: root.labelFor(modelData)
                         color: Theme.ink
                         font.family: Theme.fontFamily
-                        font.pixelSize: 16
+                        font.pixelSize: 14
                         font.weight: 620
                         elide: Text.ElideRight
                     }
                     Item {
                         id: streamRow
                         width: parent.width
-                        height: 44
+                        height: 34
                         readonly property int muteWidth: 148
                         AeroSlider {
                             anchors.left: parent.left

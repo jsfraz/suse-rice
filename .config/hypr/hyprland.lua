@@ -79,6 +79,11 @@ hl.on("hyprland.start", function()
         pgrep -x avizo-service >/dev/null && exit 0
         exec avizo-service
     ]=]))
+    -- Blueman keeps a BlueZ agent up and reconnects trusted devices.
+    hl.exec_cmd(rcmAutostart([=[
+        pgrep -x blueman-applet >/dev/null && exit 0
+        exec blueman-applet
+    ]=]))
     -- Timeouts come from rcm (idleKbd, idleScreensaver, idleLock). The generated
     -- file lives outside the repo so saving them does not dirty hypridle.conf.
     hl.exec_cmd(rcmAutostart([=[~/.config/quickshell/scripts/apply-idle.sh --if-absent]=]))
@@ -422,7 +427,7 @@ hl.window_rule({
     match   = { title = "^Nastavení systému$" },
     float   = true,
     center  = true,
-    size    = "1120 740",
+    size    = "960 560",
     rounding = 16,
 })
 
@@ -433,6 +438,22 @@ hl.window_rule({
     float  = true,
     center = true,
     pin    = true,
+})
+
+-- Every Blueman window: manager, adapters, local services, send-to, applet dialogs.
+hl.window_rule({
+    name   = "blueman",
+    match  = { class = "^(blueman-manager|blueman-services|blueman-adapters|blueman-sendto|blueman-applet|blueman-tray)$" },
+    float  = true,
+    center = true,
+})
+
+-- NetworkManager connection editor opened from the Wi-Fi page.
+hl.window_rule({
+    name   = "nm-connection-editor",
+    match  = { class = "^nm-connection-editor$" },
+    float  = true,
+    center = true,
 })
 
 -- Hyprland-run windowrule

@@ -20,11 +20,14 @@ Singleton {
     property color shadow: "#000000"
 
     readonly property string fontFamily: "Source Sans 3"
-    readonly property int radius: 16
-    readonly property int radiusSm: 12
+    readonly property int radius: 12
+    readonly property int radiusSm: 8
 
     readonly property color ink: foreground
     readonly property color inkSoft: tint(foreground, 0.78)
+    // Dark mode type is nearly white, and so is the gel disc behind category icons.
+    readonly property bool lightType: foreground.r * 0.2126 + foreground.g * 0.7152 + foreground.b * 0.0722 > 0.62
+    readonly property color iconInk: lightType ? Qt.darker(glassDeep, 1.55) : foreground
     readonly property color line: tint(rim, 0.55)
     readonly property color window: tint(glass, 0.38)
     readonly property color sidebar: tint(glassDeep, 0.46)
@@ -46,7 +49,21 @@ Singleton {
     }
 
     function sheen(alpha) {
-        return tint(highlight, alpha)
+        // Dark mode type is white, so the same highlight has to stay a veil.
+        return tint(highlight, lightType ? alpha * 0.4 : alpha)
+    }
+
+    // Pale gel reads as a white cap over white type. Pull it toward the deep glass.
+    function gloss(color) {
+        if (!lightType)
+            return color
+        var deep = glassDeep
+        var keep = 0.34
+        return Qt.rgba(
+            color.r * keep + deep.r * (1 - keep),
+            color.g * keep + deep.g * (1 - keep),
+            color.b * keep + deep.b * (1 - keep),
+            color.a)
     }
 
     function readColors(text) {

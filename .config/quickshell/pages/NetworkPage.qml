@@ -1,10 +1,29 @@
 import QtQuick
+import Quickshell
 import qs.components
 
 Item {
     id: root
 
     property var snapshot: ({ wifiEnabled: false, networks: [], saved: [], ethernet: [] })
+    property bool editorChecked: false
+    property bool editorReady: false
+    readonly property var activeSaved: {
+        var saved = snapshot.saved || []
+        var out = []
+        for (var i = 0; i < saved.length; ++i) {
+            if (saved[i] && saved[i].active)
+                out.push(saved[i])
+        }
+        return out
+    }
+
+    function openEditor() {
+        if (!editorReady)
+            return
+        Quickshell.execDetached(["nm-connection-editor"])
+        Config.dismissSettings()
+    }
     property bool busy: false
     property bool scanning: false
     property string message: ""
@@ -42,11 +61,22 @@ Item {
         proc.run(["python3", script(), "scan"])
     }
 
-    Component.onCompleted: refresh()
+    Component.onCompleted: {
+        refresh()
+        editorProc.run(["sh", "-c", "command -v nm-connection-editor"])
+    }
 
     Proc {
         id: proc
         onFinished: (code, stdout, stderr) => root.take(code, stdout, stderr)
+    }
+
+    Proc {
+        id: editorProc
+        onFinished: (code, stdout) => {
+            root.editorChecked = true
+            root.editorReady = code === 0 && stdout.trim().length > 0
+        }
     }
 
     Page {
@@ -58,7 +88,7 @@ Item {
             width: parent.width
             Item {
                 width: parent.width
-                height: 42
+                height: 32
 
                 SectionLabel {
                     id: wifiLabel
@@ -69,8 +99,8 @@ Item {
 
                 Item {
                     id: refreshButton
-                    width: 36
-                    height: 36
+                    width: 28
+                    height: 28
                     anchors.left: wifiLabel.right
                     anchors.leftMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
@@ -86,7 +116,7 @@ Item {
                         border.color: Theme.line
                         gradient: Gradient {
                             GradientStop { position: 0; color: Theme.sheen(refreshMouse.pressed ? 0.22 : 0.62) }
-                            GradientStop { position: 0.46; color: refreshMouse.pressed ? Theme.gelDeep : Theme.gel }
+                            GradientStop { position: 0.46; color: refreshMouse.pressed ? Theme.gelDeep : Theme.gloss(Theme.gel) }
                             GradientStop { position: 0.52; color: Theme.glassDeep }
                             GradientStop { position: 1; color: Theme.glassDeep }
                         }
@@ -177,7 +207,7 @@ Item {
                             text: modelData.ssid + (modelData.inUse ? "  ·  připojeno" : "")
                             color: Theme.ink
                             font.family: Theme.fontFamily
-                            font.pixelSize: 16
+                            font.pixelSize: 14
                             font.weight: 640
                             elide: Text.ElideRight
                         }
@@ -208,14 +238,14 @@ Item {
 
         AeroCard {
             width: parent.width
-            SectionLabel { text: "Uložená připojení"; width: parent.width }
+            SectionLabel { text: "Aktivní připojení"; width: parent.width }
             BodyText {
                 width: parent.width
-                visible: !root.snapshot.saved || root.snapshot.saved.length === 0
-                text: "Žádné uložené připojení."
+                visible: root.activeSaved.length === 0
+                text: "Žádné aktivní připojení."
             }
             Repeater {
-                model: root.snapshot.saved || []
+                model: root.activeSaved
                 delegate: Row {
                     required property var modelData
                     width: parent.width
@@ -227,22 +257,22 @@ Item {
                             text: modelData.name
                             color: Theme.ink
                             font.family: Theme.fontFamily
-                            font.pixelSize: 16
+                            font.pixelSize: 14
                             font.weight: 620
                             elide: Text.ElideRight
                         }
                         BodyText {
-                            text: (modelData.type === "wifi" ? "Wi-Fi" : "Ethernet") + (modelData.active ? "  ·  aktivní" : "")
+                            text: modelData.type === "wifi" ? "Wi-Fi" : "Ethernet"
                         }
                     }
                     AeroButton {
-                        text: modelData.active ? "Odpojit" : "Připojit"
-                        accent: !modelData.active
+                        text: "Odpojit"
+                        accent: false
                         enabled: !root.busy
                         anchors.verticalCenter: parent.verticalCenter
                         onClicked: {
                             root.busy = true
-                            proc.run(["python3", root.script(), modelData.active ? "down" : "up", modelData.name])
+                            proc.run(["python3", root.script(), "down", modelData.name])
                         }
                     }
                     AeroButton {
@@ -275,6 +305,18 @@ Item {
                     text: modelData.device + "  ·  " + modelData.state + (modelData.connection ? "  ·  " + modelData.connection : "")
                 }
             }
+        }
+
+        AeroButton {
+            text: "Nastavení"
+            enabled: root.editorReady
+            onClicked: root.openEditor()
+        }
+
+        BodyText {
+            width: parent.width
+            visible: root.editorChecked && !root.editorReady
+            text: "Rozšířené nastavení sítě není nainstalované. Nainstalujte ho příkazem: sudo zypper in NetworkManager-connection-editor"
         }
     }
 

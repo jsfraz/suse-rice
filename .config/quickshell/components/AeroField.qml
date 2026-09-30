@@ -8,7 +8,7 @@ Item {
     property bool password: false
     signal accepted
 
-    implicitHeight: 44
+    implicitHeight: 34
 
     Rectangle {
         anchors.fill: parent
@@ -31,14 +31,14 @@ Item {
         TextInput {
             id: input
             anchors.fill: parent
-            anchors.leftMargin: 14
-            anchors.rightMargin: 14
+            anchors.leftMargin: 10
+            anchors.rightMargin: 10
             verticalAlignment: Text.AlignVCenter
             color: Theme.ink
             selectionColor: Theme.glossLow
             selectedTextColor: Theme.ink
             font.family: Theme.fontFamily
-            font.pixelSize: 16
+            font.pixelSize: 14
             font.weight: 560
             clip: true
             selectByMouse: true

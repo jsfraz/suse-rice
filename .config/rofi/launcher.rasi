@@ -40,9 +40,9 @@ window {
     enabled:                     true;
     margin:                      0px;
     padding:                     0px;
-    border:                      2px 1px 1px 1px;
+    border:                      1px 0px 0px 0px;
     border-radius:               16px;
-    border-color:                @rim;
+    border-color:                @rim-bar;
     background-color:            @glass;
     background-image:            @gloss-window;
     cursor:                      "default";
@@ -52,9 +52,10 @@ window {
 mainbox {
     enabled:                     true;
     spacing:                     8px;
-    margin:                      4px;
+    margin:                      0px 4px 4px 4px;
     padding:                     8px 8px 10px 8px;
-    border:                      0px;
+    border:                      1px 0px 0px 0px;
+    border-color:                @sheen-bar;
     border-radius:               0px;
     background-color:            transparent;
     children:                    [ "inputbar", "message", "body" ];

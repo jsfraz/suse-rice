@@ -28,9 +28,11 @@
 - [waybar](https://github.com/alexays/waybar)
 - [quickshell](https://quickshell.org/) (`qs`; on openSUSE the package that provides it is `noctalia-qs`)
 - [bluez](https://software.opensuse.org/package/bluez)
+- [blueman](https://github.com/blueman-project/blueman)
 - [zenity](https://gitlab.gnome.org/GNOME/zenity)
 - [cups](https://github.com/openprinting/cups)
-upower
+- [upower](https://software.opensuse.org/package/upower)
+- [power-profiles-daemon](https://software.opensuse.org/package/power-profiles-daemon)
 - [grim](https://gitlab.freedesktop.org/emersion/grim)
 - [slurp](https://github.com/emersion/slurp)
 - [hyprpicker](https://github.com/hyprwm/hyprpicker)

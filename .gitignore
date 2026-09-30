@@ -3,6 +3,9 @@ crystal-remix-icon-theme-color-variants/
 darkman/
 avizo/
 
+# pycache
+.config/matugen/__pycache__/
+
 # Generated config
 .config/hypr/colors.lua
 .config/hypr/hyprlock-colors.conf

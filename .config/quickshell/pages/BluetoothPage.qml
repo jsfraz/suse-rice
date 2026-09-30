@@ -1,8 +1,30 @@
 import QtQuick
+import Quickshell
 import Quickshell.Bluetooth
 import qs.components
 
 Item {
+    id: root
+    property bool bluemanChecked: false
+    property bool bluemanReady: false
+
+    function openBlueman() {
+        if (!bluemanReady)
+            return
+        Quickshell.execDetached(["blueman-manager"])
+        Config.dismissSettings()
+    }
+
+    Component.onCompleted: whichProc.run(["sh", "-c", "command -v blueman-manager"])
+
+    Proc {
+        id: whichProc
+        onFinished: (code, stdout) => {
+            root.bluemanChecked = true
+            root.bluemanReady = code === 0 && stdout.trim().length > 0
+        }
+    }
+
     Page {
         anchors.fill: parent
         anchors.rightMargin: 12
@@ -57,83 +79,18 @@ Item {
                     }
                 }
             }
-
-            AeroButton {
-                text: Bluetooth.defaultAdapter && Bluetooth.defaultAdapter.discovering ? "Zastavit hledání" : "Hledat zařízení"
-                enabled: Bluetooth.defaultAdapter ? Bluetooth.defaultAdapter.enabled : false
-                onClicked: {
-                    if (Bluetooth.defaultAdapter)
-                        Bluetooth.defaultAdapter.discovering = !Bluetooth.defaultAdapter.discovering
-                }
-            }
         }
 
-        AeroCard {
-            width: parent.width
-            visible: Bluetooth.defaultAdapter !== null
-            SectionLabel { text: "Zařízení"; width: parent.width }
-            BodyText {
-                width: parent.width
-                visible: deviceRepeater.count === 0
-                text: "Žádné zařízení. Zapněte hledání a dejte druhou stranu do párovacího režimu."
-            }
-            Repeater {
-                id: deviceRepeater
-                model: Bluetooth.defaultAdapter ? Bluetooth.defaultAdapter.devices : 0
-                delegate: Column {
-                    required property var modelData
-                    width: parent.width
-                    spacing: 8
+        AeroButton {
+            text: "Nastavení"
+            enabled: root.bluemanReady
+            onClicked: root.openBlueman()
+        }
 
-                    Text {
-                        width: parent.width
-                        text: (modelData.name || modelData.deviceName || modelData.address)
-                              + (modelData.connected ? "  ·  připojeno" : (modelData.paired ? "  ·  spárováno" : ""))
-                        color: Theme.ink
-                        font.family: Theme.fontFamily
-                        font.pixelSize: 16
-                        font.weight: 640
-                        elide: Text.ElideRight
-                    }
-                    BodyText {
-                        visible: modelData.batteryAvailable
-                        text: "Baterie " + Math.round(modelData.battery * 100) + " %"
-                    }
-                    Flow {
-                        width: parent.width
-                        spacing: 8
-                        AeroButton {
-                            text: modelData.connected ? "Odpojit" : (modelData.paired ? "Připojit" : "Párovat")
-                            onClicked: {
-                                if (modelData.connected)
-                                    modelData.disconnect()
-                                else if (modelData.paired)
-                                    modelData.connect()
-                                else
-                                    modelData.pair()
-                            }
-                        }
-                        AeroButton {
-                            text: "Zapomenout"
-                            accent: false
-                            visible: modelData.paired || modelData.bonded
-                            onClicked: modelData.forget()
-                        }
-                        Row {
-                            spacing: 8
-                            visible: modelData.paired
-                            BodyText {
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: "Důvěryhodné"
-                            }
-                            AeroSwitch {
-                                checked: modelData.trusted
-                                onClicked: modelData.trusted = !modelData.trusted
-                            }
-                        }
-                    }
-                }
-            }
+        BodyText {
+            width: parent.width
+            visible: root.bluemanChecked && !root.bluemanReady
+            text: "Párování řeší Blueman. Nainstalujte ho příkazem: sudo zypper in blueman"
         }
     }
 }

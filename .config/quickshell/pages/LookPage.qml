@@ -211,7 +211,8 @@ Item {
                 opacity: root.forcedBrightnessMode ? 1 : 0.4
                 AeroButton {
                     text: "Světlý"
-                    accent: root.brightnessMode === "light"
+                    accent: false
+                    selected: root.brightnessMode === "light"
                     enabled: root.forcedBrightnessMode
                     onClicked: {
                         if (root.brightnessMode === "light")
@@ -222,7 +223,8 @@ Item {
                 }
                 AeroButton {
                     text: "Tmavý"
-                    accent: root.brightnessMode === "dark"
+                    accent: false
+                    selected: root.brightnessMode === "dark"
                     enabled: root.forcedBrightnessMode
                     onClicked: {
                         if (root.brightnessMode === "dark")

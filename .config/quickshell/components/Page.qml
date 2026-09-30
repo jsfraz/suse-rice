@@ -16,14 +16,14 @@ Flickable {
     Column {
         id: column
         width: root.width - 8
-        spacing: 14
+        spacing: 8
 
         Text {
             width: parent.width
             text: root.heading
             color: Theme.ink
             font.family: Theme.fontFamily
-            font.pixelSize: 28
+            font.pixelSize: 20
             font.weight: 650
             visible: root.heading.length > 0
         }
@@ -31,7 +31,7 @@ Flickable {
         Column {
             id: bodyCol
             width: parent.width
-            spacing: 12
+            spacing: 8
         }
     }
 

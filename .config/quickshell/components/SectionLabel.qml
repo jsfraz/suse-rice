@@ -4,6 +4,6 @@ import qs.components
 Text {
     color: Theme.ink
     font.family: Theme.fontFamily
-    font.pixelSize: 18
+    font.pixelSize: 15
     font.weight: 650
 }

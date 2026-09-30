@@ -88,7 +88,7 @@ Item {
                 text: Qt.formatDateTime(root.now, "HH:mm:ss")
                 color: Theme.ink
                 font.family: Theme.fontFamily
-                font.pixelSize: 42
+                font.pixelSize: 32
                 font.weight: 650
             }
             BodyText { text: Qt.formatDateTime(root.now, "d. MMMM yyyy") + "   ·   " + root.timezone }

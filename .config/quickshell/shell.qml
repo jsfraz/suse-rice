@@ -14,9 +14,10 @@ Scope {
         }
 
         function showPage(index: int): void {
-            settings.pageIndex = index
-            if (!settings.visible)
-                settings.visible = true
+            if (settings.visible)
+                settings.pageIndex = index
+            else
+                settings.openFresh(index)
         }
     }
 }

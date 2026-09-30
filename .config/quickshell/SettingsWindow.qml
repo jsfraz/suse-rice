@@ -7,9 +7,9 @@ import qs.components
 FloatingWindow {
     id: win
     title: "Nastavení systému"
-    implicitWidth: 1120
-    implicitHeight: 740
-    minimumSize: Qt.size(900, 600)
+    implicitWidth: 960
+    implicitHeight: 560
+    minimumSize: Qt.size(800, 480)
     color: Theme.window
     visible: false
 
@@ -26,22 +26,67 @@ FloatingWindow {
         { title: "Datum a čas", icon: "\uf017", font: "Font Awesome 7 Free Solid", file: "pages/DateTimePage.qml" }
     ]
 
+    property real reveal: 0
+
     function toggle() {
         if (visible) {
-            visible = false
+            dismiss()
             return
         }
+        openFresh(0)
+    }
+
+    // The window stays loaded while hidden, so the last page and its scroll
+    // would otherwise come back. Unload first, then show the requested page
+    // from the top.
+    function openFresh(index) {
+        pages.active = false
+        pageIndex = index
+        pages.active = true
         visible = true
         focusTimer.restart()
     }
 
+    function dismiss() {
+        if (!visible || hideAnim.running)
+            return
+        hideAnim.restart()
+    }
+
+    onVisibleChanged: {
+        if (visible)
+            revealAnim.restart()
+    }
+
+    NumberAnimation {
+        id: revealAnim
+        target: win
+        property: "reveal"
+        from: 0
+        to: 1
+        duration: 280
+        easing.type: Easing.OutCubic
+    }
+
+    NumberAnimation {
+        id: hideAnim
+        target: win
+        property: "reveal"
+        to: 0
+        duration: 160
+        easing.type: Easing.InQuad
+        onFinished: win.visible = false
+    }
+
     onClosed: visible = false
+
+    Component.onCompleted: Config.settingsWindow = win
 
     Shortcut {
         sequences: ["Escape"]
         enabled: win.visible
         context: Qt.WindowShortcut
-        onActivated: win.visible = false
+        onActivated: win.dismiss()
     }
 
     Timer {
@@ -84,8 +129,10 @@ FloatingWindow {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.margins: 16
-        width: 250
+        anchors.margins: 10
+        width: 210
+        opacity: win.reveal
+        transform: Translate { y: (1 - win.reveal) * 18 }
         radius: Theme.radius
         border.width: 1
         border.color: Theme.line
@@ -101,92 +148,129 @@ FloatingWindow {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
-            height: 72
+            height: 48
             onPressed: win.startSystemMove()
         }
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: 14
-            spacing: 8
+            anchors.margins: 10
+            spacing: 4
 
             Text {
                 Layout.fillWidth: true
                 text: "Nastavení"
                 color: Theme.ink
                 font.family: Theme.fontFamily
-                font.pixelSize: 26
+                font.pixelSize: 20
                 font.weight: 650
                 horizontalAlignment: Text.AlignHCenter
             }
 
-            Repeater {
-                model: win.pages
-                delegate: Rectangle {
-                    required property int index
-                    required property var modelData
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 44
+            Item {
+                id: navHost
+                Layout.fillWidth: true
+                Layout.preferredHeight: navCol.implicitHeight
+
+                Rectangle {
+                    id: pill
+                    width: parent.width
+                    height: 32
                     radius: Theme.radiusSm
+                    y: {
+                        var row = navCol.children[win.pageIndex]
+                        return row ? row.y : 0
+                    }
                     border.width: 1
-                    border.color: win.pageIndex === index ? Theme.highlight : Theme.tint(Theme.rim, 0.4)
+                    border.color: Theme.highlight
                     gradient: Gradient {
-                        GradientStop {
-                            position: 0
-                            color: Theme.sheen(win.pageIndex === index ? 0.55 : 0.22)
-                        }
-                        GradientStop {
-                            position: 0.48
-                            color: win.pageIndex === index ? Theme.gelActive : Theme.tint(Theme.gel, 0.28)
-                        }
-                        GradientStop {
-                            position: 1
-                            color: win.pageIndex === index ? Theme.gelDeep : Theme.tint(Theme.glassDeep, 0.35)
-                        }
+                        GradientStop { position: 0; color: Theme.sheen(0.55) }
+                        GradientStop { position: 0.48; color: Theme.gloss(Theme.gelActive) }
+                        GradientStop { position: 1; color: Theme.gelDeep }
+                    }
+                    Behavior on y {
+                        enabled: win.visible
+                        NumberAnimation { duration: 320; easing.type: Easing.OutBack; easing.overshoot: 1.15 }
                     }
 
-                    Row {
-                        anchors.fill: parent
-                        anchors.leftMargin: 10
-                        anchors.rightMargin: 10
-                        spacing: 10
+                    AeroGlint { id: pillGlint }
+                }
 
-                        Rectangle {
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: 28
-                            height: 28
-                            radius: 14
-                            gradient: Gradient {
-                                GradientStop { position: 0; color: Theme.highlight }
-                                GradientStop { position: 0.45; color: Theme.gel }
-                                GradientStop { position: 1; color: Theme.gelDeep }
+                Column {
+                    id: navCol
+                    width: parent.width
+                    spacing: 4
+                    z: 1
+
+                    Repeater {
+                        model: win.pages
+                        delegate: Item {
+                            id: row
+                            required property int index
+                            required property var modelData
+                            width: navCol.width
+                            height: 32
+
+                            Rectangle {
+                                anchors.fill: parent
+                                radius: Theme.radiusSm
+                                color: Theme.tint(Theme.highlight, area.containsMouse && win.pageIndex !== index ? 0.16 : 0)
+                                Behavior on color { ColorAnimation { duration: 160 } }
                             }
-                            Text {
-                                anchors.centerIn: parent
-                                text: modelData.icon
-                                color: Theme.ink
-                                font.family: modelData.font
-                                font.pixelSize: 13
-                                font.weight: modelData.font.indexOf("Solid") >= 0 ? 900 : 400
+
+                            Row {
+                                anchors.fill: parent
+                                anchors.leftMargin: 10
+                                anchors.rightMargin: 10
+                                spacing: 8
+
+                                Rectangle {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: 22
+                                    height: 22
+                                    radius: 11
+                                    scale: win.pageIndex === row.index ? 1.08 : 1
+                                    Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutBack } }
+                                    gradient: Gradient {
+                                        GradientStop { position: 0; color: Theme.highlight }
+                                        GradientStop { position: 0.45; color: Theme.gel }
+                                        GradientStop { position: 1; color: Theme.gelDeep }
+                                    }
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: modelData.icon
+                                        color: Theme.iconInk
+                                        font.family: modelData.font
+                                        font.pixelSize: 11
+                                        font.weight: modelData.font.indexOf("Solid") >= 0 ? 900 : 400
+                                    }
+                                }
+
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: parent.width - 30
+                                    text: modelData.title
+                                    color: Theme.ink
+                                    font.family: Theme.fontFamily
+                                    font.pixelSize: 14
+                                    font.weight: win.pageIndex === row.index ? 700 : 560
+                                    elide: Text.ElideRight
+                                }
+                            }
+
+                            MouseArea {
+                                id: area
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                onClicked: win.pageIndex = index
                             }
                         }
-
-                        Text {
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: parent.width - 38
-                            text: modelData.title
-                            color: Theme.ink
-                            font.family: Theme.fontFamily
-                            font.pixelSize: 16
-                            font.weight: 620
-                            elide: Text.ElideRight
-                        }
                     }
+                }
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: win.pageIndex = index
-                    }
+                Connections {
+                    target: win
+                    function onPageIndexChanged() { pillGlint.play() }
                 }
             }
 
@@ -196,7 +280,7 @@ FloatingWindow {
                 text: "Zavřít"
                 accent: false
                 Layout.fillWidth: true
-                onClicked: win.visible = false
+                onClicked: win.dismiss()
             }
         }
     }
@@ -207,7 +291,35 @@ FloatingWindow {
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.margins: 16
+        anchors.margins: 10
         source: win.pages[win.pageIndex].file
+
+        property real pageReveal: 0
+        opacity: win.reveal * pageReveal
+        transform: Translate { y: (1 - pageReveal) * 18 }
+
+        onStatusChanged: {
+            if (status === Loader.Ready)
+                pageAnim.restart()
+        }
+
+        NumberAnimation {
+            id: pageAnim
+            target: pages
+            property: "pageReveal"
+            from: 0
+            to: 1
+            duration: 280
+            easing.type: Easing.OutCubic
+        }
+    }
+
+    // Same top edge as waybar: 1px rim, then a 1px inset highlight.
+    Item {
+        anchors.fill: parent
+        enabled: false
+        z: 20
+        AeroSheen { curve: 16; strength: 0.62; color: Theme.rim; inset: 0 }
+        AeroSheen { curve: 16; strength: 0.42; inset: 1 }
     }
 }

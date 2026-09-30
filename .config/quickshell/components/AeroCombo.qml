@@ -10,7 +10,7 @@ Item {
     property int currentIndex: 0
     signal picked(int index)
 
-    implicitHeight: 44
+    implicitHeight: 34
     implicitWidth: 220
 
     readonly property string currentText: currentIndex >= 0 && currentIndex < labels.length
@@ -26,7 +26,7 @@ Item {
 
         gradient: Gradient {
             GradientStop { position: 0; color: Theme.sheen(menu.opened ? 0.28 : 0.62) }
-            GradientStop { position: 0.46; color: menu.opened ? Theme.gelDeep : Theme.gel }
+            GradientStop { position: 0.46; color: menu.opened ? Theme.gelDeep : Theme.gloss(Theme.gel) }
             GradientStop { position: 0.52; color: menu.opened ? Theme.glassDeep : Theme.gelDeep }
             GradientStop { position: 1; color: Theme.glassDeep }
         }
@@ -37,12 +37,12 @@ Item {
             anchors.left: parent.left
             anchors.right: chevron.left
             anchors.verticalCenter: parent.verticalCenter
-            anchors.leftMargin: 16
-            anchors.rightMargin: 8
+            anchors.leftMargin: 12
+            anchors.rightMargin: 6
             text: root.currentText
             color: Theme.ink
             font.family: Theme.fontFamily
-            font.pixelSize: 16
+            font.pixelSize: 14
             font.weight: 620
             elide: Text.ElideRight
             verticalAlignment: Text.AlignVCenter
@@ -51,7 +51,7 @@ Item {
         Text {
             id: chevron
             anchors.right: parent.right
-            anchors.rightMargin: 16
+            anchors.rightMargin: 12
             anchors.verticalCenter: parent.verticalCenter
             text: menu.opened ? "▴" : "▾"
             color: Theme.ink
@@ -143,7 +143,7 @@ Item {
                         required property int index
                         required property var modelData
                         width: choices.width
-                        height: 36
+                        height: 30
                         radius: height / 2
                         border.width: 1
                         border.color: index === root.currentIndex ? Theme.highlight : Theme.tint(Theme.rim, 0.35)
@@ -166,7 +166,7 @@ Item {
                             text: String(modelData)
                             color: Theme.ink
                             font.family: Theme.fontFamily
-                            font.pixelSize: 15
+                            font.pixelSize: 13
                             font.weight: 620
                             elide: Text.ElideRight
                         }
@@ -187,8 +187,8 @@ Item {
             var count = root.labels.length
             if (count < 1)
                 return 52
-            var content = count * 36 + (count - 1) * 4
-            return Math.min(360, content + topPadding + bottomPadding)
+            var content = count * 30 + (count - 1) * 4
+            return Math.min(280, content + topPadding + bottomPadding)
         }
     }
 }

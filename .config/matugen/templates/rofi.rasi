@@ -69,6 +69,8 @@
 
     rim-outer: {{ colors.primary.default.hex | set_saturation: 16.0 | set_lightness: 100.0 }}66;
     rim: {{ colors.primary.default.hex | set_saturation: 16.0 | set_lightness: 100.0 }}cc;
+    rim-bar: {{ colors.primary.default.hex | set_saturation: 16.0 | set_lightness: 100.0 }}9e;
+    sheen-bar: {{ colors.primary.default.hex | set_saturation: 8.0 | set_lightness: 100.0 }}6b;
     rim-input: {{ colors.primary.default.hex | set_saturation: 18.0 | set_lightness: 98.0 }}e6;
     rim-tile: {{ colors.primary.default.hex | set_saturation: 42.0 | set_lightness: 82.0 }}55;
     rim-gel: {{ colors.primary.default.hex | set_saturation: 8.0 | set_lightness: 100.0 }}f0;
@@ -99,6 +101,8 @@
 
     rim-outer: {{ colors.primary.default.hex | set_saturation: 40.0 | set_lightness: 100.0 }}99;
     rim: {{ colors.primary.default.hex | set_saturation: 40.0 | set_lightness: 100.0 }}cc;
+    rim-bar: {{ colors.primary.default.hex | set_saturation: 40.0 | set_lightness: 100.0 }}9e;
+    sheen-bar: {{ colors.primary.default.hex | set_saturation: 8.0 | set_lightness: 100.0 }}6b;
     rim-input: {{ colors.primary.default.hex | set_saturation: 20.0 | set_lightness: 100.0 }}e6;
     rim-tile: {{ colors.primary.default.hex | set_saturation: 50.0 | set_lightness: 70.0 }}4d;
     rim-gel: {{ colors.primary.default.hex | set_saturation: 15.0 | set_lightness: 100.0 }}f0;

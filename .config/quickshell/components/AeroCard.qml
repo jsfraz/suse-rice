@@ -3,7 +3,7 @@ import qs.components
 
 Rectangle {
     id: root
-    property int pad: 14
+    property int pad: 10
     default property alias content: holder.data
     radius: Theme.radiusSm
     border.width: 1
@@ -23,6 +23,6 @@ Rectangle {
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.margins: root.pad
-        spacing: 10
+        spacing: 6
     }
 }
