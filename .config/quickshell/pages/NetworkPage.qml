@@ -8,6 +8,8 @@ Item {
     property var snapshot: ({ wifiEnabled: false, networks: [], saved: [], ethernet: [] })
     property bool editorChecked: false
     property bool editorReady: false
+    property bool firewallChecked: false
+    property bool firewallReady: false
     readonly property var activeSaved: {
         var saved = snapshot.saved || []
         var out = []
@@ -22,6 +24,13 @@ Item {
         if (!editorReady)
             return
         Quickshell.execDetached(["nm-connection-editor"])
+        Config.dismissSettings()
+    }
+
+    function openFirewall() {
+        if (!firewallReady)
+            return
+        Quickshell.execDetached(["firewall-config"])
         Config.dismissSettings()
     }
     property bool busy: false
@@ -64,6 +73,7 @@ Item {
     Component.onCompleted: {
         refresh()
         editorProc.run(["sh", "-c", "command -v nm-connection-editor"])
+        firewallProc.run(["sh", "-c", "command -v firewall-config"])
     }
 
     Proc {
@@ -76,6 +86,14 @@ Item {
         onFinished: (code, stdout) => {
             root.editorChecked = true
             root.editorReady = code === 0 && stdout.trim().length > 0
+        }
+    }
+
+    Proc {
+        id: firewallProc
+        onFinished: (code, stdout) => {
+            root.firewallChecked = true
+            root.firewallReady = code === 0 && stdout.trim().length > 0
         }
     }
 
@@ -317,6 +335,27 @@ Item {
             width: parent.width
             visible: root.editorChecked && !root.editorReady
             text: "Advanced network settings are not installed. Install them with: sudo zypper in NetworkManager-connection-editor"
+        }
+
+        AeroCard {
+            width: parent.width
+            SectionLabel { text: "Firewall"; width: parent.width }
+            BodyText {
+                width: parent.width
+                text: "Zones, services and ports are configured in firewall-config."
+            }
+        }
+
+        AeroButton {
+            text: "Firewall"
+            enabled: root.firewallReady
+            onClicked: root.openFirewall()
+        }
+
+        BodyText {
+            width: parent.width
+            visible: root.firewallChecked && !root.firewallReady
+            text: "The firewall editor is not installed. Install it with: sudo zypper in firewall-config"
         }
     }
 

@@ -151,9 +151,8 @@ hl.config({
         rounding       = 15,
         rounding_power = 2,
 
-        -- Focused apps stay readable; inactive ones sit further back in the glass
         active_opacity   = 1.0,
-        inactive_opacity = 0.86,
+        inactive_opacity = 1.0,
 
         shadow = {
             enabled      = true,
@@ -454,6 +453,22 @@ hl.window_rule({
 hl.window_rule({
     name   = "nm-connection-editor",
     match  = { class = "^nm-connection-editor$" },
+    float  = true,
+    center = true,
+})
+
+-- firewall-config opened from the Network page.
+hl.window_rule({
+    name   = "firewall-config",
+    match  = { class = "^firewall-config$" },
+    float  = true,
+    center = true,
+})
+
+-- Alacarte opened from the Applications page.
+hl.window_rule({
+    name   = "alacarte",
+    match  = { class = "^alacarte$" },
     float  = true,
     center = true,
 })

@@ -31,6 +31,7 @@
 - [bluez](https://software.opensuse.org/package/bluez)
 - [blueman](https://github.com/blueman-project/blueman)
 - [nm-connection-editor](https://software.opensuse.org/package/NetworkManager-connection-editor)
+- [firewall-config](https://software.opensuse.org/package/firewall-config)
 - [zenity](https://gitlab.gnome.org/GNOME/zenity)
 - [cups](https://github.com/openprinting/cups)
 - [upower](https://software.opensuse.org/package/upower)
@@ -45,6 +46,12 @@
 - [hypridle](https://github.com/hyprwm/hypridle)
 - [hyprlock](https://github.com/hyprwm/hyprlock)
 - [hyprsaver](https://github.com/maravexa/hyprsaver)
+
+### Recommanded dependencies
+
+- [alacarte](https://gitlab.gnome.org/GNOME/alacarte) ([fix the rofi launcher](#alacarte))
+- [flatpak](https://flathub.org/cs/setup)
+- [localsend](https://github.com/localsend/localsend) ([firewalld settings needs to be adjusted](https://github.com/localsend/localsend/issues/2592))
 
 ## Recommanded installation setup
 
@@ -245,4 +252,17 @@ OSD for volume and brightness keys.
 ```bash
 chmod +x ./build_avizo.sh
 ./build_avizo.sh
+```
+
+### alacarte
+
+Hyprland sets `XDG_MENU_PREFIX=hyprland-`, so a plain `alacarte` looks for `hyprland-applications.menu` and exits. The menu file that exists is `gnome-applications.menu`. Rofi launches the `.desktop` file, so point its `Exec` at that menu. The copy in `~/.local/share/applications/` overrides `/usr/share/applications/alacarte.desktop`:
+
+```bash
+menu_dir="${XDG_DATA_HOME:-$HOME/.local/share}/applications"
+mkdir -p "$menu_dir"
+sed 's/^Exec=alacarte$/Exec=alacarte gnome-applications.menu/' \
+  /usr/share/applications/alacarte.desktop \
+  > "$menu_dir/alacarte.desktop"
+update-desktop-database "$menu_dir"
 ```
