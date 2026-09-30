@@ -31,7 +31,7 @@ local appLauncher = "rofi -show combi -combi-modes 'drun,ssh' -modes combi -them
 local function rcmAutostart(body)
     return string.format([=[uwsm app -- sh -c '
         export PATH="$PATH:/usr/local/bin:${HOME}/.local/bin"
-        rcm set-fallback color blue wallpaper /usr/share/hypr/wall0.png keyboard cz keyboardVariant - monitors - idleKbd 150 idleScreensaver 600 idleLock 3600 forcedColor false colorFromWallpaper false forcedBrightnessMode false brightnessMode light screensaver cycle
+        rcm set-fallback color blue wallpaper /usr/share/hypr/wall0.png keyboard cz keyboardVariant - monitors - idleKbd 150 idleScreensaver 600 idleLock 3600 forcedColor false colorFromWallpaper false forcedBrightnessMode false brightnessMode light screensaver cycle sunsetFollowDarkman true sunsetOn false sunsetTemperature 4000
         %s
     ']=], body)
 end
@@ -67,6 +67,8 @@ hl.on("hyprland.start", function()
     -- Keyboard layout and any saved monitor layout, before wayvnc reads `keyboard`.
     hl.exec_cmd(rcmAutostart([=[~/.config/quickshell/scripts/apply-keyboard.sh]=]))
     hl.exec_cmd(rcmAutostart([=[~/.config/quickshell/scripts/apply-monitors.sh]=]))
+    -- Blue-light filter follows darkman, or a manual switch, from rcm.
+    hl.exec_cmd(rcmAutostart([=[~/.config/quickshell/scripts/apply-sunset.sh]=]))
     -- TODO secure wayvnc
     hl.exec_cmd(rcmAutostart([=[wayvnc 0.0.0.0 -f 60 -k "$(rcm get keyboard)" -r]=]))
     -- Mic-mute LED follows PipeWire, including mutes that did not come from the key.
@@ -424,7 +426,7 @@ hl.layer_rule({
 -- Layer rules cannot match an xdg window, so ignore_alpha lives on the surface alpha.
 hl.window_rule({
     name    = "settings-glass",
-    match   = { title = "^Nastavení systému$" },
+    match   = { title = "^System Settings$" },
     float   = true,
     center  = true,
     size    = "960 560",
@@ -434,7 +436,7 @@ hl.window_rule({
 -- File chooser opened from Look & Feel. Pin keeps it above the floating settings window.
 hl.window_rule({
     name   = "wallpaper-picker",
-    match  = { title = "^Tapeta$" },
+    match  = { title = "^Wallpaper$" },
     float  = true,
     center = true,
     pin    = true,

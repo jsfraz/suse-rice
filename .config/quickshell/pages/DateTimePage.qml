@@ -33,11 +33,11 @@ Item {
         try {
             parsed = JSON.parse(stdout)
         } catch (e) {
-            message = (stderr || stdout || "Čas se nepodařilo načíst").trim()
+            message = (stderr || stdout || "Could not load the time").trim()
             return
         }
         if (!parsed.ok) {
-            message = parsed.error || "Akce selhala"
+            message = parsed.error || "Action failed"
             return
         }
         if (parsed.timezone !== undefined)
@@ -79,7 +79,7 @@ Item {
     Page {
         anchors.fill: parent
         anchors.rightMargin: 12
-        heading: "Datum a čas"
+        heading: "Date and time"
 
         AeroCard {
             width: parent.width
@@ -91,7 +91,7 @@ Item {
                 font.pixelSize: 32
                 font.weight: 650
             }
-            BodyText { text: Qt.formatDateTime(root.now, "d. MMMM yyyy") + "   ·   " + root.timezone }
+            BodyText { text: Qt.formatDateTime(root.now, "MMMM d, yyyy") + "   ·   " + root.timezone }
         }
 
         AeroCard {
@@ -102,7 +102,7 @@ Item {
                 BodyText {
                     width: parent.width - 80
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "Automatický čas (NTP)"
+                    text: "Automatic time (NTP)"
                 }
                 AeroSwitch {
                     checked: root.ntp
@@ -116,7 +116,7 @@ Item {
             BodyText {
                 width: parent.width
                 visible: !root.ntp
-                text: "Ruční čas ve tvaru RRRR-MM-DD HH:MM:SS"
+                text: "Manual time as YYYY-MM-DD HH:MM:SS"
             }
             AeroField {
                 width: parent.width
@@ -126,7 +126,7 @@ Item {
             }
             AeroButton {
                 visible: !root.ntp
-                text: "Nastavit čas"
+                text: "Set time"
                 enabled: !root.busy
                 onClicked: {
                     root.busy = true
@@ -137,7 +137,7 @@ Item {
 
         AeroCard {
             width: parent.width
-            SectionLabel { text: "Časové pásmo"; width: parent.width }
+            SectionLabel { text: "Time zone"; width: parent.width }
             AeroCombo {
                 width: parent.width
                 enabled: !root.busy

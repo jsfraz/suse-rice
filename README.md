@@ -27,8 +27,10 @@
 - [darkman](https://gitlab.com/WhyNotHugo/darkman)
 - [waybar](https://github.com/alexays/waybar)
 - [quickshell](https://quickshell.org/) (`qs`; on openSUSE the package that provides it is `noctalia-qs`)
+- [hyprsunset](https://github.com/hyprwm/hyprsunset)
 - [bluez](https://software.opensuse.org/package/bluez)
 - [blueman](https://github.com/blueman-project/blueman)
+- [nm-connection-editor](https://software.opensuse.org/package/NetworkManager-connection-editor)
 - [zenity](https://gitlab.gnome.org/GNOME/zenity)
 - [cups](https://github.com/openprinting/cups)
 - [upower](https://software.opensuse.org/package/upower)
@@ -78,7 +80,7 @@ sudo systemctl enable --now zramswap.service
 
 Edit `sudoers` file using `sudo EDITOR=nano visudo` and add line for your user:
 
-```
+```txt
 your_username ALL=(ALL) NOPASSWD: ALL
 ```
 

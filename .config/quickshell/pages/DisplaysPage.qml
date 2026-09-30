@@ -13,6 +13,13 @@ Item {
     ]
     property bool busy: false
     property string message: ""
+    property bool followDarkman: true
+    property bool sunsetOn: false
+    property int temperature: 4000
+    property bool sunsetBusy: false
+    property bool sunsetLoaded: false
+    property bool sunsetPending: false
+    property string sunsetMessage: ""
 
     function script() { return Config.scripts + "/monitors.py" }
 
@@ -22,11 +29,11 @@ Item {
         try {
             parsed = JSON.parse(stdout)
         } catch (e) {
-            message = (stderr || stdout || "Displeje se nepodařilo načíst").trim()
+            message = (stderr || stdout || "Could not load displays").trim()
             return
         }
         if (!parsed.ok) {
-            message = parsed.error || "Akce selhala"
+            message = parsed.error || "Action failed"
             return
         }
         monitors = parsed.monitors || []
@@ -77,22 +84,132 @@ Item {
         statusProc.run(["python3", script(), "apply", JSON.stringify({ monitors: monitors })])
     }
 
-    Component.onCompleted: statusProc.run(["python3", script(), "status"])
+    function sunsetScript() { return Config.scripts + "/sunset.py" }
+
+    function commitSunset() {
+        if (!sunsetLoaded)
+            return
+        if (sunsetBusy) {
+            sunsetPending = true
+            return
+        }
+        sunsetBusy = true
+        sunsetPending = false
+        sunsetMessage = ""
+        sunsetProc.run(["python3", sunsetScript(), "apply", JSON.stringify({
+            followDarkman: followDarkman,
+            on: sunsetOn,
+            temperature: temperature
+        })])
+    }
+
+    function takeSunset(stdout, stderr) {
+        sunsetBusy = false
+        var parsed = null
+        try {
+            parsed = JSON.parse(stdout)
+        } catch (e) {
+            sunsetMessage = (stderr || stdout || "Could not load the filter").trim()
+            if (sunsetPending)
+                commitSunset()
+            return
+        }
+        if (!parsed.ok) {
+            sunsetMessage = parsed.error || "Could not save the filter"
+            sunsetPending = false
+            return
+        }
+        if (sunsetPending) {
+            commitSunset()
+            return
+        }
+        followDarkman = parsed.followDarkman === true
+        sunsetOn = parsed.on === true
+        temperature = parsed.temperature
+        sunsetLoaded = true
+        sunsetMessage = ""
+    }
+
+    Component.onCompleted: {
+        statusProc.run(["python3", script(), "status"])
+        sunsetProc.run(["python3", sunsetScript(), "status"])
+    }
 
     Proc {
         id: statusProc
         onFinished: (code, stdout, stderr) => root.load(code, stdout, stderr)
     }
 
+    Proc {
+        id: sunsetProc
+        onFinished: (code, stdout, stderr) => root.takeSunset(stdout, stderr)
+    }
+
     Page {
         anchors.fill: parent
         anchors.rightMargin: 12
-        heading: "Displeje"
+        heading: "Displays"
 
         BodyText {
             width: parent.width
             text: root.message
             visible: root.message.length > 0
+        }
+
+        AeroCard {
+            width: parent.width
+            SectionLabel { text: "Blue light filter"; width: parent.width }
+            Row {
+                width: parent.width
+                spacing: 12
+                BodyText {
+                    width: parent.width - 80
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "Automatic"
+                }
+                AeroSwitch {
+                    checked: root.followDarkman
+                    onClicked: {
+                        root.followDarkman = !root.followDarkman
+                        root.commitSunset()
+                    }
+                }
+            }
+            Row {
+                width: parent.width
+                spacing: 12
+                opacity: root.followDarkman ? 0.4 : 1
+                BodyText {
+                    width: parent.width - 80
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "On"
+                }
+                AeroSwitch {
+                    enabled: !root.followDarkman
+                    checked: root.sunsetOn
+                    onClicked: {
+                        root.sunsetOn = !root.sunsetOn
+                        root.commitSunset()
+                    }
+                }
+            }
+            BodyText { text: "Temperature  ·  " + root.temperature + " K" }
+            AeroSlider {
+                width: parent.width
+                from: 2500
+                to: 6500
+                step: 100
+                value: root.temperature
+                onMoved: (v) => {
+                    root.temperature = v
+                    root.commitSunset()
+                }
+            }
+            BodyText {
+                width: parent.width
+                text: root.sunsetMessage
+                visible: root.sunsetMessage.length > 0
+            }
         }
 
         Repeater {
@@ -110,7 +227,7 @@ Item {
                     BodyText {
                         width: parent.width - 80
                         anchors.verticalCenter: parent.verticalCenter
-                        text: "Zapnutý"
+                        text: "Enabled"
                     }
                     AeroSwitch {
                         checked: modelData.enabled === true
@@ -124,7 +241,7 @@ Item {
                     }
                 }
 
-                BodyText { text: "Rozlišení"; visible: modelData.enabled === true }
+                BodyText { text: "Resolution"; visible: modelData.enabled === true }
                 AeroCombo {
                     width: parent.width
                     visible: modelData.enabled === true
@@ -142,7 +259,7 @@ Item {
                     }
                 }
 
-                BodyText { text: "Měřítko"; visible: modelData.enabled === true }
+                BodyText { text: "Scale"; visible: modelData.enabled === true }
                 AeroCombo {
                     width: parent.width
                     visible: modelData.enabled === true
@@ -159,7 +276,7 @@ Item {
                     }
                 }
 
-                BodyText { text: "Otočení"; visible: modelData.enabled === true }
+                BodyText { text: "Rotation"; visible: modelData.enabled === true }
                 AeroCombo {
                     width: parent.width
                     visible: modelData.enabled === true
@@ -183,7 +300,7 @@ Item {
                     Column {
                         width: (parent.width - 10) / 2
                         spacing: 4
-                        BodyText { text: "Pozice X" }
+                        BodyText { text: "Position X" }
                         AeroField {
                             width: parent.width
                             text: String(modelData.x)
@@ -200,7 +317,7 @@ Item {
                     Column {
                         width: (parent.width - 10) / 2
                         spacing: 4
-                        BodyText { text: "Pozice Y" }
+                        BodyText { text: "Position Y" }
                         AeroField {
                             width: parent.width
                             text: String(modelData.y)
@@ -221,12 +338,12 @@ Item {
         Row {
             spacing: 10
             AeroButton {
-                text: root.busy ? "Ukládám…" : "Použít"
+                text: root.busy ? "Saving…" : "Apply"
                 enabled: !root.busy && root.monitors.length > 0
                 onClicked: root.apply()
             }
             AeroButton {
-                text: "Výchozí"
+                text: "Default"
                 accent: false
                 enabled: !root.busy
                 onClicked: {
@@ -237,7 +354,7 @@ Item {
         }
         BodyText {
             width: parent.width
-            text: "Výchozí vrátí preferovaný režim z Hyprlandu a přestane ukládat vlastní rozložení."
+            text: "Default restores Hyprland's preferred mode and stops saving a custom layout."
         }
     }
 }

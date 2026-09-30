@@ -33,10 +33,10 @@ Item {
         AeroCard {
             width: parent.width
             visible: Bluetooth.defaultAdapter === null
-            SectionLabel { text: "Adaptér není k dispozici"; width: parent.width }
+            SectionLabel { text: "Adapter is not available"; width: parent.width }
             BodyText {
                 width: parent.width
-                text: "Nainstalujte bluez a spusťte Bluetooth."
+                text: "Install bluez and start Bluetooth."
             }
         }
 
@@ -51,7 +51,7 @@ Item {
                 BodyText {
                     width: parent.width - 80
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "Zapnuto"
+                    text: "On"
                 }
                 AeroSwitch {
                     checked: Bluetooth.defaultAdapter ? Bluetooth.defaultAdapter.enabled : false
@@ -68,7 +68,7 @@ Item {
                 BodyText {
                     width: parent.width - 80
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "Viditelný pro ostatní"
+                    text: "Visible to others"
                 }
                 AeroSwitch {
                     enabled: Bluetooth.defaultAdapter ? Bluetooth.defaultAdapter.enabled : false
@@ -82,7 +82,7 @@ Item {
         }
 
         AeroButton {
-            text: "Nastavení"
+            text: "Settings"
             enabled: root.bluemanReady
             onClicked: root.openBlueman()
         }
@@ -90,7 +90,7 @@ Item {
         BodyText {
             width: parent.width
             visible: root.bluemanChecked && !root.bluemanReady
-            text: "Párování řeší Blueman. Nainstalujte ho příkazem: sudo zypper in blueman"
+            text: "Pairing is handled by Blueman. Install it with: sudo zypper in blueman"
         }
     }
 }

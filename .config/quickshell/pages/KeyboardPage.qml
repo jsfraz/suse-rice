@@ -15,9 +15,9 @@ Item {
     function failText(stdout, stderr) {
         try {
             var parsed = JSON.parse(stdout)
-            return parsed.error || "Akce selhala"
+            return parsed.error || "Action failed"
         } catch (e) {
-            return (stderr || stdout || "Klávesnice se nepodařila načíst").trim()
+            return (stderr || stdout || "Could not load the keyboard").trim()
         }
     }
 
@@ -29,7 +29,7 @@ Item {
     }
 
     function variantLabels() {
-        var out = ["žádná"]
+        var out = ["none"]
         for (var i = 0; i < variants.length; i++)
             out.push(variants[i])
         return out
@@ -96,7 +96,7 @@ Item {
             root.busy = false
             try {
                 var parsed = JSON.parse(stdout)
-                root.message = parsed.ok ? "Rozložení je nastavené." : (parsed.error || "Akce selhala")
+                root.message = parsed.ok ? "Layout is set." : (parsed.error || "Action failed")
             } catch (e) {
                 root.message = root.failText(stdout, stderr)
             }
@@ -106,11 +106,11 @@ Item {
     Page {
         anchors.fill: parent
         anchors.rightMargin: 12
-        heading: "Klávesnice"
+        heading: "Keyboard"
 
         AeroCard {
             width: parent.width
-            SectionLabel { text: "Rozložení"; width: parent.width }
+            SectionLabel { text: "Layout"; width: parent.width }
             AeroCombo {
                 width: parent.width
                 labels: root.shownLayouts()
@@ -128,7 +128,7 @@ Item {
 
         AeroCard {
             width: parent.width
-            SectionLabel { text: "Varianta"; width: parent.width }
+            SectionLabel { text: "Variant"; width: parent.width }
             AeroCombo {
                 width: parent.width
                 labels: root.variantLabels()
@@ -142,7 +142,7 @@ Item {
         Row {
             spacing: 10
             AeroButton {
-                text: root.busy ? "Ukládám…" : "Použít"
+                text: root.busy ? "Saving…" : "Apply"
                 enabled: !root.busy
                 onClicked: {
                     root.busy = true
@@ -150,7 +150,7 @@ Item {
                 }
             }
             AeroButton {
-                text: "Restartovat wayvnc"
+                text: "Restart wayvnc"
                 accent: false
                 enabled: !root.busy
                 onClicked: {

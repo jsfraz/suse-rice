@@ -18,13 +18,13 @@ saver=${saver//$'\n'/}
 lock=${lock//$'\n'/}
 
 case "$kbd" in
-    ''|*[!0-9]*) echo "idleKbd musí být celé číslo" >&2; exit 1 ;;
+    ''|*[!0-9]*) echo "idleKbd must be an integer" >&2; exit 1 ;;
 esac
 case "$saver" in
-    ''|*[!0-9]*) echo "idleScreensaver musí být celé číslo" >&2; exit 1 ;;
+    ''|*[!0-9]*) echo "idleScreensaver must be an integer" >&2; exit 1 ;;
 esac
 case "$lock" in
-    ''|*[!0-9]*) echo "idleLock musí být celé číslo" >&2; exit 1 ;;
+    ''|*[!0-9]*) echo "idleLock must be an integer" >&2; exit 1 ;;
 esac
 
 python3 - "$template" "$out" "$kbd" "$saver" "$lock" <<'PY'
@@ -38,7 +38,7 @@ def repl(_match):
 
 new, count = re.subn(r"timeout = \d+", repl, text, count=3)
 if count != 3:
-    raise SystemExit(f"šablona hypridle nemá 3 timeouty (nalezeno {count})")
+    raise SystemExit(f"hypridle template does not have 3 timeouts (found {count})")
 pathlib.Path(dest).write_text(new)
 PY
 

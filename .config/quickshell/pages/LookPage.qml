@@ -27,7 +27,7 @@ Item {
         }
         busy = true
         pending = false
-        message = "Přepočítávám vzhled…"
+        message = "Updating the look…"
         proc.run(["python3", script(), "apply", JSON.stringify({
             wallpaper: wallpaper,
             color: colorName,
@@ -42,8 +42,8 @@ Item {
     function pickWallpaper() {
         picking = true
         pickerProc.run([
-            "zenity", "--file-selection", "--title=Tapeta",
-            "--file-filter=Obrázky | *.png *.jpg *.jpeg *.webp *.bmp"
+            "zenity", "--file-selection", "--title=Wallpaper",
+            "--file-filter=Images | *.png *.jpg *.jpeg *.webp *.bmp"
         ])
     }
 
@@ -55,13 +55,13 @@ Item {
         try {
             parsed = JSON.parse(stdout)
         } catch (e) {
-            message = (stderr || stdout || "Vzhled se nepodařilo načíst").trim()
+            message = (stderr || stdout || "Could not load the look").trim()
             if (pending)
                 commit()
             return
         }
         if (!parsed.ok) {
-            message = parsed.error || "Uložení selhalo"
+            message = parsed.error || "Save failed"
             pending = false
             return
         }
@@ -104,7 +104,7 @@ Item {
                 return
             }
             if (code !== 1)
-                root.message = (stderr || "Zenity se nepodařilo spustit").trim()
+                root.message = (stderr || "Could not start Zenity").trim()
         }
     }
 
@@ -115,10 +115,10 @@ Item {
 
         AeroCard {
             width: parent.width
-            SectionLabel { text: "Tapeta"; width: parent.width }
+            SectionLabel { text: "Wallpaper"; width: parent.width }
             BodyText { width: parent.width; text: root.wallpaper; wrapMode: Text.WrapAnywhere }
             AeroButton {
-                text: root.picking ? "Vybírám…" : "Vybrat soubor"
+                text: root.picking ? "Choosing…" : "Choose file"
                 enabled: !root.picking
                 onClicked: root.pickWallpaper()
             }
@@ -126,14 +126,14 @@ Item {
 
         AeroCard {
             width: parent.width
-            SectionLabel { text: "Barva"; width: parent.width }
+            SectionLabel { text: "Color"; width: parent.width }
             Row {
                 width: parent.width
                 spacing: 12
                 BodyText {
                     width: parent.width - 80
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "Vynutit barvu"
+                    text: "Force color"
                 }
                 AeroSwitch {
                     checked: root.forcedColor
@@ -146,8 +146,8 @@ Item {
             BodyText {
                 width: parent.width
                 text: root.forcedColor
-                      ? "Accent se vezme z vybrané barvy."
-                      : "Bez vynucení se accent počítá z tapety."
+                      ? "The accent comes from the chosen color."
+                      : "Without forcing, the accent is taken from the wallpaper."
             }
             AeroCombo {
                 width: parent.width
@@ -170,7 +170,7 @@ Item {
                 BodyText {
                     width: parent.width - 80
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "Přesná barva z tapety"
+                    text: "Exact color from the wallpaper"
                 }
                 AeroSwitch {
                     enabled: !root.forcedColor
@@ -185,14 +185,14 @@ Item {
 
         AeroCard {
             width: parent.width
-            SectionLabel { text: "Světlý a tmavý režim"; width: parent.width }
+            SectionLabel { text: "Light and dark mode"; width: parent.width }
             Row {
                 width: parent.width
                 spacing: 12
                 BodyText {
                     width: parent.width - 80
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "Vynutit režim"
+                    text: "Force mode"
                 }
                 AeroSwitch {
                     checked: root.forcedBrightnessMode
@@ -204,13 +204,13 @@ Item {
             }
             BodyText {
                 width: parent.width
-                text: root.forcedBrightnessMode ? "Režim bere nastavení tady." : "Režim bere darkman podle denní doby."
+                text: root.forcedBrightnessMode ? "The mode uses the setting here." : "The mode follows darkman by time of day."
             }
             Row {
                 spacing: 8
                 opacity: root.forcedBrightnessMode ? 1 : 0.4
                 AeroButton {
-                    text: "Světlý"
+                    text: "Light"
                     accent: false
                     selected: root.brightnessMode === "light"
                     enabled: root.forcedBrightnessMode
@@ -222,7 +222,7 @@ Item {
                     }
                 }
                 AeroButton {
-                    text: "Tmavý"
+                    text: "Dark"
                     accent: false
                     selected: root.brightnessMode === "dark"
                     enabled: root.forcedBrightnessMode
@@ -238,7 +238,7 @@ Item {
 
         AeroCard {
             width: parent.width
-            SectionLabel { text: "Spořič"; width: parent.width }
+            SectionLabel { text: "Screensaver"; width: parent.width }
             AeroCombo {
                 width: parent.width
                 labels: root.screensavers

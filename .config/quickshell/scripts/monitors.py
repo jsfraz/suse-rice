@@ -39,7 +39,7 @@ def rcm_set(value):
 def live():
     proc = run(["hyprctl", "monitors", "-j"])
     if proc.returncode != 0:
-        fail(proc.stderr or proc.stdout or "hyprctl monitors selhal")
+        fail(proc.stderr or proc.stdout or "hyprctl monitors failed")
     try:
         data = json.loads(proc.stdout or "[]")
     except json.JSONDecodeError as exc:
@@ -72,11 +72,11 @@ def encode(monitors):
     for mon in monitors:
         name = str(mon.get("name", "")).strip()
         if not name or "|" in name:
-            fail(f"neplatný výstup: {name}")
+            fail(f"invalid output: {name}")
         mode = str(mon.get("mode", "")).strip()
         enabled = bool(mon.get("enabled"))
         if enabled and not mode:
-            fail(f"{name}: chybí režim")
+            fail(f"{name}: missing mode")
         lines.append("|".join([
             name,
             mode,
@@ -103,27 +103,27 @@ def apply_file():
     script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "apply-monitors.sh")
     proc = run(["bash", script])
     if proc.returncode != 0:
-        fail(proc.stderr or proc.stdout or "hyprctl monitor selhal")
+        fail(proc.stderr or proc.stdout or "hyprctl monitor failed")
 
 
 def main():
     env()
     if len(sys.argv) < 2:
-        fail("chybí příkaz")
+        fail("missing command")
     cmd = sys.argv[1]
     if cmd == "status":
         emit_status()
         return
     if cmd == "apply":
         if len(sys.argv) < 3:
-            fail("chybí JSON")
+            fail("missing JSON")
         try:
             data = json.loads(sys.argv[2])
         except json.JSONDecodeError as exc:
             fail(f"JSON: {exc}")
         monitors = data.get("monitors")
         if not isinstance(monitors, list) or not monitors:
-            fail("chybí seznam displejů")
+            fail("missing display list")
         rcm_set(encode(monitors))
         apply_file()
         emit_status()
@@ -140,7 +140,7 @@ def main():
         rcm_set("-")
         emit_status()
         return
-    fail("neznámý příkaz")
+    fail("unknown command")
 
 
 if __name__ == "__main__":

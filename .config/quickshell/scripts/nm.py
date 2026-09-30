@@ -126,7 +126,7 @@ def saved_connections():
 
 def snapshot(rescan=False):
     if shutil.which("nmcli") is None:
-        fail("nmcli není nainstalované")
+        fail("nmcli is not installed")
     enabled = wifi_radio()
     payload = {
         "ok": True,
@@ -145,7 +145,7 @@ def connect(ssid, password):
         cmd += ["password", password]
     code, out, err = run(cmd)
     if code != 0:
-        fail(err or out or "připojení selhalo")
+        fail(err or out or "connection failed")
     snapshot()
 
 
@@ -157,23 +157,23 @@ def connection_cmd(action, name):
     elif action == "forget":
         cmd = ["nmcli", "connection", "delete", name]
     else:
-        fail("neznámá akce")
+        fail("unknown action")
     code, out, err = run(cmd)
     if code != 0:
-        fail(err or out or "akce selhala")
+        fail(err or out or "action failed")
     snapshot()
 
 
 def radio(state):
     code, out, err = run(["nmcli", "radio", "wifi", state])
     if code != 0:
-        fail(err or out or "Wi-Fi rádio se nepodařilo přepnout")
+        fail(err or out or "could not switch the Wi-Fi radio")
     snapshot()
 
 
 def main():
     if len(sys.argv) < 2:
-        fail("chybí příkaz")
+        fail("missing command")
     cmd = sys.argv[1]
     if cmd == "status":
         snapshot(False)
@@ -181,18 +181,18 @@ def main():
         snapshot(True)
     elif cmd == "connect":
         if len(sys.argv) < 3:
-            fail("chybí SSID")
+            fail("missing SSID")
         connect(sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else "")
     elif cmd in ("up", "down", "forget"):
         if len(sys.argv) < 3:
-            fail("chybí název připojení")
+            fail("missing connection name")
         connection_cmd(cmd, sys.argv[2])
     elif cmd == "radio":
         if len(sys.argv) < 3 or sys.argv[2] not in ("on", "off"):
             fail("radio on|off")
         radio(sys.argv[2])
     else:
-        fail("neznámý příkaz")
+        fail("unknown command")
 
 
 if __name__ == "__main__":

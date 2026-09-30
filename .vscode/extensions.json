@@ -1,7 +1,10 @@
 {
 	"recommendations": [
+		"davidanson.vscode-markdownlint",
 		"gruntfuggly.todo-tree",
 		"sumneko.lua",
-		"ms-python.python"
+		"golang.go",
+		"ms-python.python",
+		"theqtcompany.qt-qml"
 	],
 }

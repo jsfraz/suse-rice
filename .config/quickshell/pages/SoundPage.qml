@@ -12,7 +12,7 @@ Item {
         if (!node)
             return ""
         var props = node.properties || {}
-        return props["application.name"] || node.description || node.nickname || node.name || "Zvuk"
+        return props["application.name"] || node.description || node.nickname || node.name || "Sound"
     }
 
     function sameList(a, b) {
@@ -57,15 +57,15 @@ Item {
     Page {
         anchors.fill: parent
         anchors.rightMargin: 12
-        heading: "Zvuk"
+        heading: "Sound"
 
         AeroCard {
             width: parent.width
-            SectionLabel { text: "Výstup"; width: parent.width }
+            SectionLabel { text: "Output"; width: parent.width }
             BodyText {
                 width: parent.width
                 visible: root.sinks.length === 0
-                text: "Žádný výstup. PipeWire neběží, nebo ještě není připravené."
+                text: "No output. PipeWire is not running, or it is not ready yet."
             }
             Repeater {
                 model: root.sinks
@@ -79,7 +79,7 @@ Item {
                         Text {
                             width: parent.width - 140
                             anchors.verticalCenter: parent.verticalCenter
-                            text: root.labelFor(modelData) + (modelData === Pipewire.defaultAudioSink ? "  ·  výchozí" : "")
+                            text: root.labelFor(modelData) + (modelData === Pipewire.defaultAudioSink ? "  ·  default" : "")
                             color: Theme.ink
                             font.family: Theme.fontFamily
                             font.pixelSize: 14
@@ -87,7 +87,7 @@ Item {
                             elide: Text.ElideRight
                         }
                         AeroButton {
-                            text: "Vybrat"
+                            text: "Select"
                             accent: modelData !== Pipewire.defaultAudioSink
                             enabled: modelData !== Pipewire.defaultAudioSink
                             onClicked: Pipewire.preferredDefaultAudioSink = modelData
@@ -112,7 +112,7 @@ Item {
                             anchors.right: parent.right
                             anchors.verticalCenter: parent.verticalCenter
                             width: sinkRow.muteWidth
-                            text: modelData.audio && modelData.audio.muted ? "Ztlumeno" : "Zvuk"
+                            text: modelData.audio && modelData.audio.muted ? "Muted" : "Sound"
                             accent: !(modelData.audio && modelData.audio.muted)
                             onClicked: { if (modelData.audio) modelData.audio.muted = !modelData.audio.muted }
                         }
@@ -123,11 +123,11 @@ Item {
 
         AeroCard {
             width: parent.width
-            SectionLabel { text: "Mikrofon"; width: parent.width }
+            SectionLabel { text: "Microphone"; width: parent.width }
             BodyText {
                 width: parent.width
                 visible: root.sources.length === 0
-                text: "Žádný mikrofon."
+                text: "No microphone."
             }
             Repeater {
                 model: root.sources
@@ -141,7 +141,7 @@ Item {
                         Text {
                             width: parent.width - 140
                             anchors.verticalCenter: parent.verticalCenter
-                            text: root.labelFor(modelData) + (modelData === Pipewire.defaultAudioSource ? "  ·  výchozí" : "")
+                            text: root.labelFor(modelData) + (modelData === Pipewire.defaultAudioSource ? "  ·  default" : "")
                             color: Theme.ink
                             font.family: Theme.fontFamily
                             font.pixelSize: 14
@@ -149,7 +149,7 @@ Item {
                             elide: Text.ElideRight
                         }
                         AeroButton {
-                            text: "Vybrat"
+                            text: "Select"
                             accent: modelData !== Pipewire.defaultAudioSource
                             enabled: modelData !== Pipewire.defaultAudioSource
                             onClicked: Pipewire.preferredDefaultAudioSource = modelData
@@ -174,7 +174,7 @@ Item {
                             anchors.right: parent.right
                             anchors.verticalCenter: parent.verticalCenter
                             width: sourceRow.muteWidth
-                            text: modelData.audio && modelData.audio.muted ? "Ztlumeno" : "Živý"
+                            text: modelData.audio && modelData.audio.muted ? "Muted" : "Live"
                             accent: !(modelData.audio && modelData.audio.muted)
                             onClicked: { if (modelData.audio) modelData.audio.muted = !modelData.audio.muted }
                         }
@@ -185,11 +185,11 @@ Item {
 
         AeroCard {
             width: parent.width
-            SectionLabel { text: "Aplikace"; width: parent.width }
+            SectionLabel { text: "Applications"; width: parent.width }
             BodyText {
                 width: parent.width
                 visible: root.streams.length === 0
-                text: "Žádná aplikace právě nehraje zvuk."
+                text: "No application is playing audio."
             }
             Repeater {
                 model: root.streams
@@ -225,7 +225,7 @@ Item {
                             anchors.right: parent.right
                             anchors.verticalCenter: parent.verticalCenter
                             width: streamRow.muteWidth
-                            text: modelData.audio && modelData.audio.muted ? "Ztlumeno" : "Zvuk"
+                            text: modelData.audio && modelData.audio.muted ? "Muted" : "Sound"
                             accent: !(modelData.audio && modelData.audio.muted)
                             onClicked: { if (modelData.audio) modelData.audio.muted = !modelData.audio.muted }
                         }

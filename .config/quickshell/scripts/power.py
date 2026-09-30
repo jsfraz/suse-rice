@@ -71,29 +71,29 @@ def emit(extra=None):
 def set_brightness(percent):
     percent = int(percent)
     if percent < 2 or percent > 100:
-        fail("jas musí být 2 až 100")
+        fail("brightness must be from 2 to 100")
     proc = run(["brightnessctl", "-n2", "set", f"{percent}%"])
     if proc.returncode != 0:
-        fail(proc.stderr or proc.stdout or "brightnessctl selhal")
+        fail(proc.stderr or proc.stdout or "brightnessctl failed")
 
 
 def main():
     env()
     if len(sys.argv) < 2:
-        fail("chybí příkaz")
+        fail("missing command")
     cmd = sys.argv[1]
     if cmd == "status":
         emit()
         return
     if cmd == "brightness":
         if len(sys.argv) < 3:
-            fail("chybí procenta")
+            fail("missing percent")
         set_brightness(sys.argv[2])
         emit()
         return
     if cmd == "idle":
         if len(sys.argv) < 3:
-            fail("chybí JSON")
+            fail("missing JSON")
         try:
             data = json.loads(sys.argv[2])
         except json.JSONDecodeError as exc:
@@ -105,15 +105,15 @@ def main():
         ):
             value = int(data[key])
             if value < low or value > high:
-                fail(f"{key} je mimo rozsah")
+                fail(f"{key} is out of range")
             rcm_set(key, value)
         script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "apply-idle.sh")
         proc = run(["bash", script])
         if proc.returncode != 0:
-            fail(proc.stderr or proc.stdout or "hypridle selhal")
+            fail(proc.stderr or proc.stdout or "hypridle failed")
         emit()
         return
-    fail("neznámý příkaz")
+    fail("unknown command")
 
 
 if __name__ == "__main__":

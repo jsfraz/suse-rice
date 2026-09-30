@@ -39,7 +39,7 @@ def rcm_set(key, value):
 def lines(args):
     proc = run(args)
     if proc.returncode != 0:
-        fail(proc.stderr or proc.stdout or "localectl selhal")
+        fail(proc.stderr or proc.stdout or "localectl failed")
     return [line.strip() for line in proc.stdout.splitlines() if line.strip()]
 
 
@@ -51,7 +51,7 @@ def emit(payload):
 def main():
     env()
     if len(sys.argv) < 2:
-        fail("chybí příkaz")
+        fail("missing command")
     cmd = sys.argv[1]
     if cmd == "status":
         variant = rcm_get("keyboardVariant", "-")
@@ -66,34 +66,34 @@ def main():
         return
     if cmd == "variants":
         if len(sys.argv) < 3:
-            fail("chybí rozložení")
+            fail("missing layout")
         emit({"ok": True, "variants": lines(["localectl", "list-x11-keymap-variants", sys.argv[2]])})
         return
     if cmd == "apply":
         if len(sys.argv) < 3:
-            fail("chybí rozložení")
+            fail("missing layout")
         layout = sys.argv[2]
         variant = sys.argv[3] if len(sys.argv) > 3 else ""
         if not layout or "/" in layout or " " in layout:
-            fail("neplatné rozložení")
+            fail("invalid layout")
         if variant and ("/" in variant or " " in variant):
-            fail("neplatná varianta")
+            fail("invalid variant")
         rcm_set("keyboard", layout)
         rcm_set("keyboardVariant", variant if variant else "-")
         script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "apply-keyboard.sh")
         proc = run(["bash", script])
         if proc.returncode != 0:
-            fail(proc.stderr or proc.stdout or "hyprctl selhal")
+            fail(proc.stderr or proc.stdout or "hyprctl failed")
         emit({"ok": True})
         return
     if cmd == "restart-wayvnc":
         script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "apply-keyboard.sh")
         proc = run(["bash", script, "--restart-wayvnc"])
         if proc.returncode != 0:
-            fail(proc.stderr or proc.stdout or "wayvnc se nepodařilo restartovat")
+            fail(proc.stderr or proc.stdout or "could not restart wayvnc")
         emit({"ok": True})
         return
-    fail("neznámý příkaz")
+    fail("unknown command")
 
 
 if __name__ == "__main__":

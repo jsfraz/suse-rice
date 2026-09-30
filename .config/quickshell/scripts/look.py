@@ -91,17 +91,17 @@ def status():
 def apply(data):
     color = data.get("color", "blue")
     if color not in COLORS:
-        fail("neznámá barva")
+        fail("unknown color")
     mode = data.get("brightnessMode", "light")
     if mode not in ("light", "dark"):
-        fail("neznámý režim jasu")
+        fail("unknown brightness mode")
     saver = data.get("screensaver", "cycle")
     allowed = set(SAVER_MODES) | set(shaders())
     if saver not in allowed:
-        fail("neznámý spořič")
+        fail("unknown screensaver")
     wallpaper = data.get("wallpaper", "").strip()
     if not wallpaper:
-        fail("chybí tapeta")
+        fail("missing wallpaper")
     rcm_set("wallpaper", wallpaper)
     rcm_set("color", color)
     rcm_set("forcedColor", bool(data.get("forcedColor")))
@@ -113,27 +113,27 @@ def apply(data):
     script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "apply-look.sh")
     proc = run(["bash", script])
     if proc.returncode != 0:
-        fail(proc.stderr or proc.stdout or "matugen selhal")
+        fail(proc.stderr or proc.stdout or "matugen failed")
     status()
 
 
 def main():
     env()
     if len(sys.argv) < 2:
-        fail("chybí příkaz")
+        fail("missing command")
     if sys.argv[1] == "status":
         status()
         return
     if sys.argv[1] == "apply":
         if len(sys.argv) < 3:
-            fail("chybí JSON")
+            fail("missing JSON")
         try:
             data = json.loads(sys.argv[2])
         except json.JSONDecodeError as exc:
             fail(f"JSON: {exc}")
         apply(data)
         return
-    fail("neznámý příkaz")
+    fail("unknown command")
 
 
 if __name__ == "__main__":

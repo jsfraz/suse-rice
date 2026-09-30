@@ -26,11 +26,11 @@ Item {
         try {
             parsed = JSON.parse(stdout)
         } catch (e) {
-            message = (stderr || stdout || "Napájení se nepodařilo načíst").trim()
+            message = (stderr || stdout || "Could not load power").trim()
             return
         }
         if (!parsed.ok) {
-            message = parsed.error || "Akce selhala"
+            message = parsed.error || "Action failed"
             return
         }
         brightness = parsed.brightness === null || parsed.brightness === undefined ? -1 : parsed.brightness
@@ -50,44 +50,44 @@ Item {
     Page {
         anchors.fill: parent
         anchors.rightMargin: 12
-        heading: "Napájení"
+        heading: "Power"
 
         AeroCard {
             width: parent.width
-            SectionLabel { text: "Baterie"; width: parent.width }
+            SectionLabel { text: "Battery"; width: parent.width }
             BodyText {
                 width: parent.width
                 text: {
                     var device = UPower.displayDevice
                     if (!device || !device.ready)
-                        return "UPower neběží. Nainstalujte ho příkazem: sudo zypper in upower"
+                        return "UPower is not running. Install it with: sudo zypper in upower"
                     // This quickshell build exposes UPower's percentage as 0–1.
                     var pct = device.percentage
                     if (pct <= 1)
                         pct *= 100
-                    return (UPower.onBattery ? "Na baterii" : "Na napájení") + "  ·  " + Math.round(pct) + " %"
+                    return (UPower.onBattery ? "On battery" : "Plugged in") + "  ·  " + Math.round(pct) + " %"
                 }
             }
         }
 
         AeroCard {
             width: parent.width
-            SectionLabel { text: "Profil"; width: parent.width }
+            SectionLabel { text: "Profile"; width: parent.width }
             Row {
                 spacing: 10
                 AeroButton {
                     visible: PowerProfiles.hasPerformanceProfile
-                    text: "Výkon"
+                    text: "Performance"
                     accent: PowerProfiles.profile === PowerProfile.Performance
                     onClicked: PowerProfiles.profile = PowerProfile.Performance
                 }
                 AeroButton {
-                    text: "Rovnováha"
+                    text: "Balanced"
                     accent: PowerProfiles.profile === PowerProfile.Balanced
                     onClicked: PowerProfiles.profile = PowerProfile.Balanced
                 }
                 AeroButton {
-                    text: "Úsporný"
+                    text: "Power saver"
                     accent: PowerProfiles.profile === PowerProfile.PowerSaver
                     onClicked: PowerProfiles.profile = PowerProfile.PowerSaver
                 }
@@ -97,7 +97,7 @@ Item {
         AeroCard {
             width: parent.width
             visible: root.brightness >= 0
-            SectionLabel { text: "Jas displeje"; width: parent.width }
+            SectionLabel { text: "Display brightness"; width: parent.width }
             BodyText { text: root.brightness + " %" }
             AeroSlider {
                 width: parent.width
@@ -115,13 +115,13 @@ Item {
         AeroCard {
             width: parent.width
             visible: root.brightness < 0
-            BodyText { width: parent.width; text: "Podsvícení se nenašlo (brightnessctl)." }
+            BodyText { width: parent.width; text: "Backlight was not found (brightnessctl)." }
         }
 
         AeroCard {
             width: parent.width
-            SectionLabel { text: "Nečinnost"; width: parent.width }
-            BodyText { text: "Podsvícení klávesnice  ·  " + root.minutes(root.idleKbd) }
+            SectionLabel { text: "Idle"; width: parent.width }
+            BodyText { text: "Keyboard backlight  ·  " + root.minutes(root.idleKbd) }
             AeroSlider {
                 width: parent.width
                 from: 30
@@ -131,7 +131,7 @@ Item {
                 onMoved: (v) => root.idleKbd = v
             }
 
-            BodyText { text: "Spořič obrazovky  ·  " + root.minutes(root.idleScreensaver) }
+            BodyText { text: "Screensaver  ·  " + root.minutes(root.idleScreensaver) }
             AeroSlider {
                 width: parent.width
                 from: 60
@@ -141,7 +141,7 @@ Item {
                 onMoved: (v) => root.idleScreensaver = v
             }
 
-            BodyText { text: "Zámek a zhasnutí panelu  ·  " + root.minutes(root.idleLock) }
+            BodyText { text: "Lock and turn the panel off  ·  " + root.minutes(root.idleLock) }
             AeroSlider {
                 width: parent.width
                 from: 300
@@ -152,7 +152,7 @@ Item {
             }
 
             AeroButton {
-                text: root.busy ? "Ukládám…" : "Použít časy"
+                text: root.busy ? "Saving…" : "Apply times"
                 enabled: !root.busy
                 onClicked: {
                     root.busy = true

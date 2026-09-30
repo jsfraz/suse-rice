@@ -6,7 +6,7 @@ import qs.components
 
 FloatingWindow {
     id: win
-    title: "Nastavení systému"
+    title: "System Settings"
     implicitWidth: 960
     implicitHeight: 560
     minimumSize: Qt.size(800, 480)
@@ -15,15 +15,15 @@ FloatingWindow {
 
     property int pageIndex: 0
     property var pages: [
-        { title: "Síť", icon: "\uf1eb", font: "Font Awesome 7 Free Solid", file: "pages/NetworkPage.qml" },
+        { title: "Network", icon: "\uf1eb", font: "Font Awesome 7 Free Solid", file: "pages/NetworkPage.qml" },
         { title: "Bluetooth", icon: "\uf294", font: "Font Awesome 7 Brands", file: "pages/BluetoothPage.qml" },
-        { title: "Displeje", icon: "\uf108", font: "Font Awesome 7 Free Solid", file: "pages/DisplaysPage.qml" },
-        { title: "Zvuk", icon: "\uf028", font: "Font Awesome 7 Free Solid", file: "pages/SoundPage.qml" },
-        { title: "Napájení", icon: "\uf0e7", font: "Font Awesome 7 Free Solid", file: "pages/PowerPage.qml" },
+        { title: "Displays", icon: "\uf108", font: "Font Awesome 7 Free Solid", file: "pages/DisplaysPage.qml" },
+        { title: "Sound", icon: "\uf028", font: "Font Awesome 7 Free Solid", file: "pages/SoundPage.qml" },
+        { title: "Power", icon: "\uf0e7", font: "Font Awesome 7 Free Solid", file: "pages/PowerPage.qml" },
         { title: "Look & Feel", icon: "\uf53f", font: "Font Awesome 7 Free Solid", file: "pages/LookPage.qml" },
-        { title: "Klávesnice", icon: "\uf11c", font: "Font Awesome 7 Free Solid", file: "pages/KeyboardPage.qml" },
-        { title: "Tiskárny", icon: "\uf02f", font: "Font Awesome 7 Free Solid", file: "pages/PrinterPage.qml" },
-        { title: "Datum a čas", icon: "\uf017", font: "Font Awesome 7 Free Solid", file: "pages/DateTimePage.qml" }
+        { title: "Keyboard", icon: "\uf11c", font: "Font Awesome 7 Free Solid", file: "pages/KeyboardPage.qml" },
+        { title: "Printers", icon: "\uf02f", font: "Font Awesome 7 Free Solid", file: "pages/PrinterPage.qml" },
+        { title: "Date and time", icon: "\uf017", font: "Font Awesome 7 Free Solid", file: "pages/DateTimePage.qml" }
     ]
 
     property real reveal: 0
@@ -92,7 +92,7 @@ FloatingWindow {
     Timer {
         id: focusTimer
         interval: 120
-        onTriggered: focusProc.run(["hyprctl", "dispatch", "focuswindow", "title:^(Nastavení systému)$"])
+        onTriggered: focusProc.run(["hyprctl", "dispatch", "focuswindow", "title:^(System Settings)$"])
     }
 
     Proc { id: focusProc }
@@ -159,7 +159,7 @@ FloatingWindow {
 
             Text {
                 Layout.fillWidth: true
-                text: "Nastavení"
+                text: "Settings"
                 color: Theme.ink
                 font.family: Theme.fontFamily
                 font.pixelSize: 20
@@ -277,7 +277,7 @@ FloatingWindow {
             Item { Layout.fillHeight: true }
 
             AeroButton {
-                text: "Zavřít"
+                text: "Close"
                 accent: false
                 Layout.fillWidth: true
                 onClicked: win.dismiss()

@@ -38,11 +38,11 @@ Item {
         try {
             parsed = JSON.parse(stdout)
         } catch (e) {
-            message = (stderr || stdout || "Síť neodpověděla").trim()
+            message = (stderr || stdout || "The network did not respond").trim()
             return
         }
         if (!parsed.ok) {
-            message = parsed.error || "Akce selhala"
+            message = parsed.error || "Action failed"
             return
         }
         snapshot = parsed
@@ -57,7 +57,7 @@ Item {
     function scan() {
         busy = true
         scanning = true
-        message = "Hledám sítě…"
+        message = "Searching for networks…"
         proc.run(["python3", script(), "scan"])
     }
 
@@ -82,7 +82,7 @@ Item {
     Page {
         anchors.fill: parent
         anchors.rightMargin: 12
-        heading: "Síť"
+        heading: "Network"
 
         AeroCard {
             width: parent.width
@@ -165,7 +165,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     BodyText {
                         anchors.verticalCenter: parent.verticalCenter
-                        text: root.snapshot.wifiEnabled ? "Zapnuto" : "Vypnuto"
+                        text: root.snapshot.wifiEnabled ? "On" : "Off"
                     }
                     AeroSwitch {
                         checked: root.snapshot.wifiEnabled === true
@@ -187,11 +187,11 @@ Item {
         AeroCard {
             width: parent.width
             visible: root.snapshot.wifiEnabled === true
-            SectionLabel { text: "Sítě v dosahu"; width: parent.width }
+            SectionLabel { text: "Networks in range"; width: parent.width }
             BodyText {
                 width: parent.width
                 visible: !root.snapshot.networks || root.snapshot.networks.length === 0
-                text: "Žádná síť. Zkuste hledání znovu."
+                text: "No network. Try searching again."
             }
             Repeater {
                 model: root.snapshot.networks || []
@@ -204,7 +204,7 @@ Item {
                         spacing: 2
                         Text {
                             width: parent.width
-                            text: modelData.ssid + (modelData.inUse ? "  ·  připojeno" : "")
+                            text: modelData.ssid + (modelData.inUse ? "  ·  connected" : "")
                             color: Theme.ink
                             font.family: Theme.fontFamily
                             font.pixelSize: 14
@@ -213,11 +213,11 @@ Item {
                         }
                         BodyText {
                             width: parent.width
-                            text: modelData.signal + " %  ·  " + (modelData.security || "otevřená")
+                            text: modelData.signal + " %  ·  " + (modelData.security || "open")
                         }
                     }
                     AeroButton {
-                        text: modelData.inUse ? "Připojeno" : "Připojit"
+                        text: modelData.inUse ? "Connected" : "Connect"
                         enabled: !modelData.inUse && !root.busy
                         anchors.verticalCenter: parent.verticalCenter
                         onClicked: {
@@ -238,11 +238,11 @@ Item {
 
         AeroCard {
             width: parent.width
-            SectionLabel { text: "Aktivní připojení"; width: parent.width }
+            SectionLabel { text: "Active connections"; width: parent.width }
             BodyText {
                 width: parent.width
                 visible: root.activeSaved.length === 0
-                text: "Žádné aktivní připojení."
+                text: "No active connection."
             }
             Repeater {
                 model: root.activeSaved
@@ -266,7 +266,7 @@ Item {
                         }
                     }
                     AeroButton {
-                        text: "Odpojit"
+                        text: "Disconnect"
                         accent: false
                         enabled: !root.busy
                         anchors.verticalCenter: parent.verticalCenter
@@ -276,7 +276,7 @@ Item {
                         }
                     }
                     AeroButton {
-                        text: "Zapomenout"
+                        text: "Forget"
                         accent: false
                         enabled: !root.busy
                         anchors.verticalCenter: parent.verticalCenter
@@ -295,7 +295,7 @@ Item {
             BodyText {
                 width: parent.width
                 visible: !root.snapshot.ethernet || root.snapshot.ethernet.length === 0
-                text: "Žádný ethernetový adaptér."
+                text: "No Ethernet adapter."
             }
             Repeater {
                 model: root.snapshot.ethernet || []
@@ -308,7 +308,7 @@ Item {
         }
 
         AeroButton {
-            text: "Nastavení"
+            text: "Settings"
             enabled: root.editorReady
             onClicked: root.openEditor()
         }
@@ -316,7 +316,7 @@ Item {
         BodyText {
             width: parent.width
             visible: root.editorChecked && !root.editorReady
-            text: "Rozšířené nastavení sítě není nainstalované. Nainstalujte ho příkazem: sudo zypper in NetworkManager-connection-editor"
+            text: "Advanced network settings are not installed. Install them with: sudo zypper in NetworkManager-connection-editor"
         }
     }
 
@@ -330,23 +330,23 @@ Item {
         AeroCard {
             width: 420
             anchors.centerIn: parent
-            SectionLabel { text: "Heslo k " + root.pendingSsid; width: parent.width; wrapMode: Text.WordWrap }
+            SectionLabel { text: "Password for " + root.pendingSsid; width: parent.width; wrapMode: Text.WordWrap }
             AeroField {
                 id: passwordField
                 width: parent.width
-                placeholder: "Heslo"
+                placeholder: "Password"
                 password: true
                 onAccepted: passwordDialog.connectNow()
             }
             Row {
                 spacing: 10
                 AeroButton {
-                    text: "Připojit"
+                    text: "Connect"
                     enabled: !root.busy
                     onClicked: passwordDialog.connectNow()
                 }
                 AeroButton {
-                    text: "Zrušit"
+                    text: "Cancel"
                     accent: false
                     onClicked: passwordDialog.visible = false
                 }

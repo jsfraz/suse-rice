@@ -5,6 +5,7 @@ avizo/
 
 # pycache
 .config/matugen/__pycache__/
+.config/quickshell/scripts/__pycache__/
 
 # Generated config
 .config/hypr/colors.lua

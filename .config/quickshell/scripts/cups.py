@@ -34,7 +34,7 @@ def unavailable():
     json.dump({
         "ok": True,
         "available": False,
-        "hint": "CUPS není nainstalovaný. Nainstalujte ho příkazem: sudo zypper in cups",
+        "hint": "CUPS is not installed. Install it with: sudo zypper in cups",
         "printers": [],
         "jobs": [],
         "default": "",
@@ -68,7 +68,7 @@ def status():
             json.dump({
                 "ok": True,
                 "available": False,
-                "hint": "Služba CUPS neběží. Spusťte ji: sudo systemctl enable --now cups",
+                "hint": "The CUPS service is not running. Start it with: sudo systemctl enable --now cups",
                 "printers": [],
                 "jobs": [],
                 "default": "",
@@ -101,58 +101,58 @@ def status():
 
 def main():
     if len(sys.argv) < 2:
-        fail("chybí příkaz")
+        fail("missing command")
     cmd = sys.argv[1]
     if cmd == "status":
         status()
         return
     if shutil.which("lpadmin") is None or shutil.which("lpstat") is None:
-        fail("CUPS není nainstalovaný. sudo zypper in cups")
+        fail("CUPS is not installed. sudo zypper in cups")
     if cmd == "default":
         name = sys.argv[2] if len(sys.argv) > 2 else ""
         if not NAME_RE.match(name):
-            fail("neplatný název tiskárny")
+            fail("invalid printer name")
         proc = cups_run(["lpadmin", "-d", name])
         if proc.returncode != 0:
-            fail(proc.stderr or proc.stdout or "výchozí tiskárnu se nepodařilo nastavit")
+            fail(proc.stderr or proc.stdout or "could not set the default printer")
     elif cmd == "enable":
         name = sys.argv[2] if len(sys.argv) > 2 else ""
         if not NAME_RE.match(name):
-            fail("neplatný název tiskárny")
+            fail("invalid printer name")
         tool = "cupsenable" if shutil.which("cupsenable") else None
         proc = cups_run([tool, name]) if tool else cups_run(["lpadmin", "-p", name, "-E"])
         if proc.returncode != 0:
-            fail(proc.stderr or proc.stdout or "tiskárnu se nepodařilo zapnout")
+            fail(proc.stderr or proc.stdout or "could not enable the printer")
     elif cmd == "disable":
         name = sys.argv[2] if len(sys.argv) > 2 else ""
         if not NAME_RE.match(name):
-            fail("neplatný název tiskárny")
+            fail("invalid printer name")
         tool = "cupsdisable" if shutil.which("cupsdisable") else None
         if tool is None:
-            fail("chybí cupsdisable")
+            fail("cupsdisable is missing")
         proc = cups_run([tool, name])
         if proc.returncode != 0:
-            fail(proc.stderr or proc.stdout or "tiskárnu se nepodařilo pozastavit")
+            fail(proc.stderr or proc.stdout or "could not pause the printer")
     elif cmd == "delete":
         name = sys.argv[2] if len(sys.argv) > 2 else ""
         if not NAME_RE.match(name):
-            fail("neplatný název tiskárny")
+            fail("invalid printer name")
         proc = cups_run(["lpadmin", "-x", name])
         if proc.returncode != 0:
-            fail(proc.stderr or proc.stdout or "tiskárnu se nepodařilo smazat")
+            fail(proc.stderr or proc.stdout or "could not delete the printer")
     elif cmd == "add":
         if len(sys.argv) < 4:
-            fail("add NÁZEV URI")
+            fail("add NAME URI")
         name, uri = sys.argv[2], sys.argv[3]
         if not NAME_RE.match(name):
-            fail("název smí obsahovat jen písmena, čísla, _ a -")
+            fail("the name may contain only letters, digits, _ and -")
         if not URI_RE.match(uri):
-            fail("URI musí začínat ipp://, ipps://, socket://, lpd:// nebo usb://")
+            fail("the URI must start with ipp://, ipps://, socket://, lpd:// or usb://")
         proc = cups_run(["lpadmin", "-p", name, "-E", "-v", uri, "-m", "everywhere"])
         if proc.returncode != 0:
-            fail(proc.stderr or proc.stdout or "tiskárnu se nepodařilo přidat")
+            fail(proc.stderr or proc.stdout or "could not add the printer")
     else:
-        fail("neznámý příkaz")
+        fail("unknown command")
     status()
 
 
