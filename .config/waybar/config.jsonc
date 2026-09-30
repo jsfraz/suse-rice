@@ -32,7 +32,7 @@
         "interval": "once",
         "tooltip": false,
         "format": " ",
-        "on-click": "sh -c 'rofi -show combi -combi-modes drun,ssh -modes combi -theme ~/.config/rofi/launcher.rasi -show-icons -icon-theme crystal-remix-$(rcm get color)'"
+        "on-click": "~/.config/quickshell/scripts/app-launcher.sh"
     },
     "custom/runcat": {
         "exec": "~/.config/waybar/scripts/runcat.sh",

@@ -20,7 +20,7 @@ hl.monitor({
 -- Set programs
 local terminal    = "kitty"
 local fileManager = "nemo"
-local appLauncher = "rofi -show combi -combi-modes 'drun,ssh' -modes combi -theme ~/.config/rofi/launcher.rasi -show-icons -icon-theme crystal-remix-$(rcm get color)"
+local appLauncher = "~/.config/quickshell/scripts/app-launcher.sh"
 
 
 -------------------

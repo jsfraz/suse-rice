@@ -1,7 +1,8 @@
 #!/bin/sh
-# Super+N. Start quickshell if it is not running, then ask it to show or hide settings.
+# Super+D. Start quickshell if it is not running, then ask it to show or hide settings.
 export PATH="$PATH:/usr/local/bin:${HOME}/.local/bin"
 . "${HOME}/.config/quickshell/scripts/quickshell-env.sh"
+"${HOME}/.config/quickshell/scripts/close-app-launcher.sh"
 log_dir="${HOME}/.local/state/suse-rice"
 mkdir -p "$log_dir"
 
