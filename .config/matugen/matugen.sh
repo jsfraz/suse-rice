@@ -5,26 +5,13 @@ export PATH="${HOME}/.cargo/bin:${HOME}/.local/bin:/usr/local/bin:${PATH:-/usr/b
 
 # TODO check if anything changed since last run or just optimize the code
 
-# colors
-forced_color=$(rcm get forcedColor)
+rice_color="${HOME}/.config/matugen/resolve-rice-color.sh"
+color=$("$rice_color")
+color_hex=$("$rice_color" --hex)
 
-if [ $forced_color = true ]; then
-    # color set by force
-    color=$(rcm get color)
-    color_hex=$(~/.config/matugen/color_utils.py -color2hex $color)
-else
-    color_from_wallpaper=$(rcm get colorFromWallpaper)
-    if [ $color_from_wallpaper = true ]; then
-        # color based on the wallpaper
-        color_hex=$(~/.config/matugen/color_utils.py -hex $(rcm get wallpaper))
-        color=$(~/.config/matugen/color_utils.py -hex2color $color_hex)
-    else
-        # color from palette based on the wallpaper
-        color_hex=$(~/.config/matugen/color_utils.py -hex $(rcm get wallpaper))
-        color=$(~/.config/matugen/color_utils.py -hex2color $color_hex)
-        color_hex=$(~/.config/matugen/color_utils.py -color2hex $color)
-    fi
-fi
+# Crystal Remix and rofi read `rcm get color`; keep it in sync here so launchers
+# never re-scan the wallpaper (resolve-rice-color.sh is slow on every Super+R).
+rcm set color "$color"
 
 # brightness mode
 forced_brightness_mode=$(rcm get forcedBrightnessMode)
@@ -42,6 +29,10 @@ matugen color hex $color_hex -m $brightness_mode
 # TODO move to post hooks
 
 icons=crystal-remix-$color
+
+rice_cache="${HOME}/.cache/suse-rice"
+mkdir -p "$rice_cache"
+printf '%s\n' "$icons" > "${rice_cache}/icon-theme"
 
 # GTK
 # gsettings list-recursively org.gnome.desktop.interface

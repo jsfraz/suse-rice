@@ -126,6 +126,7 @@ See [Hyprland Systemd startup](https://wiki.hypr.land/Useful-Utilities/Systemd-s
 ```bash
 sudo zypper in uwsm
 chmod +x ~/.config/matugen/matugen.sh
+chmod +x ~/.config/matugen/resolve-rice-color.sh
 chmod +x ~/.config/matugen/color_utils.py
 ```
 

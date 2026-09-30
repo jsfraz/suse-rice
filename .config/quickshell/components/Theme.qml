@@ -25,9 +25,7 @@ Singleton {
 
     readonly property color ink: foreground
     readonly property color inkSoft: tint(foreground, 0.78)
-    // Dark mode type is nearly white, and so is the gel disc behind category icons.
     readonly property bool lightType: foreground.r * 0.2126 + foreground.g * 0.7152 + foreground.b * 0.0722 > 0.62
-    readonly property color iconInk: lightType ? Qt.darker(glassDeep, 1.55) : foreground
     readonly property color line: tint(rim, 0.55)
     readonly property color window: tint(glass, 0.38)
     readonly property color sidebar: tint(glassDeep, 0.46)

@@ -15,15 +15,15 @@ FloatingWindow {
 
     property int pageIndex: 0
     property var pages: [
-        { title: "Network", icon: "\uf1eb", font: "Font Awesome 7 Free Solid", file: "pages/NetworkPage.qml" },
-        { title: "Bluetooth", icon: "\uf294", font: "Font Awesome 7 Brands", file: "pages/BluetoothPage.qml" },
-        { title: "Displays", icon: "\uf108", font: "Font Awesome 7 Free Solid", file: "pages/DisplaysPage.qml" },
-        { title: "Sound", icon: "\uf028", font: "Font Awesome 7 Free Solid", file: "pages/SoundPage.qml" },
-        { title: "Power", icon: "\uf0e7", font: "Font Awesome 7 Free Solid", file: "pages/PowerPage.qml" },
-        { title: "Look & Feel", icon: "\uf53f", font: "Font Awesome 7 Free Solid", file: "pages/LookPage.qml" },
-        { title: "Keyboard", icon: "\uf11c", font: "Font Awesome 7 Free Solid", file: "pages/KeyboardPage.qml" },
-        { title: "Printers", icon: "\uf02f", font: "Font Awesome 7 Free Solid", file: "pages/PrinterPage.qml" },
-        { title: "Date and time", icon: "\uf017", font: "Font Awesome 7 Free Solid", file: "pages/DateTimePage.qml" }
+        { title: "Network", themeIcon: "preferences-system-network", file: "pages/NetworkPage.qml" },
+        { title: "Bluetooth", themeIcon: "preferences-system-bluetooth", file: "pages/BluetoothPage.qml" },
+        { title: "Displays", themeIcon: "preferences-desktop-display", file: "pages/DisplaysPage.qml" },
+        { title: "Sound", themeIcon: "preferences-desktop-sound", file: "pages/SoundPage.qml" },
+        { title: "Power", themeIcon: "preferences-system-power-management", file: "pages/PowerPage.qml" },
+        { title: "Look & Feel", themeIcon: "preferences-desktop-theme", file: "pages/LookPage.qml" },
+        { title: "Keyboard", themeIcon: "preferences-desktop-keyboard", file: "pages/KeyboardPage.qml" },
+        { title: "Printers", themeIcon: "preferences-desktop-printer", file: "pages/PrinterPage.qml" },
+        { title: "Date and time", themeIcon: "preferences-system-time", file: "pages/DateTimePage.qml" }
     ]
 
     property real reveal: 0
@@ -224,25 +224,22 @@ FloatingWindow {
                                 anchors.rightMargin: 10
                                 spacing: 8
 
-                                Rectangle {
+                                Item {
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: 22
                                     height: 22
-                                    radius: 11
                                     scale: win.pageIndex === row.index ? 1.08 : 1
                                     Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutBack } }
-                                    gradient: Gradient {
-                                        GradientStop { position: 0; color: Theme.highlight }
-                                        GradientStop { position: 0.45; color: Theme.gel }
-                                        GradientStop { position: 1; color: Theme.gelDeep }
-                                    }
-                                    Text {
+
+                                    Image {
                                         anchors.centerIn: parent
-                                        text: modelData.icon
-                                        color: Theme.iconInk
-                                        font.family: modelData.font
-                                        font.pixelSize: 11
-                                        font.weight: modelData.font.indexOf("Solid") >= 0 ? 900 : 400
+                                        width: 22
+                                        height: 22
+                                        fillMode: Image.PreserveAspectFit
+                                        asynchronous: true
+                                        smooth: true
+                                        sourceSize: Qt.size(32, 32)
+                                        source: Icons.prefix + "/32x32/preferences/" + modelData.themeIcon + ".png"
                                     }
                                 }
 
