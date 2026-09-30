@@ -265,4 +265,6 @@ sed 's/^Exec=alacarte$/Exec=alacarte gnome-applications.menu/' \
   /usr/share/applications/alacarte.desktop \
   > "$menu_dir/alacarte.desktop"
 update-desktop-database "$menu_dir"
+# Hide yast apps
+sudo mv /usr/share/applications/YaST2/ /usr/share/applications/.YaST2/
 ```
