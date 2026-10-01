@@ -18,17 +18,6 @@ Item {
     property bool pressed: mouse.pressed
 
     Rectangle {
-        id: glow
-        visible: root.selected && root.enabled
-        x: face.x - 5
-        y: face.y + 2
-        width: face.width + 10
-        height: face.height + 8
-        radius: height / 2
-        color: Theme.tint(Theme.gelActive, root.pressed ? 0.2 : 0.72)
-    }
-
-    Rectangle {
         id: face
         anchors.fill: parent
         anchors.topMargin: root.pressed && root.enabled ? 2 : 0
