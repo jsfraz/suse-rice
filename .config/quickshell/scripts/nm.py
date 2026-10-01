@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 """NetworkManager snapshot and actions for the settings window. Prints JSON."""
 
+import glob
 import json
+import os
 import shutil
 import subprocess
 import sys
 
 PATH_PREFIX = "/usr/local/bin:/usr/bin:/bin"
+CACHE_DIR = os.path.join(os.path.expanduser("~"), ".cache", "suse-rice")
+EAP_CA_BUNDLE = os.path.join(CACHE_DIR, "geteduroam-ca-bundle.pem")
 
 
 def run(args):
@@ -15,9 +19,69 @@ def run(args):
 
 
 def fail(message, code=1):
-    json.dump({"ok": False, "error": message.strip()}, sys.stdout, ensure_ascii=False)
+    text = message.strip()
+    if "\nHint:" in text:
+        text = text.split("\nHint:", 1)[0].strip()
+    json.dump({"ok": False, "error": text}, sys.stdout, ensure_ascii=False)
     sys.stdout.write("\n")
     raise SystemExit(code)
+
+
+def connection_value(name, field):
+    code, out, err = run(["nmcli", "-g", field, "connection", "show", name])
+    if code != 0:
+        return ""
+    return out.strip()
+
+
+def is_eap_connection(name):
+    key_mgmt = connection_value(name, "802-11-wireless-security.key-mgmt")
+    return "wpa-eap" in key_mgmt or "ieee8021x" in key_mgmt
+
+
+def _bundle_mtime(path):
+    try:
+        return os.path.getmtime(path)
+    except OSError:
+        return 0
+
+
+def build_ca_bundle(ca_dir):
+    paths = sorted(glob.glob(os.path.join(ca_dir, "[0-9].pem")))
+    if not paths:
+        return None
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    newest = max(_bundle_mtime(p) for p in paths)
+    if _bundle_mtime(EAP_CA_BUNDLE) >= newest and os.path.isfile(EAP_CA_BUNDLE):
+        return EAP_CA_BUNDLE
+    with open(EAP_CA_BUNDLE, "w", encoding="utf-8") as handle:
+        for path in paths:
+            with open(path, encoding="utf-8") as cert:
+                data = cert.read()
+            handle.write(data)
+            if data and not data.endswith("\n"):
+                handle.write("\n")
+    return EAP_CA_BUNDLE
+
+
+def prepare_eap_profile(name):
+    """NetworkManager rejects 802-1x.ca-path on user profiles; merge CAs into one file."""
+    if not is_eap_connection(name):
+        return
+    ca_path = connection_value(name, "802-1x.ca-path")
+    ca_cert = connection_value(name, "802-1x.ca-cert")
+    if not ca_path or ca_cert:
+        return
+    bundle = build_ca_bundle(ca_path)
+    if not bundle:
+        fail(f"no CA certificates found in {ca_path}")
+    code, out, err = run([
+        "nmcli", "connection", "modify", name,
+        "802-1x.ca-cert", bundle,
+        "802-1x.ca-path", "",
+    ])
+    if code != 0:
+        fail(err or out or "could not prepare the 802.1X profile")
 
 
 def split_fields(line):
@@ -164,6 +228,8 @@ def connect(ssid, password):
         if name:
             connection_cmd("up", name)
             return
+    if password and saved_wifi_name(ssid):
+        fail("this network already has a saved profile; use Connect without a password")
     cmd = ["nmcli", "device", "wifi", "connect", ssid]
     if password:
         cmd += ["password", password]
@@ -175,6 +241,7 @@ def connect(ssid, password):
 
 def connection_cmd(action, name):
     if action == "up":
+        prepare_eap_profile(name)
         cmd = ["nmcli", "connection", "up", name]
     elif action == "down":
         cmd = ["nmcli", "connection", "down", name]

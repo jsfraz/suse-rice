@@ -32,6 +32,12 @@ Item {
         return ""
     }
 
+    function isEnterprise(security) {
+        if (!security)
+            return false
+        return security.indexOf("802.1X") !== -1 || security.indexOf("802.1x") !== -1
+    }
+
     function openEditor() {
         if (!editorReady)
             return
@@ -253,6 +259,10 @@ Item {
                         onClicked: {
                             var open = !modelData.security || modelData.security === "--"
                             var known = root.savedWifiName(modelData.ssid)
+                            if (root.isEnterprise(modelData.security) && !known) {
+                                root.message = "802.1X networks need a profile from geteduroam before you can connect here."
+                                return
+                            }
                             if (open || known) {
                                 root.busy = true
                                 proc.run(["python3", root.script(), "connect", modelData.ssid])

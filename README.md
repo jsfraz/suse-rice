@@ -106,6 +106,7 @@ your_username ALL=(ALL) NOPASSWD: ALL
 - [remmina](https://github.com/freerdp/remmina)
 - [mousepad](https://gitlab.xfce.org/apps/mousepad)
 - [inkscape](https://gitlab.com/inkscape/inkscape)
+- [geteduoroam](https://github.com/geteduroam/linux-app)
 - [flatpak](https://flathub.org/cs/setup)
 - [flatseal](https://github.com/tchx84/flatseal)
 - [localsend](https://github.com/localsend/localsend) ([firewalld settings needs to be adjusted](https://github.com/localsend/localsend/issues/2592))
@@ -113,6 +114,7 @@ your_username ALL=(ALL) NOPASSWD: ALL
 - [MQTTX](https://github.com/emqx/MQTTX)
 - [aisleriot](https://gitlab.gnome.org/GNOME/aisleriot)
 - [HeroicGamesLauncher](https://github.com/Heroic-Games-Launcher/HeroicGamesLauncher)
+- [Spotify](https://flathub.org/en/apps/com.spotify.Client)
 
 #### Games
 
@@ -207,17 +209,6 @@ chmod +x ./build_rcm.sh
 ```
 
 The script compiles as your user (so it finds `go` on your PATH) and asks for sudo only to install into `/usr/local/bin`.
-
-### Settings
-
-Hyprland seeds these fallbacks on every start. `rcm set` still wins over them:
-
-- Look & Feel: `color`, `wallpaper`, `forcedColor`, `colorFromWallpaper`, `forcedBrightnessMode`, `brightnessMode`, `screensaver`
-- Keyboard: `keyboard` (also the wayvnc `-k` layout), `keyboardVariant` (`-` means none)
-- Displays: `monitors` (`-` keeps the `hl.monitor` default in `hyprland.lua`)
-- Power timeouts, in seconds: `idleKbd`, `idleScreensaver`, `idleLock`
-
-Date and time changes use `sudo -n timedatectl`, which matches the passwordless sudo setup above. Idle timeouts are written to `~/.local/state/suse-rice/hypridle.conf` from `.config/hypr/hypridle.conf`, so saving them does not edit the repo copy.
 
 ### wayvnc
 
