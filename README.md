@@ -62,6 +62,7 @@ your_username ALL=(ALL) NOPASSWD: ALL
 - [rofi](https://github.com/davatorium/rofi)
 - [nemo](https://github.com/linuxmint/nemo)
 - [Crystal Remix icon theme — color variants](https://github.com/jsfraz/crystal-remix-icon-theme-color-variants)
+- [Win7Bulid cursors](https://github.com/jsfraz/Win7Bulid-cursors-plus-dark) (light and dark)
 - [darkman](https://gitlab.com/WhyNotHugo/darkman)
 - [waybar](https://github.com/alexays/waybar)
 - [quickshell](https://quickshell.org/) (`qs`; on openSUSE the package that provides it is `noctalia-qs`)
@@ -104,6 +105,7 @@ your_username ALL=(ALL) NOPASSWD: ALL
 - [kdenlive](https://github.com/kde/kdenlive)
 - [remmina](https://github.com/freerdp/remmina)
 - [mousepad](https://gitlab.xfce.org/apps/mousepad)
+- [inkscape](https://gitlab.com/inkscape/inkscape)
 - [flatpak](https://flathub.org/cs/setup)
 - [flatseal](https://github.com/tchx84/flatseal)
 - [localsend](https://github.com/localsend/localsend) ([firewalld settings needs to be adjusted](https://github.com/localsend/localsend/issues/2592))
@@ -259,6 +261,15 @@ Clones [crystal-remix-icon-theme-color-variants](https://github.com/jsfraz/cryst
 ```bash
 chmod +x ./install_crystal_remix.sh
 ./install_crystal_remix.sh
+```
+
+### Win7Bulid cursors
+
+Clones [Win7Bulid-cursors-plus-dark](https://github.com/jsfraz/Win7Bulid-cursors-plus-dark) and installs both variants into `~/.local/share/icons/`. Light mode uses `Win7Bulid-cursors`, dark mode uses `Win7Bulid-cursors-dark`. The switch follows the same brightness mode as the rest of the theme (`forcedBrightnessMode`, otherwise darkman) in `matugen.sh`.
+
+```bash
+chmod +x ./install_win7bulid_cursors.sh
+./install_win7bulid_cursors.sh
 ```
 
 ### darkman
