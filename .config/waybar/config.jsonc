@@ -24,7 +24,13 @@
     ],
     "tray": {
         "icon-size": 18,
-        "spacing": 10
+        "spacing": 10,
+        "show-passive-items": true,
+        "icons": {
+            "kdeconnect-indicator": "/usr/share/icons/hicolor/scalable/apps/kdeconnectindicator.svg",
+            "org.kde.kdeconnect-indicator": "/usr/share/icons/hicolor/scalable/apps/kdeconnectindicator.svg",
+            "org.localsend.localsend_app": "/var/lib/flatpak/app/org.localsend.localsend_app/current/active/files/share/icons/hicolor/32x32/apps/org.localsend.localsend_app-tray.png"
+        }
     },
     "custom/os": {
         "exec": "~/.config/waybar/scripts/os-icon.sh",

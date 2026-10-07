@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=LocalSend
+Comment=Share files to nearby devices (Flatpak)
+Exec=flatpak run org.localsend.localsend_app
+Icon=org.localsend.localsend_app
+Terminal=false
+StartupNotify=false
+X-GNOME-Autostart-enabled=true

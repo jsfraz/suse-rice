@@ -64,6 +64,10 @@ window#waybar > box {
     background: transparent;
 }
 
+#tray widget image {
+    -gtk-icon-shadow: 0 0 2px alpha(@highlight, 0.85);
+}
+
 #battery {
     margin-right: 8px;
 }

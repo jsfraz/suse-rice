@@ -86,6 +86,8 @@ hl.on("hyprland.start", function()
         pgrep -x blueman-applet >/dev/null && exit 0
         exec blueman-applet
     ]=]))
+    -- KDE Connect, MEGA, LocalSend (Flatpak).
+    hl.exec_cmd(rcmAutostart([=[~/.config/hypr/scripts/autostart-sync-apps.sh]=]))
     -- Timeouts come from rcm (idleKbd, idleScreensaver, idleLock). The generated
     -- file lives outside the repo so saving them does not dirty hypridle.conf.
     hl.exec_cmd(rcmAutostart([=[~/.config/quickshell/scripts/apply-idle.sh --if-absent]=]))
@@ -480,6 +482,15 @@ hl.window_rule({
     match  = { class = "^qalculate-gtk$" },
     float  = true,
     center = true,
+})
+
+-- MEGAsync transfer window. The client asks for 402×564, but tiling stretches
+-- the transparent surface across the whole workspace.
+hl.window_rule({
+    name  = "megasync",
+    match = { class = "^MEGAsync$", title = "^MEGAsync$" },
+    float = true,
+    size  = "402 564",
 })
 
 -- Hyprland-run windowrule

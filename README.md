@@ -107,6 +107,7 @@ your_username ALL=(ALL) NOPASSWD: ALL
 - [mousepad](https://gitlab.xfce.org/apps/mousepad)
 - [inkscape](https://gitlab.com/inkscape/inkscape)
 - [geteduoroam](https://github.com/geteduroam/linux-app)
+- [kdeconnect-kde](https://github.com/kde/kdeconnect-kde)
 - [flatpak](https://flathub.org/cs/setup)
 - [flatseal](https://github.com/tchx84/flatseal)
 - [localsend](https://github.com/localsend/localsend) ([firewalld settings needs to be adjusted](https://github.com/localsend/localsend/issues/2592))
