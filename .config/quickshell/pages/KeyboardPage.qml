@@ -8,7 +8,6 @@ Item {
     property var layouts: []
     property var variants: []
     property bool busy: false
-    property string message: ""
 
     function script() { return Config.scripts + "/keyboard.py" }
 
@@ -48,7 +47,7 @@ Item {
             try {
                 var parsed = JSON.parse(stdout)
                 if (!parsed.ok) {
-                    root.message = parsed.error
+                    Config.notifyError(parsed.error, "Keyboard")
                     return
                 }
                 var same = root.layout === parsed.layout
@@ -57,7 +56,7 @@ Item {
                 if (same)
                     variantProc.run(["python3", root.script(), "variants", root.layout])
             } catch (e) {
-                root.message = root.failText(stdout, stderr)
+                Config.notifyError(root.failText(stdout, stderr), "Keyboard")
             }
         }
     }
@@ -70,9 +69,9 @@ Item {
                 if (parsed.ok)
                     root.layouts = parsed.layouts
                 else
-                    root.message = parsed.error
+                    Config.notifyError(parsed.error, "Keyboard")
             } catch (e) {
-                root.message = root.failText(stdout, stderr)
+                Config.notifyError(root.failText(stdout, stderr), "Keyboard")
             }
         }
     }
@@ -96,9 +95,10 @@ Item {
             root.busy = false
             try {
                 var parsed = JSON.parse(stdout)
-                root.message = parsed.ok ? "Layout is set." : (parsed.error || "Action failed")
+                if (!parsed.ok)
+                    Config.notifyError(parsed.error || "Action failed", "Keyboard")
             } catch (e) {
-                root.message = root.failText(stdout, stderr)
+                Config.notifyError(root.failText(stdout, stderr), "Keyboard")
             }
         }
     }
@@ -159,6 +159,5 @@ Item {
                 }
             }
         }
-        BodyText { width: parent.width; text: root.message; visible: root.message.length > 0 }
     }
 }

@@ -70,6 +70,8 @@ your_username ALL=(ALL) NOPASSWD: ALL
 - [bluez](https://software.opensuse.org/package/bluez)
 - [blueman](https://github.com/blueman-project/blueman)
 - [nm-connection-editor](https://software.opensuse.org/package/NetworkManager-connection-editor)
+- [NetworkManager-openvpn](https://software.opensuse.org/package/NetworkManager-openvpn) (import `.ovpn` profiles from Quickshell **Network → Import VPN…**, same backend as GNOME)
+- [NetworkManager-applet-openvpn](https://software.opensuse.org/package/NetworkManager-applet-openvpn) (VPN tab in **nm-connection-editor**; without it the editor stays empty)
 - [firewall-config](https://software.opensuse.org/package/firewall-config)
 - [zenity](https://gitlab.gnome.org/GNOME/zenity)
 - [cups](https://github.com/openprinting/cups)

@@ -86,7 +86,7 @@ hl.on("hyprland.start", function()
         pgrep -x blueman-applet >/dev/null && exit 0
         exec blueman-applet
     ]=]))
-    -- KDE Connect, MEGA, LocalSend (Flatpak).
+    -- Autostart
     hl.exec_cmd(rcmAutostart([=[~/.config/hypr/scripts/autostart-sync-apps.sh]=]))
     -- Timeouts come from rcm (idleKbd, idleScreensaver, idleLock). The generated
     -- file lives outside the repo so saving them does not dirty hypridle.conf.
@@ -439,6 +439,15 @@ hl.window_rule({
 hl.window_rule({
     name   = "wallpaper-picker",
     match  = { title = "^Wallpaper$" },
+    float  = true,
+    center = true,
+    pin    = true,
+})
+
+-- OpenVPN import picker from Network settings (zenity --title=Import VPN).
+hl.window_rule({
+    name   = "vpn-import-picker",
+    match  = { title = "^Import VPN$" },
     float  = true,
     center = true,
     pin    = true,

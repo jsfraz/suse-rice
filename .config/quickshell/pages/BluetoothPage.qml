@@ -90,7 +90,7 @@ Item {
         BodyText {
             width: parent.width
             visible: root.bluemanChecked && !root.bluemanReady
-            text: "Pairing is handled by Blueman. Install it with: sudo zypper in blueman"
+            text: "Pairing is handled by Blueman."
         }
     }
 }

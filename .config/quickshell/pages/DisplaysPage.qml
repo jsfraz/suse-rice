@@ -12,14 +12,12 @@ Item {
         { value: 3, label: "270°" }
     ]
     property bool busy: false
-    property string message: ""
     property bool followDarkman: true
     property bool sunsetOn: false
     property int temperature: 4000
     property bool sunsetBusy: false
     property bool sunsetLoaded: false
     property bool sunsetPending: false
-    property string sunsetMessage: ""
 
     function script() { return Config.scripts + "/monitors.py" }
 
@@ -29,11 +27,11 @@ Item {
         try {
             parsed = JSON.parse(stdout)
         } catch (e) {
-            message = (stderr || stdout || "Could not load displays").trim()
+            Config.notifyError((stderr || stdout || "Could not load displays").trim(), "Displays")
             return
         }
         if (!parsed.ok) {
-            message = parsed.error || "Action failed"
+            Config.notifyError(parsed.error || "Action failed", "Displays")
             return
         }
         monitors = parsed.monitors || []
@@ -41,7 +39,6 @@ Item {
             scales = parsed.scales
         if (parsed.transforms)
             transforms = parsed.transforms
-        message = ""
     }
 
     function scaleIndex(scale) {
@@ -95,7 +92,6 @@ Item {
         }
         sunsetBusy = true
         sunsetPending = false
-        sunsetMessage = ""
         sunsetProc.run(["python3", sunsetScript(), "apply", JSON.stringify({
             followDarkman: followDarkman,
             on: sunsetOn,
@@ -109,13 +105,13 @@ Item {
         try {
             parsed = JSON.parse(stdout)
         } catch (e) {
-            sunsetMessage = (stderr || stdout || "Could not load the filter").trim()
+            Config.notifyError((stderr || stdout || "Could not load the filter").trim(), "Displays")
             if (sunsetPending)
                 commitSunset()
             return
         }
         if (!parsed.ok) {
-            sunsetMessage = parsed.error || "Could not save the filter"
+            Config.notifyError(parsed.error || "Could not save the filter", "Displays")
             sunsetPending = false
             return
         }
@@ -127,7 +123,6 @@ Item {
         sunsetOn = parsed.on === true
         temperature = parsed.temperature
         sunsetLoaded = true
-        sunsetMessage = ""
     }
 
     Component.onCompleted: {
@@ -149,12 +144,6 @@ Item {
         anchors.fill: parent
         anchors.rightMargin: 12
         heading: "Displays"
-
-        BodyText {
-            width: parent.width
-            text: root.message
-            visible: root.message.length > 0
-        }
 
         AeroCard {
             width: parent.width
@@ -204,11 +193,6 @@ Item {
                     root.temperature = v
                     root.commitSunset()
                 }
-            }
-            BodyText {
-                width: parent.width
-                text: root.sunsetMessage
-                visible: root.sunsetMessage.length > 0
             }
         }
 

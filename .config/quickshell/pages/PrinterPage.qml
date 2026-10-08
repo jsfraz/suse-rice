@@ -9,7 +9,6 @@ Item {
     property var jobs: []
     property string defaultPrinter: ""
     property bool busy: false
-    property string message: ""
     property string newName: ""
     property string newUri: ""
 
@@ -21,11 +20,11 @@ Item {
         try {
             parsed = JSON.parse(stdout)
         } catch (e) {
-            message = (stderr || stdout || "Could not load printers").trim()
+            Config.notifyError((stderr || stdout || "Could not load printers").trim(), "Printers")
             return
         }
         if (!parsed.ok) {
-            message = parsed.error || "Action failed"
+            Config.notifyError(parsed.error || "Action failed", "Printers")
             return
         }
         available = parsed.available === true
@@ -33,7 +32,6 @@ Item {
         printers = parsed.printers || []
         jobs = parsed.jobs || []
         defaultPrinter = parsed.default || ""
-        message = ""
     }
 
     function refresh() {
@@ -164,6 +162,5 @@ Item {
             }
         }
 
-        BodyText { width: parent.width; text: root.message; visible: root.message.length > 0 }
     }
 }

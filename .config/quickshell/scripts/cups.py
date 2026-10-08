@@ -34,7 +34,7 @@ def unavailable():
     json.dump({
         "ok": True,
         "available": False,
-        "hint": "CUPS is not installed. Install it with: sudo zypper in cups",
+        "hint": "CUPS is not installed.",
         "printers": [],
         "jobs": [],
         "default": "",
@@ -107,7 +107,7 @@ def main():
         status()
         return
     if shutil.which("lpadmin") is None or shutil.which("lpstat") is None:
-        fail("CUPS is not installed. sudo zypper in cups")
+        fail("CUPS is not installed.")
     if cmd == "default":
         name = sys.argv[2] if len(sys.argv) > 2 else ""
         if not NAME_RE.match(name):

@@ -20,4 +20,22 @@ Singleton {
         if (settingsWindow)
             settingsWindow.dismiss()
     }
+
+    function notify(title, body, urgency) {
+        if (!body || body.length === 0)
+            return
+        var args = ["notify-send", "-a", "System Settings"]
+        if (urgency && urgency.length > 0)
+            args.push("-u", urgency)
+        args.push(title || "System Settings", body)
+        Quickshell.execDetached(args)
+    }
+
+    function notifyError(body, title) {
+        notify(title || "System Settings", body, "critical")
+    }
+
+    function notifyInfo(body, title) {
+        notify(title || "System Settings", body, "normal")
+    }
 }

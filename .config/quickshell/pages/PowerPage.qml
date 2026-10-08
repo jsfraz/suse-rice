@@ -9,7 +9,6 @@ Item {
     property int idleScreensaver: 600
     property int idleLock: 3600
     property bool busy: false
-    property string message: ""
 
     function script() { return Config.scripts + "/power.py" }
 
@@ -26,18 +25,17 @@ Item {
         try {
             parsed = JSON.parse(stdout)
         } catch (e) {
-            message = (stderr || stdout || "Could not load power").trim()
+            Config.notifyError((stderr || stdout || "Could not load power").trim(), "Power")
             return
         }
         if (!parsed.ok) {
-            message = parsed.error || "Action failed"
+            Config.notifyError(parsed.error || "Action failed", "Power")
             return
         }
         brightness = parsed.brightness === null || parsed.brightness === undefined ? -1 : parsed.brightness
         idleKbd = parsed.idleKbd
         idleScreensaver = parsed.idleScreensaver
         idleLock = parsed.idleLock
-        message = ""
     }
 
     Component.onCompleted: proc.run(["python3", script(), "status"])
@@ -60,7 +58,7 @@ Item {
                 text: {
                     var device = UPower.displayDevice
                     if (!device || !device.ready)
-                        return "UPower is not running. Install it with: sudo zypper in upower"
+                        return "UPower is not running."
                     // This quickshell build exposes UPower's percentage as 0–1.
                     var pct = device.percentage
                     if (pct <= 1)
@@ -163,7 +161,6 @@ Item {
                     })])
                 }
             }
-            BodyText { width: parent.width; text: root.message; visible: root.message.length > 0 }
         }
     }
 

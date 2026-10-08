@@ -5,17 +5,30 @@ import qs.components
 Item {
     id: root
 
-    property var snapshot: ({ wifiEnabled: false, networks: [], saved: [], ethernet: [] })
+    property var snapshot: ({
+        wifiEnabled: false,
+        networks: [],
+        saved: [],
+        vpn: [],
+        ethernet: [],
+        openvpnReady: false,
+        openvpnEditorReady: false
+    })
     property bool editorChecked: false
     property bool editorReady: false
     property bool firewallChecked: false
     property bool firewallReady: false
     readonly property var activeSaved: {
         var saved = snapshot.saved || []
+        var vpn = snapshot.vpn || []
         var out = []
         for (var i = 0; i < saved.length; ++i) {
             if (saved[i] && saved[i].active)
                 out.push(saved[i])
+        }
+        for (var j = 0; j < vpn.length; ++j) {
+            if (vpn[j] && vpn[j].active)
+                out.push(vpn[j])
         }
         return out
     }
@@ -53,10 +66,48 @@ Item {
     }
     property bool busy: false
     property bool scanning: false
-    property string message: ""
     property string pendingSsid: ""
+    property string pendingVpnName: ""
+    property bool pickingVpn: false
+    // Last nm.py action: drives error notification title (VPN vs Network).
+    property bool notifyVpn: false
 
     function script() { return Config.scripts + "/nm.py" }
+
+    function notifyFailure(message) {
+        Config.notifyError(message, root.notifyVpn ? "VPN" : "Network")
+    }
+
+    function connectionTypeLabel(type) {
+        if (type === "wifi")
+            return "Wi-Fi"
+        if (type === "vpn")
+            return "VPN"
+        return "Ethernet"
+    }
+
+    function pickVpnFile() {
+        if (!snapshot.openvpnReady)
+            return
+        pickingVpn = true
+        vpnPickerProc.run([
+            "zenity", "--file-selection", "--title=Import VPN",
+            "--file-filter=OpenVPN | *.ovpn"
+        ])
+    }
+
+    function connectVpn(name, needsLogin) {
+        pendingVpnName = name
+        notifyVpn = true
+        if (needsLogin) {
+            vpnUserField.text = ""
+            vpnPasswordField.text = ""
+            vpnAuthDialog.visible = true
+            return
+        }
+        busy = true
+        proc.run(["python3", script(), "up", name])
+    }
 
     function take(code, stdout, stderr) {
         busy = false
@@ -65,26 +116,36 @@ Item {
         try {
             parsed = JSON.parse(stdout)
         } catch (e) {
-            message = (stderr || stdout || "The network did not respond").trim()
+            notifyFailure((stderr || stdout || "The network did not respond").trim())
             return
         }
         if (!parsed.ok) {
-            message = parsed.error || "Action failed"
+            var err = parsed.error || "Action failed"
+            notifyFailure(err)
+            if (parsed.needsAuth) {
+                notifyVpn = true
+                pendingVpnName = parsed.connection || pendingVpnName
+                vpnUserField.text = ""
+                vpnPasswordField.text = ""
+                vpnAuthDialog.visible = true
+                return
+            }
             return
         }
+        notifyVpn = false
         snapshot = parsed
-        message = ""
     }
 
     function refresh() {
+        notifyVpn = false
         busy = true
         proc.run(["python3", script(), "status"])
     }
 
     function scan() {
+        notifyVpn = false
         busy = true
         scanning = true
-        message = "Searching for networks…"
         proc.run(["python3", script(), "scan"])
     }
 
@@ -112,6 +173,26 @@ Item {
         onFinished: (code, stdout) => {
             root.firewallChecked = true
             root.firewallReady = code === 0 && stdout.trim().length > 0
+        }
+    }
+
+    Proc {
+        id: vpnPickerProc
+        onFinished: (code, stdout, stderr) => {
+            root.pickingVpn = false
+            if (code === 0) {
+                var path = stdout.trim()
+                if (path.startsWith("file://"))
+                    path = decodeURIComponent(path.slice(7))
+                if (path.length > 0) {
+                    root.notifyVpn = true
+                    root.busy = true
+                    proc.run(["python3", root.script(), "import-vpn", path])
+                }
+                return
+            }
+            if (code !== 1)
+                Config.notifyError((stderr || "Could not start Zenity").trim(), "VPN")
         }
     }
 
@@ -213,11 +294,6 @@ Item {
                     }
                 }
             }
-            BodyText {
-                width: parent.width
-                text: root.message
-                visible: root.message.length > 0
-            }
         }
 
         AeroCard {
@@ -260,7 +336,7 @@ Item {
                             var open = !modelData.security || modelData.security === "--"
                             var known = root.savedWifiName(modelData.ssid)
                             if (root.isEnterprise(modelData.security) && !known) {
-                                root.message = "802.1X networks need a profile from geteduroam before you can connect here."
+                                Config.notifyInfo("802.1X networks need a profile from geteduroam before you can connect here.", "Network")
                                 return
                             }
                             if (open || known) {
@@ -303,7 +379,7 @@ Item {
                             elide: Text.ElideRight
                         }
                         BodyText {
-                            text: modelData.type === "wifi" ? "Wi-Fi" : "Ethernet"
+                            text: root.connectionTypeLabel(modelData.type)
                         }
                     }
                     AeroButton {
@@ -327,6 +403,77 @@ Item {
                         }
                     }
                 }
+            }
+        }
+
+        AeroCard {
+            width: parent.width
+            SectionLabel { text: "VPN"; width: parent.width }
+            BodyText {
+                width: parent.width
+                visible: !root.snapshot.vpn || root.snapshot.vpn.length === 0
+                text: "No VPN profiles yet."
+            }
+            Repeater {
+                model: root.snapshot.vpn || []
+                delegate: Row {
+                    required property var modelData
+                    width: parent.width
+                    spacing: 8
+                    Column {
+                        width: parent.width - 280
+                        spacing: 2
+                        Text {
+                            width: parent.width
+                            text: modelData.name + (modelData.active ? "  ·  connected" : "")
+                            color: Theme.ink
+                            font.family: Theme.fontFamily
+                            font.pixelSize: 14
+                            font.weight: 620
+                            elide: Text.ElideRight
+                        }
+                        BodyText {
+                            text: (modelData.vpnType || "vpn") + (modelData.needsLogin ? "  ·  login" : "")
+                        }
+                    }
+                    AeroButton {
+                        text: modelData.active ? "Connected" : "Connect"
+                        enabled: !modelData.active && !root.busy
+                        anchors.verticalCenter: parent.verticalCenter
+                        onClicked: root.connectVpn(modelData.name, modelData.needsLogin === true)
+                    }
+                    AeroButton {
+                        text: "Disconnect"
+                        accent: false
+                        visible: modelData.active
+                        enabled: !root.busy
+                        anchors.verticalCenter: parent.verticalCenter
+                        onClicked: {
+                            root.busy = true
+                            proc.run(["python3", root.script(), "down", modelData.name])
+                        }
+                    }
+                    AeroButton {
+                        text: "Remove"
+                        accent: false
+                        enabled: !root.busy
+                        anchors.verticalCenter: parent.verticalCenter
+                        onClicked: {
+                            root.busy = true
+                            proc.run(["python3", root.script(), "forget", modelData.name])
+                        }
+                    }
+                }
+            }
+            AeroButton {
+                text: "Import VPN…"
+                enabled: root.snapshot.openvpnReady === true && !root.busy && !root.pickingVpn
+                onClicked: root.pickVpnFile()
+            }
+            BodyText {
+                width: parent.width
+                visible: root.snapshot.openvpnReady !== true
+                text: "OpenVPN import is not installed."
             }
         }
 
@@ -360,6 +507,13 @@ Item {
             text: "Advanced network settings are not installed. Install them with: sudo zypper in NetworkManager-connection-editor"
         }
 
+        BodyText {
+            width: parent.width
+            visible: root.snapshot.openvpnReady === true
+                && root.snapshot.openvpnEditorReady !== true
+            text: "The VPN tab in Settings stays empty until you install: sudo zypper in NetworkManager-applet-openvpn"
+        }
+
         AeroCard {
             width: parent.width
             SectionLabel { text: "Firewall"; width: parent.width }
@@ -378,7 +532,60 @@ Item {
         BodyText {
             width: parent.width
             visible: root.firewallChecked && !root.firewallReady
-            text: "The firewall editor is not installed. Install it with: sudo zypper in firewall-config"
+            text: "The firewall editor is not installed."
+        }
+    }
+
+    Rectangle {
+        id: vpnAuthDialog
+        visible: false
+        anchors.fill: parent
+        color: Theme.tint(Theme.glassDeep, 0.45)
+        radius: Theme.radius
+
+        AeroCard {
+            width: 420
+            anchors.centerIn: parent
+            SectionLabel {
+                text: "Sign in to " + root.pendingVpnName
+                width: parent.width
+                wrapMode: Text.WordWrap
+            }
+            AeroField {
+                id: vpnUserField
+                width: parent.width
+                placeholder: "Username"
+            }
+            AeroField {
+                id: vpnPasswordField
+                width: parent.width
+                placeholder: "Password"
+                password: true
+                onAccepted: vpnAuthDialog.connectNow()
+            }
+            Row {
+                spacing: 10
+                AeroButton {
+                    text: "Connect"
+                    enabled: !root.busy
+                    onClicked: vpnAuthDialog.connectNow()
+                }
+                AeroButton {
+                    text: "Cancel"
+                    accent: false
+                    onClicked: vpnAuthDialog.visible = false
+                }
+            }
+        }
+
+        function connectNow() {
+            vpnAuthDialog.visible = false
+            root.notifyVpn = true
+            root.busy = true
+            proc.run([
+                "python3", root.script(), "up", root.pendingVpnName,
+                vpnUserField.text, vpnPasswordField.text
+            ])
         }
     }
 

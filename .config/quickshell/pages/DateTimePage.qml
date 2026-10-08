@@ -8,7 +8,6 @@ Item {
     property var zones: []
     property string manual: ""
     property bool busy: false
-    property string message: ""
     property var now: new Date()
 
     function script() { return Config.scripts + "/timedate.py" }
@@ -33,11 +32,11 @@ Item {
         try {
             parsed = JSON.parse(stdout)
         } catch (e) {
-            message = (stderr || stdout || "Could not load the time").trim()
+            Config.notifyError((stderr || stdout || "Could not load the time").trim(), "Date and time")
             return
         }
         if (!parsed.ok) {
-            message = parsed.error || "Action failed"
+            Config.notifyError(parsed.error || "Action failed", "Date and time")
             return
         }
         if (parsed.timezone !== undefined)
@@ -46,7 +45,6 @@ Item {
             ntp = parsed.ntp
         if (parsed.zones)
             zones = parsed.zones
-        message = ""
     }
 
     Timer {
@@ -154,6 +152,5 @@ Item {
             }
         }
 
-        BodyText { width: parent.width; text: root.message; visible: root.message.length > 0 }
     }
 }

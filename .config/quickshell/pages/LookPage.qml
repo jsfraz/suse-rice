@@ -16,7 +16,6 @@ Item {
     property bool picking: false
     property bool loaded: false
     property bool pending: false
-    property string message: ""
 
     function commit() {
         if (!loaded)
@@ -27,7 +26,6 @@ Item {
         }
         busy = true
         pending = false
-        message = "Updating the look…"
         proc.run(["python3", script(), "apply", JSON.stringify({
             wallpaper: wallpaper,
             color: colorName,
@@ -55,13 +53,13 @@ Item {
         try {
             parsed = JSON.parse(stdout)
         } catch (e) {
-            message = (stderr || stdout || "Could not load the look").trim()
+            Config.notifyError((stderr || stdout || "Could not load the look").trim(), "Look & Feel")
             if (pending)
                 commit()
             return
         }
         if (!parsed.ok) {
-            message = parsed.error || "Save failed"
+            Config.notifyError(parsed.error || "Save failed", "Look & Feel")
             pending = false
             return
         }
@@ -79,7 +77,6 @@ Item {
         colors = parsed.colors
         screensavers = parsed.screensavers
         loaded = true
-        message = ""
     }
 
     Component.onCompleted: proc.run(["python3", script(), "status"])
@@ -104,7 +101,7 @@ Item {
                 return
             }
             if (code !== 1)
-                root.message = (stderr || "Could not start Zenity").trim()
+                Config.notifyError((stderr || "Could not start Zenity").trim(), "Look & Feel")
         }
     }
 
@@ -254,6 +251,5 @@ Item {
             }
         }
 
-        BodyText { width: parent.width; text: root.message; visible: root.message.length > 0 }
     }
 }
