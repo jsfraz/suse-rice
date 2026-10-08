@@ -4,6 +4,7 @@
 import glob
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -68,11 +69,90 @@ def vpn_service_label(service):
     return tail or "vpn"
 
 
+def connection_uuid(name):
+    return connection_value(name, "connection.uuid")
+
+
+def _uuid_in_keyfile(path, uuid):
+    try:
+        with open(path, encoding="utf-8") as handle:
+            for line in handle:
+                if line.startswith("uuid="):
+                    return line.strip().split("=", 1)[1] == uuid
+    except OSError:
+        return False
+    return False
+
+
+def connection_keyfile_path(name):
+    uuid = connection_uuid(name)
+    if not uuid:
+        return ""
+    patterns = (
+        os.path.join(
+            os.path.expanduser("~"),
+            ".config/NetworkManager/system-connections/*.nmconnection",
+        ),
+        "/etc/NetworkManager/system-connections/*.nmconnection",
+    )
+    for pattern in patterns:
+        for path in glob.glob(pattern):
+            try:
+                if _uuid_in_keyfile(path, uuid):
+                    return path
+            except OSError:
+                continue
+    return ""
+
+
+def connection_system_wide(name):
+    path = connection_keyfile_path(name)
+    return path.startswith("/etc/NetworkManager")
+
+
+def vpn_password_save_flag(name):
+    """Use OpenVPN password-flags from vpn.data only (no nmcli -s / keyring prompt)."""
+    data = connection_value(name, "vpn.data")
+    return "password-flags = 2" in data or "password-flags=2" in data
+
+
+def openvpn_data_username(data):
+    match = re.search(r"(?:^|,)\s*username\s*=\s*([^,]+)", data)
+    if not match:
+        return ""
+    return match.group(1).strip()
+
+
+def openvpn_username(name):
+    user = connection_value(name, "vpn.user-name")
+    if user and user not in ("--", ""):
+        return user
+    return openvpn_data_username(connection_value(name, "vpn.data"))
+
+
+def vpn_uses_password(name):
+    data = connection_value(name, "vpn.data")
+    lower = data.lower()
+    return (
+        "connection-type = password-tls" in data
+        or "connection-type = passwords" in data
+        or "connection-type=password-tls" in data
+        or "connection-type=passwords" in data
+        or "auth-user-pass" in lower
+    )
+
+
 def vpn_needs_login(name):
-    data = connection_value(name, "vpn.data").lower()
-    if "auth-user-pass" in data:
+    if not vpn_uses_password(name):
+        return False
+    if not openvpn_username(name):
         return True
-    if connection_value(name, "vpn.user-name"):
+    if vpn_password_save_flag(name):
+        return False
+    data = connection_value(name, "vpn.data")
+    if "password-flags = 1" in data or "password-flags=1" in data:
+        return True
+    if "auth-user-pass" in data.lower():
         return True
     return False
 
@@ -88,6 +168,7 @@ def auth_required_message(text):
         "not given in 'passwd-file'",
         "cannot ask without '--ask'",
         "vpn.secrets.password",
+        "no valid secrets",
     )
     return any(marker in lower for marker in markers)
 
@@ -97,10 +178,37 @@ def write_vpn_passwd_file(path, username="", password=""):
     if username:
         lines.append(f"vpn.user-name:{username}")
     if password:
-        # nmcli passwd-file uses setting.property (see nmcli connection up)
         lines.append(f"vpn.secrets.password:{password}")
     with open(path, "w", encoding="utf-8") as handle:
         handle.write("\n".join(lines) + ("\n" if lines else ""))
+
+
+def store_vpn_secrets(name, username="", password=""):
+    if username:
+        code, out, err = run([
+            "nmcli", "connection", "modify", name, "vpn.user-name", username,
+        ])
+        if code != 0:
+            fail(err or out or "could not set the VPN username")
+        code, out, err = run([
+            "nmcli", "connection", "modify", name,
+            "+vpn.data", f"username {username}",
+        ])
+        if code != 0:
+            fail(err or out or "could not set the OpenVPN username")
+    if password:
+        code, out, err = run([
+            "nmcli", "connection", "modify", name,
+            "+vpn.secrets", f"password:{password}",
+        ])
+        if code != 0:
+            fail(err or out or "could not store the VPN password (is gnome-keyring running?)")
+        code, out, err = run([
+            "nmcli", "connection", "modify", name,
+            "+vpn.data", "password-flags 2",
+        ])
+        if code != 0:
+            fail(err or out or "could not mark the VPN password as saved")
 
 
 def connection_value(name, field):
@@ -302,6 +410,7 @@ def vpn_profiles():
             "device": device,
             "vpnType": vpn_service_label(service),
             "needsLogin": vpn_needs_login(name),
+            "systemWide": connection_system_wide(name),
         })
     return sorted(items, key=lambda item: (not item["active"], item["name"].lower()))
 
@@ -346,18 +455,22 @@ def connection_up(name, username="", password=""):
     prepare_eap_profile(name)
     passwd_file = None
     try:
-        if is_vpn_connection(name) and not password and not username and vpn_needs_login(name):
-            fail("VPN login required", needs_auth=True, connection=name)
-        if is_vpn_connection(name) and (password or username):
+        if is_vpn_connection(name):
+            if username or password:
+                store_vpn_secrets(name, username, password)
+            elif vpn_needs_login(name):
+                fail("VPN login required", needs_auth=True, connection=name)
+        cmd = ["nmcli", "connection", "up", name]
+        code, out, err = run(cmd)
+        if code != 0 and is_vpn_connection(name) and (username or password):
             os.makedirs(CACHE_DIR, exist_ok=True)
             fd, passwd_file = tempfile.mkstemp(prefix="nm-vpn-", dir=CACHE_DIR)
             os.close(fd)
             os.chmod(passwd_file, 0o600)
             write_vpn_passwd_file(passwd_file, username, password)
-            cmd = ["nmcli", "connection", "up", name, "passwd-file", passwd_file]
-        else:
-            cmd = ["nmcli", "connection", "up", name]
-        code, out, err = run(cmd)
+            code, out, err = run([
+                "nmcli", "connection", "up", name, "passwd-file", passwd_file,
+            ])
         if code != 0:
             msg = "\n".join(part for part in (err, out) if part and part.strip()).strip()
             msg = msg or "action failed"
@@ -367,6 +480,24 @@ def connection_up(name, username="", password=""):
     finally:
         if passwd_file and os.path.isfile(passwd_file):
             os.unlink(passwd_file)
+    snapshot()
+
+
+def rehome_vpn(name):
+    if not is_vpn_connection(name):
+        fail("not a VPN profile")
+    if not connection_system_wide(name):
+        snapshot()
+        return
+    new_name = f"{name} (user)"
+    code, out, err = run(["nmcli", "connection", "clone", name, new_name])
+    if code != 0:
+        fail(err or out or "could not copy the VPN profile to your user account")
+    if connection_system_wide(new_name):
+        fail(
+            "The copied profile is still system-wide. "
+            "Install the polkit rule: ~/.config/hypr/scripts/install-polkit-rules.sh"
+        )
     snapshot()
 
 
@@ -425,6 +556,10 @@ def main():
         if len(sys.argv) < 3:
             fail("missing path")
         import_vpn(sys.argv[2])
+    elif cmd == "rehome-vpn":
+        if len(sys.argv) < 3:
+            fail("missing connection name")
+        rehome_vpn(sys.argv[2])
     elif cmd in ("up", "down", "forget"):
         if len(sys.argv) < 3:
             fail("missing connection name")

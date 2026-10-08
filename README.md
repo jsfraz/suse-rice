@@ -74,6 +74,8 @@ your_username ALL=(ALL) NOPASSWD: ALL
 - [NetworkManager-applet-openvpn](https://software.opensuse.org/package/NetworkManager-applet-openvpn) (VPN tab in **nm-connection-editor**; without it the editor stays empty)
 - [firewall-config](https://software.opensuse.org/package/firewall-config)
 - [zenity](https://gitlab.gnome.org/GNOME/zenity)
+- [gnome-keyring](https://software.opensuse.org/package/gnome-keyring) (Secret Service for Cursor and saved VPN passwords)
+- [polkit-gnome](https://software.opensuse.org/package/polkit-gnome) (polkit prompts with your user password instead of root-only dialogs)
 - [cups](https://github.com/openprinting/cups)
 - [upower](https://software.opensuse.org/package/upower)
 - [power-profiles-daemon](https://software.opensuse.org/package/power-profiles-daemon)
@@ -151,6 +153,34 @@ chmod +x ~/.config/waybar/scripts/*.sh
 chmod +x ~/.config/hypr/scripts/*.sh
 chmod +x ~/.config/quickshell/scripts/*.sh ~/.config/quickshell/scripts/*.py
 ```
+
+### Session services (keyring, polkit, VPN)
+
+Hyprland autostart runs [`session-services.sh`](.config/hypr/scripts/session-services.sh): **gnome-keyring** (Cursor encryption, NetworkManager VPN secrets) and **polkit-gnome** (authorization dialogs).
+
+Without keyring, Cursor shows “An OS keyring couldn't be identified…” and VPN passwords cannot be saved between connects.
+
+**Autologin on tty1:** openSUSE PAM only auto-starts gnome-keyring for GDM/SDDM (`only_if=gdm,…`), not for uwsm + Hyprland. The keyring stays **locked**, so Cursor, Quickshell Network (old builds), and VPN saves keep asking for a password. After `session-services.sh` is in autostart, run once:
+
+```bash
+chmod +x ~/.config/hypr/scripts/setup-keyring-autologin.sh
+~/.config/hypr/scripts/setup-keyring-autologin.sh
+```
+
+That stores your keyring password in `~/.config/suse-rice/unlock-keyring` (0600) so each session unlocks it automatically. Use the same password you would use for “Login keyring” in GNOME; on a fresh system it is often your Linux login password.
+
+VPN profiles under `/etc/NetworkManager/system-connections/` are **system-wide**. Every edit or connect then asks for the **root** password. Either:
+
+1. Install the rice polkit rule (recommended on a personal machine):
+
+```bash
+chmod +x ~/.config/hypr/scripts/install-polkit-rules.sh
+~/.config/hypr/scripts/install-polkit-rules.sh
+```
+
+2. Or in Quickshell **Network → VPN**, use **Copy to user** on a system profile, then connect using the `(user)` copy.
+
+After changing autostart or polkit, **log out and back in** (or reboot). Restart Cursor once keyring is running.
 
 ### Hyprland / tty1 autologin / UWSM
 

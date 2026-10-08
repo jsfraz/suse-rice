@@ -37,6 +37,11 @@ local function rcmAutostart(body)
 end
 
 hl.on("hyprland.start", function()
+    -- Secret Service (Cursor, NM VPN passwords) and polkit agent for user prompts.
+    hl.exec_cmd(rcmAutostart([=[
+        pgrep -f '[s]ession-services.sh' >/dev/null && exit 0
+        exec ~/.config/hypr/scripts/session-services.sh
+    ]=]))
     -- Set wallpaper (via uwsm so it runs as a session unit)
     -- hyprpaper IPC is not ready on the first hyprctl tick; retry until it is
     hl.exec_cmd(rcmAutostart([=[
@@ -106,6 +111,7 @@ end)
 
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
+hl.env("XDG_CURRENT_DESKTOP", "Hyprland")
 
 
 -----------------------

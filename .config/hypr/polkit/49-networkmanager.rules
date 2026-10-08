@@ -1,0 +1,12 @@
+// Allow the active local user to manage NetworkManager (user + system profiles).
+// Install: sudo cp ~/.config/hypr/polkit/49-networkmanager.rules /etc/polkit-1/rules.d/
+// Personal rice / single-user desktop — avoids root password on every VPN edit.
+
+polkit.addRule(function(action, subject) {
+    if (action.id.indexOf("org.freedesktop.NetworkManager.") !== 0) {
+        return;
+    }
+    if (subject.local && subject.active && subject.isInGroup("users")) {
+        return polkit.Result.YES;
+    }
+});

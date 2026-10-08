@@ -71,6 +71,7 @@ Item {
     property bool pickingVpn: false
     // Last nm.py action: drives error notification title (VPN vs Network).
     property bool notifyVpn: false
+    property bool silentRefresh: false
 
     function script() { return Config.scripts + "/nm.py" }
 
@@ -112,16 +113,20 @@ Item {
     function take(code, stdout, stderr) {
         busy = false
         scanning = false
+        var quiet = root.silentRefresh
+        root.silentRefresh = false
         var parsed = null
         try {
             parsed = JSON.parse(stdout)
         } catch (e) {
-            notifyFailure((stderr || stdout || "The network did not respond").trim())
+            if (!quiet)
+                notifyFailure((stderr || stdout || "The network did not respond").trim())
             return
         }
         if (!parsed.ok) {
             var err = parsed.error || "Action failed"
-            notifyFailure(err)
+            if (!quiet)
+                notifyFailure(err)
             if (parsed.needsAuth) {
                 notifyVpn = true
                 pendingVpnName = parsed.connection || pendingVpnName
@@ -137,7 +142,10 @@ Item {
     }
 
     function refresh() {
+        if (busy)
+            return
         notifyVpn = false
+        silentRefresh = true
         busy = true
         proc.run(["python3", script(), "status"])
     }
@@ -150,9 +158,22 @@ Item {
     }
 
     Component.onCompleted: {
-        refresh()
         editorProc.run(["sh", "-c", "command -v nm-connection-editor"])
         firewallProc.run(["sh", "-c", "command -v firewall-config"])
+    }
+
+    Timer {
+        id: refreshDebounce
+        interval: 80
+        onTriggered: root.refresh()
+    }
+
+    Connections {
+        target: Config.settingsWindow
+        function onVisibleChanged() {
+            if (Config.settingsWindow && Config.settingsWindow.visible)
+                refreshDebounce.restart()
+        }
     }
 
     Proc {
@@ -433,7 +454,21 @@ Item {
                             elide: Text.ElideRight
                         }
                         BodyText {
-                            text: (modelData.vpnType || "vpn") + (modelData.needsLogin ? "  ·  login" : "")
+                            text: (modelData.vpnType || "vpn")
+                                + (modelData.systemWide ? "  ·  system" : "")
+                                + (modelData.needsLogin ? "  ·  login" : "")
+                        }
+                    }
+                    AeroButton {
+                        text: "Copy to user"
+                        accent: false
+                        visible: modelData.systemWide === true
+                        enabled: !root.busy
+                        anchors.verticalCenter: parent.verticalCenter
+                        onClicked: {
+                            root.notifyVpn = true
+                            root.busy = true
+                            proc.run(["python3", root.script(), "rehome-vpn", modelData.name])
                         }
                     }
                     AeroButton {

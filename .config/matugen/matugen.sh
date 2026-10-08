@@ -34,10 +34,13 @@ rice_cache="${HOME}/.cache/suse-rice"
 mkdir -p "$rice_cache"
 printf '%s\n' "$icons" > "${rice_cache}/icon-theme"
 
-# GTK
-# gsettings list-recursively org.gnome.desktop.interface
-# gsettings set org.gnome.desktop.interface gtk-theme 'TODO'
-# gsettings set org.gnome.desktop.interface color-scheme 'prefer-TODO'
+# GTK / libadwaita apps (Cursor, nm-connection-editor, zenity, …)
+if [ "$brightness_mode" = dark ]; then
+    color_scheme=prefer-dark
+else
+    color_scheme=prefer-light
+fi
+gsettings set org.gnome.desktop.interface color-scheme "$color_scheme"
 gsettings set org.gnome.desktop.interface icon-theme $icons
 
 # QT
