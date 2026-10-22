@@ -100,7 +100,7 @@ hl.on("hyprland.start", function()
     -- Timeouts come from rcm (idleKbd, idleScreensaver, idleLock). The generated
     -- file lives outside the repo so saving them does not dirty hypridle.conf.
     hl.exec_cmd(rcmAutostart([=[~/.config/quickshell/scripts/apply-idle.sh --if-absent]=]))
-    -- Settings window stays hidden until Super+N (qs ipc call settings toggle).
+    -- Settings window stays hidden until Super+D (qs ipc call settings toggle).
     hl.exec_cmd(rcmAutostart([=[
         pgrep -x qs >/dev/null && exit 0
         . "${HOME}/.config/quickshell/scripts/quickshell-env.sh"

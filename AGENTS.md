@@ -1,40 +1,84 @@
-Tento dokument slouží jako absolutní zdroj pravdy pro stylování a generování uživatelského rozhraní v estetice Frutiger Aero. Zcela ignorujte současné trendy plochého designu (Flat Design) nebo temného minimalismu. Cílem je vytvořit techno-optimistický, hmatatelný a trojrozměrný vizuál evokující technologický rozmach počátku milénia.
-1. Světlo, Stíny a Prostorová Hloubka
+This document is the absolute source of truth for styling and generating user interfaces in the Frutiger Aero aesthetic. Completely ignore current trends of flat design or dark minimalism. The goal is a techno-optimistic, tangible, three-dimensional visual evoking the technological boom of the early millennium.
 
-Prvky UI nesmí nikdy ležet naplocho na obrazovce. Každý kontejner, tlačítko i panel musí působit jako fyzický objekt, na který dopadá reálné světlo z virtuálního zdroje.
+Applies to all UI this repo produces: Quickshell QML (`.config/quickshell/components/`, `pages/`), waybar (`style.css`), rofi (`*.rasi`), kitty, hyprlock and avizo.
 
-    Vržené stíny (Drop Shadows): Používejte měkké, široce rozptýlené stíny pro oddělení aktivních oken a widgetů od plochy, čímž vytvoříte silný dojem vznášení se v prostoru.
+## 1. Light, Shadows, and Spatial Depth
 
-    Vnitřní záře a odlesky (Inner Highlights): Horní okraje tlačítek a oken musí mít jemnou poloprůhlednou bílou linku simulující odraz světla od fyzické hrany materiálu.
+UI elements must never lie flat on the screen. Every container, button, and panel must feel like a physical object struck by real light from a virtual light source.
 
-    Zkosení a reliéf (Bevel & Emboss): Interaktivní prvky musí opticky vystupovat z obrazovky. Při interakci (kliknutí) se prvek musí vizuálně "promáčknout" hlouběji do vrstvy pod ním.
+- **Drop shadows**: Use soft, widely diffused shadows to separate active windows and widgets from the surface, creating a strong impression of floating in space.
+- **Inner highlights**: The top edges of buttons and windows must carry a subtle semi-transparent white line simulating light reflecting off a physical edge of the material.
+- **Bevel & emboss**: Interactive elements must visually protrude from the screen. On interaction (click) the element must visually "sink" deeper into the layer beneath it.
 
-2. Sklo a Materiály (Aero Glass)
+## 2. Glass and Materials (Aero Glass)
 
-Rozhraní musí dýchat a propouštět prostředí pod ním. Využívejte skeuomorfní textury evokující reálný svět, zejména vodu, čisté sklo a vysoce leštěný akryl.
+The interface must breathe and transmit the environment beneath it. Use skeuomorphic textures evoking the real world, especially water, clean glass, and highly polished acrylic.
 
-    Poloprůhlednost s rozmazáním (Frosted Glass): Hlavní panely a kontextová menu musí být poloprůhledné (opacity 40–60 %) se silným efektem rozmazání pozadí za nimi (blur), aby obsah zůstal čitelný.
+- **Frosted glass**: Main panels and context menus must be semi-transparent (opacity 40–60 %) with a strong background blur behind them so the content stays legible.
+- **Glossy overlays**: Apply sharp linear gradients to button backgrounds (top half significantly lighter than the bottom) to create the effect of curved glass or a gel capsule.
+- **Organic motifs**: Subtly incorporate textures referring to nature and energy – fine bubbles, transparent wavelets, or lens flares.
 
-    Lesklé překryvy (Glossy Overlays): Na pozadí tlačítek aplikujte ostré lineární přechody (horní polovina výrazně světlejší než dolní), aby vznikl efekt zakřiveného skla nebo gelové kapsle.
+## 3. Color Palette and Gradients
 
-    Organické motivy: Do rozhraní nenápadně zakomponujte textury odkazující na přírodu a energii – jemné bubliny, průhledné vlnovky nebo odlesky objektivu (lens flares).
+Color must radiate energy, purity, and futurist optimism. Monochromatic or faded colors are strictly forbidden.
 
-3. Barevná Paleta a Přechody
+- **Air and water**: The dominant and supporting colors are vivid azure, sky blue, turquoise, and saturated spring green.
+- **Brilliant white**: Crystal-clear white is used heavily for text, icons on colored backgrounds, and for drawing light reflections.
+- **Complex gradients**: Skip solid colors entirely. Build every background from multiple radial and linear gradients simulating light refraction.
 
-Barevnost musí vyzařovat energii, čistotu a futuristický optimismus. Monochromatické nebo vybledlé barvy jsou striktně zakázány.
+## 4. Typography, Geometry, and Icons
 
-    Vzduch a Voda: Dominantními a nosnými barvami jsou zářivá azurová, nebesky modrá, tyrkysová a sytá jarní zelená.
+The morphology of the whole system must be human and maximally fluid. Sharp, aggressive edges break the illusion.
 
-    Zářivě bílá: Křišťálově čistá bílá se používá masivně pro texty, ikony na barevném pozadí a pro kreslení světelných odlesků.
+- **Humanist typography**: Clean, highly legible sans-serif fonts with open, friendly curves are required (Source Sans 3 is the repo default). Text must never look too thin or fragile.
+- **Rounded corners**: Absolutely every element, from the largest main window down to the smallest volume slider, must have visibly rounded corners.
+- **Skeuomorphic iconography**: Icons must represent real physical objects, ideally with three-dimensional perspective, their own shadows, and an unlimited palette of detailed colors.
 
-    Komplexní gradienty: Zcela vynechejte jednolité barvy (solid colors). Všechna pozadí tvořte pomocí vícenásobných radiálních a lineárních přechodů simulujících lom světla.
+---
 
-4. Typografie, Geometrie a Ikony
+# Working in this repo
 
-Tvarosloví celého systému musí být lidské a maximálně plynulé. Ostré a agresivní hrany narušují iluzi.
+- openSUSE Tumbleweed + Hyprland 0.56 rice. This repo **is** the live configuration: `~/.config/{hypr,quickshell,waybar,kitty,rofi,matugen,darkman}` and `~/.local/share/darkman` are symlinks into this tree, so edits take effect in the running session immediately.
+- There is no build, lint, or CI for the rice. The only tests are in `rcm/`.
+- Ask before running `sudo`, `zypper`, `build_*.sh`, or `install_*.sh` – they install to `/usr/local` or `~/.local/share`. Ask before destructive git operations inside vendored clones.
 
-    Humanistická typografie: Vyžadují se čisté, vysoce čitelné bezpatkové fonty (sans-serif) s otevřenými a přátelskými křivkami. Texty nesmí působit příliš tence a křehce.
+## Layout
 
-    Zaoblené hrany (Rounded Corners): Úplně každý prvek, od největšího hlavního okna až po ten nejmenší posuvník hlasitosti, musí mít viditelně zakulacené rohy.
+- `.config/hypr/` – `hyprland.lua` (Hyprland's Lua API, not `hyprland.conf`): monitors, look, keybinds, and autostart units. Each autostart unit seeds `rcm` fallbacks in `rcmAutostart()`. Helper scripts in `scripts/`.
+- `.config/matugen/` – theme pipeline: `matugen.sh` resolves the palette and runs `matugen`; `config.toml` maps templates to output files.
+- `.config/quickshell/` – Aero settings app (`qs`, package `noctalia-qs`). `SettingsWindow.qml` lists the pages; `pages/` and `components/` hold QML; `scripts/` holds Python/shell backends called through `Proc.qml` (`proc.run([...])`).
+- `.config/waybar/` – `config.jsonc`, `style.css`, custom GTK CFFI modules (`cffi/slides.c`, `modules/menucolor.c`) with prebuilt `.so` committed.
+- `rcm/` – Go CLI config store (`~/.config/rcm/config.json`).
+- `patches/` – patches reapplied by the build scripts after each `git reset --hard`.
+- Generated by matugen – never hand-edit: `hypr/colors.lua`, `hypr/hyprlock-colors.conf`, `kitty/colors.conf`, `rofi/colors.rasi`, `waybar/colors.css`.
 
-    Skeuomorfní ikonografie: Ikony v rozhraní musí představovat reálné fyzické objekty, ideálně s trojrozměrnou perspektivou, vlastními stíny a neomezenou paletou detailních barev.
+## Commands
+
+```bash
+~/.config/matugen/matugen.sh      # regenerate every theme file from the wallpaper/color
+hyprctl reload                    # apply hyprland.lua changes
+hyprctl configerrors              # verify the reload parsed cleanly
+qs log                            # running Quickshell log (QML errors, ReferenceError)
+qs ipc call settings toggle       # same as Super+D
+cd rcm && go test ./...           # whole suite
+cd rcm && go test -run TestConfigResolve ./...   # single test
+```
+
+Rebuild a waybar native after editing its `.c` (the committed `.so` are x86_64 builds):
+
+```bash
+gcc -shared -fPIC -o .config/waybar/cffi/libslides.so .config/waybar/cffi/slides.c $(pkg-config --cflags --libs gtk+-3.0)
+gcc -shared -fPIC -o .config/waybar/modules/libmenucolor.so .config/waybar/modules/menucolor.c $(pkg-config --cflags --libs gtk+-3.0)
+```
+
+## Adding an `rcm` setting
+
+Seed the fallback in `hyprland.lua`'s `rcmAutostart()` string, read it with `rcm get <field>`, and mirror it in the Quickshell page plus the `apply-*.sh` script that consumes it. `rcm get` returns the fallback but never copies it into `value`; fallbacks are re-seeded on every Hyprland start.
+
+## Gotchas
+
+- `.config/waybar/config.jsonc` hardcodes `/home/razj` absolute `.so` paths – keep that in mind before "fixing" them.
+- The committed `.so` files are prebuilt binaries; always regenerate from the adjacent `.c`.
+- Vendored clones (`avizo/`, `darkman/`, `crystal-remix-icon-theme-color-variants/`, `Win7Bulid-cursors-plus-dark/`) are gitignored and are re-cloned or reset `--hard` by their build scripts. Never make committed changes inside them.
+- `README.md` is the fresh-machine setup guide; update it whenever a dependency, script, or autostart unit is added.
+- `build_darkman.sh` fails if `darkman/` already exists – it is a one-shot bootstrap, not idempotent.
