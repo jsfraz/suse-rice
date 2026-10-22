@@ -79,6 +79,6 @@ Seed the fallback in `hyprland.lua`'s `rcmAutostart()` string, read it with `rcm
 
 - `.config/waybar/config.jsonc` hardcodes `/home/razj` absolute `.so` paths – keep that in mind before "fixing" them.
 - The committed `.so` files are prebuilt binaries; always regenerate from the adjacent `.c`.
-- Vendored clones (`avizo/`, `darkman/`, `crystal-remix-icon-theme-color-variants/`, `Win7Bulid-cursors-plus-dark/`) are gitignored and are re-cloned or reset `--hard` by their build scripts. Never make committed changes inside them.
+- Vendored clones (`avizo/`, `darkman/`, `crystal-remix-icon-theme-color-variants/`, `Win7Bulid-cursors-plus-dark/`, `xapp-symbolic-icons/`) are gitignored and are re-cloned or reset `--hard` by their build scripts. Never make committed changes inside them.
 - `README.md` is the fresh-machine setup guide; update it whenever a dependency, script, or autostart unit is added.
 - `build_darkman.sh` fails if `darkman/` already exists – it is a one-shot bootstrap, not idempotent.

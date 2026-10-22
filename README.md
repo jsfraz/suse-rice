@@ -63,6 +63,7 @@ your_username ALL=(ALL) NOPASSWD: ALL
 - [nemo](https://github.com/linuxmint/nemo)
 - [Crystal Remix icon theme — color variants](https://github.com/jsfraz/crystal-remix-icon-theme-color-variants)
 - [Win7Bulid cursors](https://github.com/jsfraz/Win7Bulid-cursors-plus-dark) (light and dark)
+- [XSI symbolic icons](https://github.com/xapp-project/xapp-symbolic-icons) (Nemo's toolbar, sidebar and view buttons)
 - [darkman](https://gitlab.com/WhyNotHugo/darkman)
 - [waybar](https://github.com/alexays/waybar)
 - [quickshell](https://quickshell.org/) (`qs`; on openSUSE the package that provides it is `noctalia-qs`)
@@ -295,6 +296,17 @@ Clones [Win7Bulid-cursors-plus-dark](https://github.com/jsfraz/Win7Bulid-cursors
 chmod +x ./install_win7bulid_cursors.sh
 ./install_win7bulid_cursors.sh
 ```
+
+### XSI symbolic icons
+
+Nemo 6 requests `xsi-*-symbolic` icons for its toolbar, sidebar and view buttons. XSI is a separate icon set that no desktop theme ships, and openSUSE does not package it, so those buttons show the "image-missing" placeholder. The script clones it and installs the SVGs into the `hicolor` fallback theme, which every icon theme inherits:
+
+```bash
+chmod +x ./install_xsi_icons.sh
+./install_xsi_icons.sh
+```
+
+Then run `nemo -q` and reopen it.
 
 ### darkman
 
