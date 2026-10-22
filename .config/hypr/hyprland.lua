@@ -93,6 +93,10 @@ hl.on("hyprland.start", function()
     ]=]))
     -- Autostart
     hl.exec_cmd(rcmAutostart([=[~/.config/hypr/scripts/autostart-sync-apps.sh]=]))
+    hl.exec_cmd(rcmAutostart([=[
+        pgrep -f '[m]egasync-dialog-fix.sh' >/dev/null && exit 0
+        exec ~/.config/hypr/scripts/megasync-dialog-fix.sh
+    ]=]))
     -- Timeouts come from rcm (idleKbd, idleScreensaver, idleLock). The generated
     -- file lives outside the repo so saving them does not dirty hypridle.conf.
     hl.exec_cmd(rcmAutostart([=[~/.config/quickshell/scripts/apply-idle.sh --if-absent]=]))
@@ -374,6 +378,48 @@ hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("playerctl previous"),   { locked = tr
 -- See https://wiki.hypr.land/Configuring/Basics/Window-Rules/
 -- and https://wiki.hypr.land/Configuring/Basics/Workspace-Rules/
 
+-- MEGAsync shrinks secondary dialogs to width 1 after window rules run (XWayland).
+local function megasyncDialogNeedsFix(win)
+    if win.class ~= "MEGAsync" then
+        return false
+    end
+    local title = win.title or ""
+    if title == "" or title == "MEGAsync" then
+        return false
+    end
+    local w = win.size and win.size.w or 0
+    return w < 200
+end
+
+local function fixMegasyncDialog(win)
+    if not megasyncDialogNeedsFix(win) then
+        return
+    end
+    hl.dispatch(hl.dsp.window.float({ action = "set", window = win }))
+    hl.dispatch(hl.dsp.window.center({ window = win }))
+    hl.dispatch(hl.dsp.window.pin({ action = "set", window = win }))
+    hl.dispatch(hl.dsp.window.resize({ x = 520, y = 640, window = win }))
+    hl.dispatch(hl.dsp.focus({ window = win }))
+end
+
+local function megasyncDialogSweep()
+    for _, current in ipairs(hl.get_windows({ class = "MEGAsync" })) do
+        fixMegasyncDialog(current)
+    end
+end
+
+local function scheduleMegasyncDialogFix(win)
+    if win.class ~= "MEGAsync" then
+        return
+    end
+    for _, delay in ipairs({ 1, 50, 200, 500, 1000 }) do
+        hl.timer(megasyncDialogSweep, { timeout = delay, type = "oneshot" })
+    end
+end
+
+hl.on("window.open", scheduleMegasyncDialogFix)
+hl.on("window.title", scheduleMegasyncDialogFix)
+
 -- Example window rules that are useful
 
 local suppressMaximizeRule = hl.window_rule({
@@ -499,10 +545,29 @@ hl.window_rule({
     center = true,
 })
 
--- MEGAsync transfer window. The client asks for 402×564, but tiling stretches
--- the transparent surface across the whole workspace.
+-- MEGAsync (Qt5 / XWayland). Secondary dialogs ("Add sync", login, …) open at
+-- width 1 and hidden on Hyprland until the compositor forces a sane float size.
 hl.window_rule({
-    name  = "megasync",
+    name           = "megasync-xwayland",
+    match          = { class = "^MEGAsync$", xwayland = true },
+    float          = true,
+    center         = true,
+    allows_input   = true,
+})
+
+hl.window_rule({
+    name   = "megasync-dialog",
+    match  = { class = "^MEGAsync$", title = "^Add sync$" },
+    float  = true,
+    center = true,
+    pin    = true,
+    size   = "520 640",
+})
+
+-- Transfer window. The client asks for 402×564, but tiling stretches the
+-- transparent surface across the whole workspace.
+hl.window_rule({
+    name  = "megasync-main",
     match = { class = "^MEGAsync$", title = "^MEGAsync$" },
     float = true,
     size  = "402 564",

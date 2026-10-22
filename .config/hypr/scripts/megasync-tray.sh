@@ -22,4 +22,14 @@ command -v megasync >/dev/null 2>&1 || exit 0
 pgrep -x megasync >/dev/null 2>&1 && exit 0
 
 wait_for_tray_host || true
-START_MEGASYNC_IN_BACKGROUND=1 exec megasync >/dev/null 2>&1
+
+megasync_launch() {
+    # Native Qt Wayland avoids the 1 px-wide hidden dialogs on Hyprland (MEGA #1150).
+    if [ -f /usr/lib64/qt5/plugins/platforms/libqwayland-generic.so ]; then
+        megasync -platform wayland
+    else
+        megasync
+    fi
+}
+
+START_MEGASYNC_IN_BACKGROUND=1 exec megasync_launch >/dev/null 2>&1

@@ -102,7 +102,7 @@ your_username ALL=(ALL) NOPASSWD: ALL
 - [gparted](https://gitlab.gnome.org/GNOME/gparted)
 - [obs-studio](https://github.com/obsproject/obs-studio)
 - [rustdesk](https://github.com/rustdesk/rustdesk)
-- [MEGA Desktop App](https://mega.io/desktop#download)
+- [MEGA Desktop App](https://mega.io/desktop#download) and [libqt5-qtwayland](https://software.opensuse.org/package/libqt5-qtwayland) (native Qt Wayland for MEGAsync; without it Hyprland window rules in `hyprland.lua` keep dialogs usable under XWayland)
 - [virtualbox](https://www.virtualbox.org/)
 - [blender](https://store.steampowered.com/app/365670/Blender/)
 - [krita](https://github.com/kde/krita)

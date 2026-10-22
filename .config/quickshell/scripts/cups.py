@@ -2,6 +2,7 @@
 """CUPS printer list and a small set of lpadmin actions. Prints JSON."""
 
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -9,6 +10,20 @@ import sys
 
 NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$")
 URI_RE = re.compile(r"^(ipp|ipps|socket|lpd|usb)://\S+$")
+
+# openSUSE keeps lpadmin, cupsenable and cupsdisable in /usr/sbin, which is
+# absent from a normal user PATH. lpstat still lives in /usr/bin, so status
+# succeeds and only the admin actions report "CUPS is not installed."
+def extend_path():
+    extra = ["/usr/local/sbin", "/usr/sbin", "/sbin"]
+    parts = [part for part in os.environ.get("PATH", "").split(":") if part]
+    for directory in extra:
+        if directory not in parts:
+            parts.append(directory)
+    os.environ["PATH"] = ":".join(parts)
+
+
+extend_path()
 
 
 def run(args):
