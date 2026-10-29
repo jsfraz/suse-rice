@@ -38,11 +38,8 @@ case "$saver" in
 esac
 
 # Same accent as the rest of the rice. See matugen.sh.
-forced_color=$(rcm get forcedColor)
-if [ "$forced_color" = true ]; then
-    color=$(rcm get color)
-    color_hex=$(python3 "$color_utils" -color2hex "$color")
-else
+auto_color=$(rcm get autoColor)
+if [ "$auto_color" = true ]; then
     wallpaper=$(rcm get wallpaper)
     wallpaper="${wallpaper/#\~/$HOME}"
     color_from_wallpaper=$(rcm get colorFromWallpaper)
@@ -53,6 +50,9 @@ else
         color=$(python3 "$color_utils" -hex2color "$color_hex")
         color_hex=$(python3 "$color_utils" -color2hex "$color")
     fi
+else
+    color=$(rcm get color)
+    color_hex=$(python3 "$color_utils" -color2hex "$color")
 fi
 
 lighter_hex=$(python3 -c 'import sys; sys.path.insert(0, sys.argv[1]); import color_utils; print(color_utils.lighten_hex_color(sys.argv[2]))' \

@@ -77,9 +77,9 @@ def status():
         "wallpaper": rcm_get("wallpaper", "/usr/share/hypr/wall0.png"),
         "color": rcm_get("color", "blue"),
         "colors": COLORS,
-        "forcedColor": as_bool(rcm_get("forcedColor", "false")),
+        "autoColor": as_bool(rcm_get("autoColor", "true")),
         "colorFromWallpaper": as_bool(rcm_get("colorFromWallpaper", "false")),
-        "forcedBrightnessMode": as_bool(rcm_get("forcedBrightnessMode", "false")),
+        "autoBrightnessMode": as_bool(rcm_get("autoBrightnessMode", "true")),
         "brightnessMode": rcm_get("brightnessMode", "light"),
         "screensaver": saver,
         "screensavers": options,
@@ -104,9 +104,9 @@ def apply(data):
         fail("missing wallpaper")
     rcm_set("wallpaper", wallpaper)
     rcm_set("color", color)
-    rcm_set("forcedColor", bool(data.get("forcedColor")))
+    rcm_set("autoColor", bool(data.get("autoColor")))
     rcm_set("colorFromWallpaper", bool(data.get("colorFromWallpaper")))
-    rcm_set("forcedBrightnessMode", bool(data.get("forcedBrightnessMode")))
+    rcm_set("autoBrightnessMode", bool(data.get("autoBrightnessMode")))
     rcm_set("brightnessMode", mode)
     rcm_set("screensaver", saver)
 

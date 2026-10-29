@@ -5,9 +5,9 @@ Item {
     id: root
     property string wallpaper: ""
     property string colorName: "blue"
-    property bool forcedColor: false
+    property bool autoColor: true
     property bool colorFromWallpaper: false
-    property bool forcedBrightnessMode: false
+    property bool autoBrightnessMode: true
     property string brightnessMode: "light"
     property string screensaver: "cycle"
     property var colors: ["red", "orange", "yellow", "green", "teal", "blue", "purple", "pink"]
@@ -29,9 +29,9 @@ Item {
         proc.run(["python3", script(), "apply", JSON.stringify({
             wallpaper: wallpaper,
             color: colorName,
-            forcedColor: forcedColor,
+            autoColor: autoColor,
             colorFromWallpaper: colorFromWallpaper,
-            forcedBrightnessMode: forcedBrightnessMode,
+            autoBrightnessMode: autoBrightnessMode,
             brightnessMode: brightnessMode,
             screensaver: screensaver
         })])
@@ -69,9 +69,9 @@ Item {
         }
         wallpaper = parsed.wallpaper
         colorName = parsed.color
-        forcedColor = parsed.forcedColor
+        autoColor = parsed.autoColor
         colorFromWallpaper = parsed.colorFromWallpaper
-        forcedBrightnessMode = parsed.forcedBrightnessMode
+        autoBrightnessMode = parsed.autoBrightnessMode
         brightnessMode = parsed.brightnessMode
         screensaver = parsed.screensaver
         colors = parsed.colors
@@ -130,26 +130,26 @@ Item {
                 BodyText {
                     width: parent.width - 80
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "Force color"
+                    text: "Automatic color"
                 }
                 AeroSwitch {
-                    checked: root.forcedColor
+                    checked: root.autoColor
                     onClicked: {
-                        root.forcedColor = !root.forcedColor
+                        root.autoColor = !root.autoColor
                         root.commit()
                     }
                 }
             }
             BodyText {
                 width: parent.width
-                text: root.forcedColor
-                      ? "The accent comes from the chosen color."
-                      : "Without forcing, the accent is taken from the wallpaper."
+                text: root.autoColor
+                      ? "The accent is taken from the wallpaper."
+                      : "The accent comes from the chosen color."
             }
             AeroCombo {
                 width: parent.width
-                opacity: root.forcedColor ? 1 : 0.45
-                enabled: root.forcedColor
+                opacity: root.autoColor ? 0.45 : 1
+                enabled: !root.autoColor
                 labels: root.colors
                 currentIndex: Math.max(0, root.colors.indexOf(root.colorName))
                 onPicked: (choice) => {
@@ -170,7 +170,7 @@ Item {
                     text: "Exact color from the wallpaper"
                 }
                 AeroSwitch {
-                    enabled: !root.forcedColor
+                    enabled: root.autoColor
                     checked: root.colorFromWallpaper
                     onClicked: {
                         root.colorFromWallpaper = !root.colorFromWallpaper
@@ -189,28 +189,28 @@ Item {
                 BodyText {
                     width: parent.width - 80
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "Force mode"
+                    text: "Automatic mode"
                 }
                 AeroSwitch {
-                    checked: root.forcedBrightnessMode
+                    checked: root.autoBrightnessMode
                     onClicked: {
-                        root.forcedBrightnessMode = !root.forcedBrightnessMode
+                        root.autoBrightnessMode = !root.autoBrightnessMode
                         root.commit()
                     }
                 }
             }
             BodyText {
                 width: parent.width
-                text: root.forcedBrightnessMode ? "The mode uses the setting here." : "The mode follows darkman by time of day."
+                text: root.autoBrightnessMode ? "The mode follows darkman by time of day." : "The mode uses the setting below."
             }
             Row {
                 spacing: 8
-                opacity: root.forcedBrightnessMode ? 1 : 0.4
+                opacity: root.autoBrightnessMode ? 0.4 : 1
                 AeroButton {
                     text: "Light"
                     accent: false
                     selected: root.brightnessMode === "light"
-                    enabled: root.forcedBrightnessMode
+                    enabled: !root.autoBrightnessMode
                     onClicked: {
                         if (root.brightnessMode === "light")
                             return
@@ -222,7 +222,7 @@ Item {
                     text: "Dark"
                     accent: false
                     selected: root.brightnessMode === "dark"
-                    enabled: root.forcedBrightnessMode
+                    enabled: !root.autoBrightnessMode
                     onClicked: {
                         if (root.brightnessMode === "dark")
                             return

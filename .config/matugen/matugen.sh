@@ -14,13 +14,13 @@ color_hex=$("$rice_color" --hex)
 rcm set color "$color"
 
 # brightness mode
-forced_brightness_mode=$(rcm get forcedBrightnessMode)
-if [ $forced_brightness_mode = true ]; then
-    # brightness mode set by force
-    brightness_mode=$(rcm get brightnessMode)
-else
+auto_brightness_mode=$(rcm get autoBrightnessMode)
+if [ "$auto_brightness_mode" = true ]; then
     # brightness mode based on darkman
     brightness_mode=$(darkman get)
+else
+    # brightness mode set by hand
+    brightness_mode=$(rcm get brightnessMode)
 fi
 
 # matugen

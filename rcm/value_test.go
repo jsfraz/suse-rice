@@ -230,7 +230,7 @@ func TestConfigFromJSON(t *testing.T) {
 }
 
 func TestParseFieldValuePairs(t *testing.T) {
-	pairs, err := parseFieldValuePairs([]string{"color", "blue", "forcedColor", "false"}, "usage")
+	pairs, err := parseFieldValuePairs([]string{"color", "blue", "autoColor", "false"}, "usage")
 	if err != nil {
 		t.Fatalf("parseFieldValuePairs: %v", err)
 	}

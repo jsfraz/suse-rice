@@ -31,7 +31,7 @@ local appLauncher = "~/.config/quickshell/scripts/app-launcher.sh"
 local function rcmAutostart(body)
     return string.format([=[uwsm app -- sh -c '
         export PATH="$PATH:/usr/local/bin:${HOME}/.local/bin"
-        rcm set-fallback color blue wallpaper /usr/share/hypr/wall0.png keyboard cz keyboardVariant - monitors - idleKbd 150 idleScreensaver 600 idleLock 3600 forcedColor false colorFromWallpaper false forcedBrightnessMode false brightnessMode light screensaver cycle sunsetFollowDarkman true sunsetOn false sunsetTemperature 4000
+        rcm set-fallback color blue wallpaper /usr/share/hypr/wall0.png keyboard cz keyboardVariant - monitors - idleKbd 150 idleScreensaver 600 idleLock 3600 autoColor true colorFromWallpaper false autoBrightnessMode true brightnessMode light screensaver cycle sunsetFollowDarkman true sunsetOn false sunsetTemperature 4000
         %s
     ']=], body)
 end

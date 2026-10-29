@@ -293,7 +293,7 @@ chmod +x ./install_crystal_remix.sh
 
 ### Win7Bulid cursors
 
-Clones [Win7Bulid-cursors-plus-dark](https://github.com/jsfraz/Win7Bulid-cursors-plus-dark) and installs both variants into `~/.local/share/icons/`. Light mode uses `Win7Bulid-cursors`, dark mode uses `Win7Bulid-cursors-dark`. The switch follows the same brightness mode as the rest of the theme (`forcedBrightnessMode`, otherwise darkman) in `matugen.sh`.
+Clones [Win7Bulid-cursors-plus-dark](https://github.com/jsfraz/Win7Bulid-cursors-plus-dark) and installs both variants into `~/.local/share/icons/`. Light mode uses `Win7Bulid-cursors`, dark mode uses `Win7Bulid-cursors-dark`. The switch follows the same brightness mode as the rest of the theme (automatic via darkman, or the manual `brightnessMode`) in `matugen.sh`.
 
 ```bash
 chmod +x ./install_win7bulid_cursors.sh
